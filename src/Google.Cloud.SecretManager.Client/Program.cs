@@ -46,7 +46,7 @@ try
         .GetRequiredService<CommandSelector>()
         .Get();
     
-    await cliHandler.Run(cts.Token);
+    await cliHandler.Handle(cts.Token);
 }
 catch (Exception e)
 {

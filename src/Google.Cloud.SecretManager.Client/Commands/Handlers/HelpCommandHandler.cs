@@ -18,7 +18,7 @@ public class HelpCommandHandler : ICommandHandler
 
     public string Description => "";
 
-    public Task Run(CancellationToken cancellationToken)
+    public Task Handle(CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"Supported commands:");
 

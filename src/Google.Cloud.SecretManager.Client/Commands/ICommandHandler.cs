@@ -6,5 +6,5 @@ public interface ICommandHandler
 
     string Description { get; }
 
-    Task Run(CancellationToken cancellationToken);
+    Task Handle(CancellationToken cancellationToken);
 }
