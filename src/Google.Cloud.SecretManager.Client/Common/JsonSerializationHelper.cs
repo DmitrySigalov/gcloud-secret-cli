@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Google.Cloud.SecretManager.Client.Helpers;
+namespace Google.Cloud.SecretManager.Client.Common;
 
 public static class JsonSerializationHelper
 {

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;
+namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 
 public static class StartupExtensions
 {

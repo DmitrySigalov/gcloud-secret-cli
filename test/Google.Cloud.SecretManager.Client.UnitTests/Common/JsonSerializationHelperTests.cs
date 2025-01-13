@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Google.Cloud.SecretManager.Client.Helpers;
+namespace Google.Cloud.SecretManager.Client.Common;
 
 public class JsonSerializationHelperTests
 {

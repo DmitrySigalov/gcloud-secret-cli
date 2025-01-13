@@ -1,5 +1,5 @@
 using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
-using Google.Cloud.SecretManager.Client.Helpers;
+using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
