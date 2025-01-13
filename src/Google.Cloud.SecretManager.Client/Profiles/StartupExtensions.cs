@@ -5,7 +5,7 @@ namespace Google.Cloud.SecretManager.Client.Profiles;
 
 public static class StartupExtensions
 {
-    public static IServiceCollection AddUserRuntimeServices(
+    public static IServiceCollection AddProfileServices(
         this IServiceCollection serviceCollection)
     {
         serviceCollection
