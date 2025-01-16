@@ -9,7 +9,7 @@ public static class StartupExtensions
         this IServiceCollection serviceCollection)
     {
         serviceCollection
-            .AddSingleton<IProfileConfigProvider, ProfileConfigProvider>();
+            .AddSingleton<IProfileConfigProvider, ProfileConfigProviderImpl>();
 
         return serviceCollection;
     }

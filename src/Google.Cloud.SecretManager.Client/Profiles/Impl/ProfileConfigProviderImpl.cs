@@ -7,18 +7,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Google.Cloud.SecretManager.Client.Profiles.Impl;
 
-public class ProfileConfigProvider : IProfileConfigProvider
+public class ProfileConfigProviderImpl : IProfileConfigProvider
 {
     private readonly IUserFilesProvider _userFilesProvider;
 
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    private readonly ILogger<ProfileConfigProvider> _logger;
+    private readonly ILogger<ProfileConfigProviderImpl> _logger;
 
-    public ProfileConfigProvider(
+    public ProfileConfigProviderImpl(
         IUserFilesProvider userFilesProvider,
         IEnvironmentVariablesProvider environmentVariablesProvider,
-        ILogger<ProfileConfigProvider> logger)
+        ILogger<ProfileConfigProviderImpl> logger)
     {
         _userFilesProvider = userFilesProvider;
 

@@ -17,7 +17,7 @@ public static class StartupExtensions
 
         serviceCollection
             .AddSingleton(userParameters)
-            .AddSingleton<IUserFilesProvider, UserFilesProvider>();
+            .AddSingleton<IUserFilesProvider, UserFilesProviderImpl>();
 
         return serviceCollection;
     }

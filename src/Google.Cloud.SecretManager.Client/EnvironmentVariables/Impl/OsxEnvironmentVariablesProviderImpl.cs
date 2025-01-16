@@ -5,17 +5,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 
-public class OsxEnvironmentVariablesProvider : IEnvironmentVariablesProvider
+public class OsxEnvironmentVariablesProviderImpl : IEnvironmentVariablesProvider
 {
     private readonly IUserFilesProvider _userFilesProvider;
 
-    private readonly ILogger<OsxEnvironmentVariablesProvider> _logger;
+    private readonly ILogger<OsxEnvironmentVariablesProviderImpl> _logger;
 
     private SortedDictionary<string, string> _loadedDescriptor = null;
 
-    public OsxEnvironmentVariablesProvider(
+    public OsxEnvironmentVariablesProviderImpl(
         IUserFilesProvider userFilesProvider,
-        ILogger<OsxEnvironmentVariablesProvider> logger)
+        ILogger<OsxEnvironmentVariablesProviderImpl> logger)
     {
         _userFilesProvider = userFilesProvider;
 
