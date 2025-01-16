@@ -1,4 +1,4 @@
-using Google.Cloud.SecretManager.Client.Helpers;
+using Google.Cloud.SecretManager.Client.Common;
 using Xunit;
 
 namespace Google.Cloud.SecretManager.Client.Profiles;

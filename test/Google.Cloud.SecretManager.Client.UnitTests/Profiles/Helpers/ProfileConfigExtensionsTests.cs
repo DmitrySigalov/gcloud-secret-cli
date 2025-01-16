@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Google.Cloud.SecretManager.Client.Profiles.Extensions;
+namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
 public class ProfileConfigExtensionsTests
 {

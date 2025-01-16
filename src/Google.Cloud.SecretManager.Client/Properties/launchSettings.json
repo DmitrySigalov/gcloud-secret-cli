@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Google.Cloud.SecretManager.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "environmentVariables": {
+        "USER_FOLDER_PATH": "." // Using for the debugging only
+      }
+    }
+  }
+}
