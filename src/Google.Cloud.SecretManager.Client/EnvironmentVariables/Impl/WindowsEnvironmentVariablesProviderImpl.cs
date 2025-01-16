@@ -1,8 +1,8 @@
 using Microsoft.Win32;
 
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Services;
+namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 
-public class WindowsEnvironmentVariablesProvider : IEnvironmentVariablesProvider
+public class WindowsEnvironmentVariablesProviderImpl : IEnvironmentVariablesProvider
 {
     public ISet<string> GetNames(string baseName = null)
     {

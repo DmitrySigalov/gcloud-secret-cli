@@ -1,7 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using Google.Cloud.SecretManager.Client.Commands;
+﻿using Google.Cloud.SecretManager.Client.Commands;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
+using Google.Cloud.SecretManager.Client.GCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +31,7 @@ services
 
 services
     .AddCommands()
+    .AddGoogleCloudServices()
     .AddUserRuntimeServices(args)
     .AddEnvironmentVariablesServices()
     .AddProfileServices();

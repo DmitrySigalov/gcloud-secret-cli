@@ -1,4 +1,4 @@
-using Google.Cloud.SecretManager.Client.Profiles.Services;
+using Google.Cloud.SecretManager.Client.Profiles.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Google.Cloud.SecretManager.Client.Profiles;
@@ -9,7 +9,7 @@ public static class StartupExtensions
         this IServiceCollection serviceCollection)
     {
         serviceCollection
-            .AddSingleton<IProfileConfigProvider, ProfileConfigProvider>();
+            .AddSingleton<IProfileConfigProvider, ProfileConfigProviderImpl>();
 
         return serviceCollection;
     }

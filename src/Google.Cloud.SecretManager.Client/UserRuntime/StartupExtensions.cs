@@ -1,4 +1,4 @@
-using Google.Cloud.SecretManager.Client.UserRuntime.Services;
+using Google.Cloud.SecretManager.Client.UserRuntime.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Google.Cloud.SecretManager.Client.UserRuntime;
@@ -17,7 +17,7 @@ public static class StartupExtensions
 
         serviceCollection
             .AddSingleton(userParameters)
-            .AddSingleton<IUserFilesProvider, UserFilesProvider>();
+            .AddSingleton<IUserFilesProvider, UserFilesProviderImpl>();
 
         return serviceCollection;
     }

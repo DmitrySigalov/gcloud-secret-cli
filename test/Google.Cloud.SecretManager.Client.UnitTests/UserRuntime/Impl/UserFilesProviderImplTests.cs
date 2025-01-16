@@ -1,9 +1,9 @@
 using System.Runtime.InteropServices;
 using Xunit;
 
-namespace Google.Cloud.SecretManager.Client.UserRuntime.Services;
+namespace Google.Cloud.SecretManager.Client.UserRuntime.Impl;
 
-public class UserFilesProviderTests
+public class UserFilesProviderImplTests
 {
     [Fact]
     public void GetFullFilePath_IsOSXPlatform_WithToolUser()
@@ -11,7 +11,7 @@ public class UserFilesProviderTests
         var folderType = FolderTypeEnum.ToolUser;
         var fileName = "test.txt";
 
-        var testComponent = new UserFilesProvider();
+        var testComponent = new UserFilesProviderImpl();
         
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
@@ -32,7 +32,7 @@ public class UserFilesProviderTests
         var folderType = FolderTypeEnum.RootUser;
         var fileName = "test.txt";
 
-        var testComponent = new UserFilesProvider();
+        var testComponent = new UserFilesProviderImpl();
         
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {

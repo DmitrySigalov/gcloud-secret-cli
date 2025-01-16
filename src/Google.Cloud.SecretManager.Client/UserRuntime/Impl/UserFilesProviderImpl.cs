@@ -1,17 +1,17 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 
-namespace Google.Cloud.SecretManager.Client.UserRuntime.Services;
+namespace Google.Cloud.SecretManager.Client.UserRuntime.Impl;
 
-public class UserFilesProvider : IUserFilesProvider
+public class UserFilesProviderImpl : IUserFilesProvider
 {
     private readonly IConfiguration _configuration;
     
-    public UserFilesProvider()
+    public UserFilesProviderImpl()
     {
     }
     
-    public UserFilesProvider(IConfiguration configuration)
+    public UserFilesProviderImpl(IConfiguration configuration)
     {
         _configuration = configuration;
     }
