@@ -32,6 +32,7 @@ public static class PocTests
             [$"{nameof(ListSecretsAsync)}"] = ListSecretsAsync,
             [$"{nameof(GetSecretAsync)}"] = GetSecretAsync,
             [$"{nameof(GetSecretVersionAsync)}"] = GetSecretVersionAsync,
+            [$"{nameof(AccessSecretVersionAsync)}"] = AccessSecretVersionAsync,
         };
         
         var testName = Prompt.Select(
@@ -86,7 +87,7 @@ public static class PocTests
         };
         
         // Make the request
-        var response = await testArgs.Client.GetSecretAsync(request);
+        var response = await testArgs.Client.GetSecretAsync(request, cancellationToken);
         
         Console.WriteLine(response);
     }
@@ -103,8 +104,27 @@ public static class PocTests
         };
         
         // Make the request
-        var response = await testArgs.Client.GetSecretVersionAsync(request);
+        var response = await testArgs.Client.GetSecretVersionAsync(request, cancellationToken);
         
         Console.WriteLine(response);
+    }
+
+    private static async Task AccessSecretVersionAsync(TestArgs testArgs, CancellationToken cancellationToken)
+    {
+        // Initialize request argument(s)
+        var request = new AccessSecretVersionRequest
+        {
+            SecretVersionName = SecretVersionName.FromProjectSecretSecretVersion(
+                testArgs.ProjectId, 
+                testArgs.SecretId,
+                "latest"),
+        };
+        
+        // Make the request
+        var response = await testArgs.Client.AccessSecretVersionAsync(request, cancellationToken);
+        
+        // Decode the secret payload
+        string payload = response.Payload.Data.ToStringUtf8();
+        Console.WriteLine(payload);
     }
 }
