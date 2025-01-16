@@ -3,7 +3,7 @@ using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Services;
+namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 
 public class OsxEnvironmentVariablesProvider : IEnvironmentVariablesProvider
 {

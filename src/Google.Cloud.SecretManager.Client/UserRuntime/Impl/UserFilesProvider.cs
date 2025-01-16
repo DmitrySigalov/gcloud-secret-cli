@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 
-namespace Google.Cloud.SecretManager.Client.UserRuntime.Services;
+namespace Google.Cloud.SecretManager.Client.UserRuntime.Impl;
 
 public class UserFilesProvider : IUserFilesProvider
 {

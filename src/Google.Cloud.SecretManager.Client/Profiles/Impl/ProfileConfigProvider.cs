@@ -5,7 +5,7 @@ using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
-namespace Google.Cloud.SecretManager.Client.Profiles.Services;
+namespace Google.Cloud.SecretManager.Client.Profiles.Impl;
 
 public class ProfileConfigProvider : IProfileConfigProvider
 {

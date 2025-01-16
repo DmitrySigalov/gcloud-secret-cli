@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Services;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;

@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Xunit;
 
-namespace Google.Cloud.SecretManager.Client.UserRuntime.Services;
+namespace Google.Cloud.SecretManager.Client.UserRuntime.Impl;
 
 public class UserFilesProviderTests
 {
