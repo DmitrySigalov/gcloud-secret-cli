@@ -66,7 +66,7 @@ public class ViewProfileHandler : ICommandHandler
             return Task.CompletedTask;
         }
         
-        selectedProfileDo.PrintProfileConfig();
+        selectedProfileDo.PrintProfileSettings();
 
         ConsoleHelper.WriteLineInfo($"DONE - {Description} with profile [{selectedProfileName}]");
 

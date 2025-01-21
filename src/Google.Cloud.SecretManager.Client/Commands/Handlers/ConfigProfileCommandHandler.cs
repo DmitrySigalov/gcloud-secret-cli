@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.GCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
@@ -10,7 +11,8 @@ namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 public class ConfigProfileCommandHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
-    
+    private readonly ISecretManagerProvider _secretManagerProvider;
+
     private enum OperationEnum
     {
         New,
@@ -18,17 +20,18 @@ public class ConfigProfileCommandHandler : ICommandHandler
         Edit,
     }
 
-    public ConfigProfileCommandHandler(
-        IProfileConfigProvider profileConfigProvider)
+    public ConfigProfileCommandHandler(IProfileConfigProvider profileConfigProvider,
+        ISecretManagerProvider secretManagerProvider)
     {
         _profileConfigProvider = profileConfigProvider;
+        _secretManagerProvider = secretManagerProvider;
     }
 
     public string CommandName => "config";
     
     public string Description => "Profile(s) configuration";
     
-    public Task Handle(CancellationToken cancellationToken)
+    public async Task Handle(CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -51,7 +54,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 $"Save new profile [{profileDetails.ProfileName}] configuration with default settings");
         }
 
-        profileDetails.ProfileDo.PrintProfileConfig();
+        profileDetails.ProfileDo.PrintProfileSettings();
 
         if (profileDetails.Operation == OperationEnum.Delete)
         {
@@ -61,7 +64,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             
             ConsoleHelper.WriteLineInfo($"DONE - Deleted profile [{profileDetails.ProfileName}]");
 
-            return Task.CompletedTask;
+            return;
         }
 
         string lastSelectedOperationKey = null;        
@@ -70,14 +73,14 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         while (lastSelectedOperationKey != completeExitOperationKey)
         {
-            var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, (bool IsChanged, ProfileConfig ProfileConfig)>>
+            var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, Task<(bool IsChanged, ProfileConfig ProfileConfig)>>>
             {
                 { completeExitOperationKey, Exit },
-                { "Validate Profile", ValidateProfile },
-                { "Set Project Id", SetProjectId },
-                { "Import json configuration (paste from clipboard)", ImportJsonConfigurationFromClipboard },
-                { "Export json configuration (copy into clipboard)", ExportJsonConfigurationIntoClipboard },
-                { "Default", SetDefaultConfiguration },
+                { "Validate", pf => ValidateAsync(pf, cancellationToken) },
+                { "Change", Change },
+                { "Default", Default },
+                { "Import json (paste from clipboard)", ImportJsonFromClipboard },
+                { "Export json (copy into clipboard)", ExportJsonIntoClipboard },
            };
 
             lastSelectedOperationKey = Prompt.Select(
@@ -87,7 +90,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
-            (bool HasChanges, ProfileConfig ProfileConfig) operationResult = operationFunction(profileDetails.ProfileDo);
+            (bool HasChanges, ProfileConfig ProfileConfig) operationResult = await operationFunction(profileDetails.ProfileDo);
 
             if (operationResult.HasChanges)
             {
@@ -95,7 +98,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
                     () => _profileConfigProvider.Save(profileDetails.ProfileName, operationResult.ProfileConfig),
                     $"Save profile [{profileDetails.ProfileName}] configuration new settings");
             
-                operationResult.ProfileConfig.PrintProfileConfig();
+                operationResult.ProfileConfig.PrintProfileSettings();
                 
                 profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
@@ -103,8 +106,6 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         ConsoleHelper.WriteLineInfo($"DONE - Profile [{profileDetails.ProfileName}] configuration");
         Console.WriteLine();
-
-        return Task.CompletedTask;
     }
     
     private (OperationEnum Operation, string ProfileName, ProfileConfig ProfileDo) GetProfileDetailsForConfiguration(
@@ -161,32 +162,90 @@ public class ConfigProfileCommandHandler : ICommandHandler
         return (operation, profileName, profileDo);
     }
     
-    private (bool, ProfileConfig) Exit(ProfileConfig profileConfig) => (false, profileConfig);
+    private Task<(bool, ProfileConfig)> Exit(ProfileConfig profileConfig) => 
+        Task.FromResult((false, profileConfig));
     
-    private (bool, ProfileConfig) ValidateProfile(ProfileConfig profileConfig)
+    private async Task<(bool, ProfileConfig)> ValidateAsync(ProfileConfig profileConfig, CancellationToken cancellationToken)
     {
-        // TODO
+        profileConfig.PrintProfileSettings();
+
+        var secretIds = new HashSet<string>();
+        
+        try
+        {
+            secretIds = await _secretManagerProvider.GetSecretIdsAsync(
+                profileConfig.ProjectId,
+                cancellationToken);
+        }
+        catch (Exception e)
+        {
+            ConsoleHelper.WriteLineError(e.Message);
+        }
+
+        if (secretIds.Any())
+        {
+            profileConfig.PrintProfileSecretIdsNamesMappings(secretIds);
+        }
         
         return (false, profileConfig);
     }
 
-    private (bool, ProfileConfig) SetProjectId(ProfileConfig profileConfig)
+    private Task<(bool, ProfileConfig)> Change(ProfileConfig profileConfig)
     {
-        var projectId = Prompt.Input<string>(
+        var hasChanges = false;
+
+        var newProjectId = Prompt.Input<string>(
             "Enter new project id",
             defaultValue: profileConfig.ProjectId);
-
-        if (!string.IsNullOrEmpty(projectId))
+        if (!string.IsNullOrEmpty(newProjectId))
         {
-            profileConfig.ProjectId = projectId;
-            
-            return (true, profileConfig);
+            profileConfig.ProjectId = newProjectId;
+            hasChanges = true;
         }
 
-        return (false, profileConfig);
+        var newEnvironmentVariablePrefix = Prompt.Input<string>(
+            "Enter environment variable prefix",
+            defaultValue: profileConfig.EnvironmentVariablePrefix);
+        newEnvironmentVariablePrefix = newEnvironmentVariablePrefix?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(newEnvironmentVariablePrefix))
+        {
+            newEnvironmentVariablePrefix = null;
+        }
+        if (newEnvironmentVariablePrefix != profileConfig.EnvironmentVariablePrefix)
+        {
+            profileConfig.EnvironmentVariablePrefix = newEnvironmentVariablePrefix;
+            hasChanges = true;
+        }
+
+        var newConfigPathDelimiter = Prompt.Select(
+            "Select config path delimiter",
+            new []
+            {
+                '_', profileConfig.ConfigPathDelimiter, 
+                '/', 
+                profileConfig.ConfigPathDelimiter,
+            }.Distinct(),
+            defaultValue: profileConfig.ConfigPathDelimiter);
+        if (newConfigPathDelimiter != profileConfig.ConfigPathDelimiter)
+        {
+            profileConfig.ConfigPathDelimiter = newConfigPathDelimiter;
+            hasChanges = true;
+        }
+
+        return Task.FromResult((hasChanges, profileConfig));
+    }
+    
+    private Task<(bool, ProfileConfig)> Default(ProfileConfig profileConfig)
+    {
+        var newProfileConfig = new ProfileConfig();
+        
+        // Don't reset project id
+        newProfileConfig.ProjectId = profileConfig.ProjectId ?? newProfileConfig.ProjectId;
+        
+        return Task.FromResult((true, newProfileConfig));
     }
 
-    private (bool, ProfileConfig) ImportJsonConfigurationFromClipboard(ProfileConfig profileConfig)
+    private Task<(bool, ProfileConfig)> ImportJsonFromClipboard(ProfileConfig profileConfig)
     {
         var newJson = ClipboardService.GetText()?.Trim(); 
         
@@ -196,22 +255,20 @@ public class ConfigProfileCommandHandler : ICommandHandler
             {
                 var newProfileConfig = JsonSerializationHelper.Deserialize<ProfileConfig>(newJson);
 
-                return new (newProfileConfig != null, newProfileConfig);
+                return Task.FromResult((newProfileConfig != null, newProfileConfig));
             }
             catch (Exception e)
             {
                 ConsoleHelper.WriteLineNotification(newJson);
 
                 ConsoleHelper.WriteLineError(e.Message);
-
-                return (false, profileConfig);
             }
         }
 
-        return (false, profileConfig);
+        return Task.FromResult((false, profileConfig));
     }
     
-    private (bool, ProfileConfig)  ExportJsonConfigurationIntoClipboard(ProfileConfig profileConfig)
+    private Task<(bool, ProfileConfig)>  ExportJsonIntoClipboard(ProfileConfig profileConfig)
     {
         var json = JsonSerializationHelper.Serialize(profileConfig);
         
@@ -219,16 +276,6 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         ConsoleHelper.WriteLineNotification(json);
 
-        return (false, profileConfig);
-    }
-    
-    private (bool, ProfileConfig) SetDefaultConfiguration(ProfileConfig profileConfig)
-    {
-        var newProfileConfig = new ProfileConfig();
-        
-        // Don't reset project id
-        newProfileConfig.ProjectId = profileConfig.ProjectId ?? newProfileConfig.ProjectId;
-        
-        return (true, newProfileConfig);
+        return Task.FromResult((false, profileConfig));
     }
 }

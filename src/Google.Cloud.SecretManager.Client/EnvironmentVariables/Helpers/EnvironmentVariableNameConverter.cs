@@ -5,20 +5,20 @@ namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 
 public static class EnvironmentVariableNameConverter
 {
-    public static string ConvertFromSecretPath(
-        string secretPath,
+    public static string ConvertFromSecretId(
+        string secretId,
         ProfileConfig profileSettings)
     {
         var result = new StringBuilder();
 
-        // result.Append(profileSettings.EnvironmentVariablePrefix);
-        //
-        // if (secretPath.StartsWith(profileSettings.BaseDelimiter))
-        // {
-        //     secretPath = secretPath.TrimStart(profileSettings.BaseDelimiter);
-        // }
+        result.Append(profileSettings.EnvironmentVariablePrefix);
 
-        foreach (var c in secretPath)
+        if (secretId.StartsWith(profileSettings.SecretIdDelimiter))
+        {
+            secretId = secretId.TrimStart(profileSettings.SecretIdDelimiter);
+        }
+        
+        foreach (var c in secretId)
         {
             if (EnvironmentVariableNameValidationRule.InvalidVariableNameCharacters.Contains(c))
             {
