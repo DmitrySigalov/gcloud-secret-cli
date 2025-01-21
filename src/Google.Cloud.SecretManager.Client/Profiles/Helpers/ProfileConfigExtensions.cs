@@ -5,7 +5,7 @@ namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 public static class ProfileConfigExtensions
 {
     public static bool IsValid(this ProfileConfig profileConfig) =>
-        profileConfig?.Filters?.Any() == true;
+        !string.IsNullOrEmpty(profileConfig?.ProjectId);
 
     public static ProfileConfig CloneObject(this ProfileConfig profileConfig)
     {

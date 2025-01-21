@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
@@ -12,8 +10,6 @@ namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 public class ConfigProfileCommandHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
-
-    private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
     
     private enum OperationEnum
     {
@@ -23,12 +19,9 @@ public class ConfigProfileCommandHandler : ICommandHandler
     }
 
     public ConfigProfileCommandHandler(
-        IProfileConfigProvider profileConfigProvider,
-        IEnvironmentVariablesProvider environmentVariablesProvider)
+        IProfileConfigProvider profileConfigProvider)
     {
         _profileConfigProvider = profileConfigProvider;
-
-        _environmentVariablesProvider = environmentVariablesProvider;
     }
 
     public string CommandName => "config";
@@ -47,15 +40,6 @@ public class ConfigProfileCommandHandler : ICommandHandler
             _profileConfigProvider.ActiveName = null;
 
             lastActiveProfileDo = _profileConfigProvider.GetByName(lastActiveProfileName);
-
-            if (lastActiveProfileDo?.IsValid() == true)
-            {
-                ConsoleHelper.WriteLineNotification($"Deactivate current profile [{lastActiveProfileName}] before any configuration changes");
-
-                SpinnerHelper.Run(
-                    () => _environmentVariablesProvider.DeleteAll(lastActiveProfileDo),
-                    "Delete active environment variables");
-            }
         }
         
         var profileDetails = GetProfileDetailsForConfiguration(lastActiveProfileName, lastActiveProfileDo);
@@ -89,15 +73,17 @@ public class ConfigProfileCommandHandler : ICommandHandler
             var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, (bool IsChanged, ProfileConfig ProfileConfig)>>
             {
                 { completeExitOperationKey, Exit },
-                { "Default (all)", GenerateDefaultAllConfiguration },
+                { "Validate Profile", ValidateProfile },
+                { "Set Project Id", SetProjectId },
                 { "Import json configuration (paste from clipboard)", ImportJsonConfigurationFromClipboard },
                 { "Export json configuration (copy into clipboard)", ExportJsonConfigurationIntoClipboard },
+                { "Default", SetDefaultConfiguration },
            };
 
             lastSelectedOperationKey = Prompt.Select(
                 "Select operation",
                 items: manageOperationsLookup.Keys,
-                defaultValue: manageOperationsLookup.Keys.First());
+                defaultValue: completeExitOperationKey);
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
@@ -110,25 +96,13 @@ public class ConfigProfileCommandHandler : ICommandHandler
                     $"Save profile [{profileDetails.ProfileName}] configuration new settings");
             
                 operationResult.ProfileConfig.PrintProfileConfig();
+                
+                profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
         }
 
         ConsoleHelper.WriteLineInfo($"DONE - Profile [{profileDetails.ProfileName}] configuration");
         Console.WriteLine();
-
-        ConsoleHelper.WriteLineNotification($"START - View profile [{profileDetails.ProfileName}] configuration");
-        Console.WriteLine();
-
-        if (profileDetails.ProfileDo.IsValid() != true)
-        {
-            ConsoleHelper.WriteLineError($"Not configured profile [{profileDetails.ProfileName}]");
-
-            return Task.CompletedTask;
-        }
-
-        ConsoleHelper.WriteLineWarn($"TODO - Connect and map environment variables according to profile [{profileDetails.ProfileName}] configuration");
-
-        ConsoleHelper.WriteLineInfo($"DONE - View profile [{profileDetails.ProfileName}] configuration");
 
         return Task.CompletedTask;
     }
@@ -156,12 +130,14 @@ public class ConfigProfileCommandHandler : ICommandHandler
         if (operation == OperationEnum.New)
         {
             profileName = Prompt.Input<string>(
-                "Enter new profile name ",
+                "Enter new profile name (project id) ",
                 defaultValue: profileName,
                 validators: new List<Func<object, ValidationResult>>
                 {
                     (check) => ProfileNameValidationRule.Handle((string) check, profileNames),
                 }).Trim();
+            
+            profileDo.ProjectId = profileName;
             
             return (operation, profileName, profileDo);
         }
@@ -187,13 +163,27 @@ public class ConfigProfileCommandHandler : ICommandHandler
     
     private (bool, ProfileConfig) Exit(ProfileConfig profileConfig) => (false, profileConfig);
     
-    private (bool, ProfileConfig) GenerateDefaultAllConfiguration(ProfileConfig profileConfig)
+    private (bool, ProfileConfig) ValidateProfile(ProfileConfig profileConfig)
     {
-        var newProfileConfig = new ProfileConfig();
+        // TODO
         
-        newProfileConfig.Filters.Add("*");
-        
-        return (true, newProfileConfig);
+        return (false, profileConfig);
+    }
+
+    private (bool, ProfileConfig) SetProjectId(ProfileConfig profileConfig)
+    {
+        var projectId = Prompt.Input<string>(
+            "Enter new project id",
+            defaultValue: profileConfig.ProjectId);
+
+        if (!string.IsNullOrEmpty(projectId))
+        {
+            profileConfig.ProjectId = projectId;
+            
+            return (true, profileConfig);
+        }
+
+        return (false, profileConfig);
     }
 
     private (bool, ProfileConfig) ImportJsonConfigurationFromClipboard(ProfileConfig profileConfig)
@@ -206,12 +196,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             {
                 var newProfileConfig = JsonSerializationHelper.Deserialize<ProfileConfig>(newJson);
 
-                if (newProfileConfig?.IsValid() != true)
-                {
-                    throw new ApplicationException("Invalid profile configuration");
-                }
-
-                return new (true, newProfileConfig);
+                return new (newProfileConfig != null, newProfileConfig);
             }
             catch (Exception e)
             {
@@ -228,17 +213,22 @@ public class ConfigProfileCommandHandler : ICommandHandler
     
     private (bool, ProfileConfig)  ExportJsonConfigurationIntoClipboard(ProfileConfig profileConfig)
     {
-        if (profileConfig.IsValid() == false)
-        {
-            ConsoleHelper.WriteLineError("Invalid profile configuration");
-
-            return (false, profileConfig);
-        }
-        
         var json = JsonSerializationHelper.Serialize(profileConfig);
         
         ClipboardService.SetText(json);
 
+        ConsoleHelper.WriteLineNotification(json);
+
         return (false, profileConfig);
+    }
+    
+    private (bool, ProfileConfig) SetDefaultConfiguration(ProfileConfig profileConfig)
+    {
+        var newProfileConfig = new ProfileConfig();
+        
+        // Don't reset project id
+        newProfileConfig.ProjectId = profileConfig.ProjectId ?? newProfileConfig.ProjectId;
+        
+        return (true, newProfileConfig);
     }
 }

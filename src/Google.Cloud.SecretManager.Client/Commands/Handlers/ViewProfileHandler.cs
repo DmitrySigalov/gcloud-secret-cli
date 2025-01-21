@@ -36,7 +36,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("Not configured any profile");
+            ConsoleHelper.WriteLineError("No found any profile");
 
             return Task.CompletedTask;
         }
@@ -59,15 +59,15 @@ public class ViewProfileHandler : ICommandHandler
             () => _profileConfigProvider.GetByName(selectedProfileName),
             $"Read profile [{selectedProfileName}]");
         
-        selectedProfileDo?.PrintProfileConfig();
-
-        if (selectedProfileDo?.IsValid() != true)
+        if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"Not configured profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
         
+        selectedProfileDo.PrintProfileConfig();
+
         ConsoleHelper.WriteLineInfo($"DONE - {Description} with profile [{selectedProfileName}]");
 
         return Task.CompletedTask;

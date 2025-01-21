@@ -11,12 +11,12 @@ public static class EnvironmentVariableNameConverter
     {
         var result = new StringBuilder();
 
-        result.Append(profileSettings.EnvironmentVariablePrefix);
-        
-        if (secretPath.StartsWith(profileSettings.BaseDelimiter))
-        {
-            secretPath = secretPath.TrimStart(profileSettings.BaseDelimiter);
-        }
+        // result.Append(profileSettings.EnvironmentVariablePrefix);
+        //
+        // if (secretPath.StartsWith(profileSettings.BaseDelimiter))
+        // {
+        //     secretPath = secretPath.TrimStart(profileSettings.BaseDelimiter);
+        // }
 
         foreach (var c in secretPath)
         {

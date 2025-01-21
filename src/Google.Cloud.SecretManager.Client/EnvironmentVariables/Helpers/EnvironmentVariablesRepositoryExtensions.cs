@@ -35,7 +35,7 @@ public static class EnvironmentVariablesRepositoryExtensions
             return result;
         }
         
-        var convertedEnvironmentVariableBaseNames = profileConfig.Filters
+        var convertedEnvironmentVariableBaseNames = profileConfig.PathFilters
             .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretPath(x, profileConfig))
             .ToArray();
 
@@ -63,7 +63,7 @@ public static class EnvironmentVariablesRepositoryExtensions
     {
         var result = new SortedDictionary<string, string>();
         
-        var convertedEnvironmentVariableBaseNames = profileConfig.Filters
+        var convertedEnvironmentVariableBaseNames = profileConfig.PathFilters
             .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretPath(x, profileConfig))
             .ToArray();
 
