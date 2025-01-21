@@ -23,7 +23,7 @@ public static class PocTests
             Client = await SecretManagerServiceClient.CreateAsync(cancellationToken),
             ProjectId = "lsports-poc",
             Filter = "",
-            SecretId = "redis_lsports-poc_endpoint",
+            SecretId = "redis_lsports-poc_endpoint-missing",
             PageSize = 5,
         };
         

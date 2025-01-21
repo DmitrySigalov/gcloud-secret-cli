@@ -16,6 +16,7 @@ public static class StartupExtensions
             .AddSingleton<ICommandHandler, PocCommandHandler>() // TODO: Delete after final impl
             // .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
             // .AddSingleton<ICommandHandler, GetEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, GetSecretsWithProfileHandler>()
             .AddSingleton<ICommandHandler, ViewProfileHandler>()
             .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>();
 

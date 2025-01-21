@@ -1,25 +1,27 @@
 using Google.Api.Gax.ResourceNames;
+using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.V1;
+using Grpc.Core;
 
 namespace Google.Cloud.SecretManager.Client.GCloud.Impl;
 
 public class SecretManagerProviderImpl : ISecretManagerProvider
 {
-    private const int PAGE_SIZE = 3;
-    
+    private const int PAGE_SIZE = 10;
+
     public async Task<HashSet<string>> GetSecretIdsAsync(string projectId,
         CancellationToken cancellationToken = default)
     {
         var result = new List<string>();
-        
+
         var client = await GetClientAsync(cancellationToken);
-        
+
         var request = new ListSecretsRequest
         {
             ParentAsProjectName = ProjectName.FromProject(projectId),
             PageSize = PAGE_SIZE,
         };
-        
+
         // Make the request
         var response = client.ListSecretsAsync(request);
 
@@ -37,7 +39,41 @@ public class SecretManagerProviderImpl : ISecretManagerProvider
             .Order()
             .ToHashSet();
     }
-    
+
+    public async Task ApplySecretLatestValueAsync(string projectId,
+        string secretId,
+        SecretDetails secretDetails,
+        CancellationToken cancellationToken = default)
+    {
+        var client = await GetClientAsync(cancellationToken);
+
+        // Initialize request argument(s)
+        var request = new AccessSecretVersionRequest
+        {
+            SecretVersionName = SecretVersionName.FromProjectSecretSecretVersion(
+                projectId,
+                secretId,
+                "latest"),
+        };
+
+        try
+        {
+            // Make the request
+            var response = await client.AccessSecretVersionAsync(request, cancellationToken);
+
+            // Decode the secret payload
+            var decodedValue = response.Payload?.Data?.ToStringUtf8();
+
+            secretDetails.AccessException = null;
+            secretDetails.DecodedValue = decodedValue;
+            
+        }
+        catch (RpcException e)
+        {
+            secretDetails.AccessException = e;
+        }
+    }
+
     private Task<SecretManagerServiceClient> GetClientAsync(CancellationToken cancellationToken) =>
         SecretManagerServiceClient.CreateAsync(cancellationToken);
 }

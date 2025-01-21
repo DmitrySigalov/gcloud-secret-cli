@@ -54,7 +54,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 $"Save new profile [{profileDetails.ProfileName}] configuration with default settings");
         }
 
-        profileDetails.ProfileDo.PrintProfileSettings();
+        profileDetails.ProfileDo.PrintProfileConfig();
 
         if (profileDetails.Operation == OperationEnum.Delete)
         {
@@ -98,13 +98,13 @@ public class ConfigProfileCommandHandler : ICommandHandler
                     () => _profileConfigProvider.Save(profileDetails.ProfileName, operationResult.ProfileConfig),
                     $"Save profile [{profileDetails.ProfileName}] configuration new settings");
             
-                operationResult.ProfileConfig.PrintProfileSettings();
+                operationResult.ProfileConfig.PrintProfileConfig();
                 
                 profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
         }
 
-        ConsoleHelper.WriteLineInfo($"DONE - Profile [{profileDetails.ProfileName}] configuration");
+        ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{profileDetails.ProfileName}]");
         Console.WriteLine();
     }
     
@@ -167,7 +167,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
     
     private async Task<(bool, ProfileConfig)> ValidateAsync(ProfileConfig profileConfig, CancellationToken cancellationToken)
     {
-        profileConfig.PrintProfileSettings();
+        profileConfig.PrintProfileConfig();
 
         var secretIds = new HashSet<string>();
         
@@ -184,7 +184,9 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         if (secretIds.Any())
         {
-            profileConfig.PrintProfileSecretIdsNamesMappings(secretIds);
+            var secrets = profileConfig.BuildSecretDetails(secretIds);
+
+            secrets.PrintSecretsMappingIdNames();
         }
         
         return (false, profileConfig);

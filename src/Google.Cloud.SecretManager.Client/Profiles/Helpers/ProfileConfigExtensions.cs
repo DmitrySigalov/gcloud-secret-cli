@@ -1,5 +1,6 @@
-using ConsoleTables;
+using System.Text;
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 
 namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
@@ -15,7 +16,7 @@ public static class ProfileConfigExtensions
         return JsonSerializationHelper.Deserialize<ProfileConfig>(json);
     }
 
-    public static void PrintProfileSettings(this ProfileConfig profileConfig)
+    public static void PrintProfileConfig(this ProfileConfig profileConfig)
     {
         if (profileConfig == null)
         {
@@ -27,27 +28,69 @@ public static class ProfileConfigExtensions
         Console.WriteLine(data);
         Console.WriteLine();
     }
+    
+    public static Dictionary<string, SecretDetails> BuildSecretDetails(this ProfileConfig profileConfig,
+        ISet<string> secretIds) =>
+        secretIds
+            .ToDictionary(
+                x => x,
+                y => profileConfig.BuildSecretDetails(y));
 
-    public static void PrintProfileSecretIdsNamesMappings(this ProfileConfig profileConfig,
-        HashSet<string> secretIds)
+    private static SecretDetails BuildSecretDetails(this ProfileConfig profileConfig,
+        string secretId)
     {
-        if (profileConfig == null)
+        var result = new SecretDetails();
+        
+        if (string.IsNullOrEmpty(secretId))
         {
-            return;
+            return result;
         }
         
-        var mapping = SecretDetailsBuilder.Build(secretIds,
-            profileConfig);
+        result.EnvironmentVariable = profileConfig.ConvertToEnvironmentVariableName(secretId);
         
-        var table = new ConsoleTable("secret-id", "environment-variable", "config-path");
+        result.ConfigPath = profileConfig.ConvertToPath(secretId);
         
-        foreach (var names in mapping)
+        return result;
+    }
+    
+    private static string ConvertToEnvironmentVariableName(
+        this ProfileConfig profileConfig,
+        string secretId)
+    {
+        var result = new StringBuilder();
+
+        result.Append(profileConfig.EnvironmentVariablePrefix);
+
+        if (secretId.StartsWith(profileConfig.SecretIdDelimiter))
         {
-            table.AddRow(names.Key, 
-                names.Value.EnvironmentVariable, 
-                names.Value.ConfigPath != names.Key ? names.Value.ConfigPath : "<secret-id>");
+            secretId = secretId.TrimStart(profileConfig.SecretIdDelimiter);
         }
         
-        table.Write(Format.Minimal);
+        foreach (var c in secretId)
+        {
+            if (EnvironmentVariableNameValidationRule.InvalidVariableNameCharacters.Contains(c))
+            {
+                result.Append(EnvironmentVariablesConsts.VariableNameDelimeter);
+
+                continue;
+            }
+
+            result.Append(c);
+        }
+
+        return result.ToString().Trim().ToUpper();
+    }
+    
+    private static string ConvertToPath(
+        this ProfileConfig profileConfig,
+        string secretId)
+    {
+        if (profileConfig.ConfigPathDelimiter == profileConfig.SecretIdDelimiter)
+        {
+            return secretId;
+        }
+        
+        return secretId.Replace(profileConfig.SecretIdDelimiter, 
+            profileConfig.ConfigPathDelimiter);
     }
 }
