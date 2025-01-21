@@ -1,6 +1,4 @@
 using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
@@ -11,26 +9,15 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
 {
     private readonly IUserFilesProvider _userFilesProvider;
 
-    private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
-
     private readonly ILogger<ProfileConfigProviderImpl> _logger;
 
     public ProfileConfigProviderImpl(
         IUserFilesProvider userFilesProvider,
-        IEnvironmentVariablesProvider environmentVariablesProvider,
         ILogger<ProfileConfigProviderImpl> logger)
     {
         _userFilesProvider = userFilesProvider;
 
-        _environmentVariablesProvider = environmentVariablesProvider;
-
         _logger = logger;
-    }
-    
-    public string ActiveName
-    {
-        get => _environmentVariablesProvider.Get(EnvironmentVariablesConsts.GetClientToolVariableName(nameof(ActiveName)));
-        set => _environmentVariablesProvider.Set(EnvironmentVariablesConsts.GetClientToolVariableName(nameof(ActiveName)), value);
     }
     
     public ISet<string> GetNames()

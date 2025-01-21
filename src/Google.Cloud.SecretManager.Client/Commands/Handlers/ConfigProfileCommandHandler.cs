@@ -36,16 +36,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var lastActiveProfileName = _profileConfigProvider.ActiveName;
-        var lastActiveProfileDo = default(ProfileConfig);
-        if (!string.IsNullOrEmpty(lastActiveProfileName))
-        {
-            _profileConfigProvider.ActiveName = null;
-
-            lastActiveProfileDo = _profileConfigProvider.GetByName(lastActiveProfileName);
-        }
-        
-        var profileDetails = GetProfileDetailsForConfiguration(lastActiveProfileName, lastActiveProfileDo);
+        var profileDetails = GetProfileDetailsForConfiguration();
 
         if (profileDetails.Operation == OperationEnum.New)
         {
@@ -108,9 +99,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
         Console.WriteLine();
     }
     
-    private (OperationEnum Operation, string ProfileName, ProfileConfig ProfileDo) GetProfileDetailsForConfiguration(
-        string lastActiveProfileName,
-        ProfileConfig currentProfileDo)
+    private (OperationEnum Operation, string ProfileName, ProfileConfig ProfileDo) GetProfileDetailsForConfiguration()
     {
         var profileNames = SpinnerHelper.Run(
             _profileConfigProvider.GetNames,
@@ -135,7 +124,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 defaultValue: profileName,
                 validators: new List<Func<object, ValidationResult>>
                 {
-                    (check) => ProfileNameValidationRule.Handle((string) check, profileNames),
+                    check => ProfileNameValidationRule.Handle((string) check, profileNames),
                 }).Trim();
             
             profileDo.ProjectId = profileName;
@@ -149,13 +138,11 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 : Prompt.Select(
                     "Select profile",
                     items: profileNames,
-                    defaultValue: lastActiveProfileName);
+                    defaultValue: profileNames.FirstOrDefault());
 
-        profileDo = lastActiveProfileName == profileName
-            ? currentProfileDo
-            : SpinnerHelper.Run(
-                () => _profileConfigProvider.GetByName(profileName),
-                $"Read selected profile [{profileName}]");
+        profileDo = SpinnerHelper.Run(
+            () => _profileConfigProvider.GetByName(profileName),
+            $"Read selected profile [{profileName}]");
 
         profileDo ??= new ProfileConfig(); 
 

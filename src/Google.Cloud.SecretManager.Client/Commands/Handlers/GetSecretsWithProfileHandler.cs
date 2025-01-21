@@ -38,19 +38,13 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             return;
         }
 
-        var lastActiveProfileName = _profileConfigProvider.ActiveName;
-        if (!string.IsNullOrEmpty(lastActiveProfileName))
-        {
-            ConsoleHelper.WriteLineNotification($"Current active profile is [{lastActiveProfileName}]");
-        }
-
         var selectedProfileName = 
             profileNames.Count == 1
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
                     items: profileNames,
-                    defaultValue: lastActiveProfileName);
+                    defaultValue: profileNames.First());
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
