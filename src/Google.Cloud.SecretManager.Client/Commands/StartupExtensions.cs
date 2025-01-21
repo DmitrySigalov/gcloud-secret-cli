@@ -13,9 +13,9 @@ public static class StartupExtensions
         serviceCollection
             .AddSingleton<HelpCommandHandler>()
             // First after help command is default
-            .AddSingleton<ICommandHandler, PocCommandHandler>() // TODO: Delete after final impl
-            // .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
-            // .AddSingleton<ICommandHandler, GetEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, GetEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, GetSecretsWithProfileHandler>()
             .AddSingleton<ICommandHandler, ViewProfileHandler>()
             .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>();
 

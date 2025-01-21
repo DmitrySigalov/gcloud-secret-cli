@@ -14,7 +14,7 @@ public static class EnvironmentVariablesRepositoryExtensions
 
         foreach (var ssmParam in secrets)
         {
-            var envVarName = EnvironmentVariableNameConverter.ConvertFromSecretPath(ssmParam.Key, profileConfig);
+            var envVarName = EnvironmentVariableNameConverter.ConvertFromSecretId(ssmParam.Key, profileConfig);
             
             environmentVariablesProvider.Set(envVarName, ssmParam.Value);
             
@@ -35,8 +35,8 @@ public static class EnvironmentVariablesRepositoryExtensions
             return result;
         }
         
-        var convertedEnvironmentVariableBaseNames = profileConfig.Filters
-            .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretPath(x, profileConfig))
+        var convertedEnvironmentVariableBaseNames = profileConfig.PathFilters
+            .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretId(x, profileConfig))
             .ToArray();
 
         var environmentVariablesToGet = environmentVariablesProvider
@@ -63,8 +63,8 @@ public static class EnvironmentVariablesRepositoryExtensions
     {
         var result = new SortedDictionary<string, string>();
         
-        var convertedEnvironmentVariableBaseNames = profileConfig.Filters
-            .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretPath(x, profileConfig))
+        var convertedEnvironmentVariableBaseNames = profileConfig.PathFilters
+            .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretId(x, profileConfig))
             .ToArray();
 
         var environmentVariablesToDelete = environmentVariablesProvider

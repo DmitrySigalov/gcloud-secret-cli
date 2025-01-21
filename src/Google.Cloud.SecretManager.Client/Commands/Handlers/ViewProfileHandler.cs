@@ -36,15 +36,9 @@ public class ViewProfileHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("Not configured any profile");
+            ConsoleHelper.WriteLineError("No found any profile");
 
             return Task.CompletedTask;
-        }
-
-        var lastActiveProfileName = _profileConfigProvider.ActiveName;
-        if (!string.IsNullOrEmpty(lastActiveProfileName))
-        {
-            ConsoleHelper.WriteLineNotification($"Current active profile is [{lastActiveProfileName}]");
         }
 
         var selectedProfileName = 
@@ -53,22 +47,22 @@ public class ViewProfileHandler : ICommandHandler
             : Prompt.Select(
                 "Select profile",
                 items: profileNames,
-                defaultValue: lastActiveProfileName);
+                defaultValue: profileNames.First());
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
             $"Read profile [{selectedProfileName}]");
         
-        selectedProfileDo?.PrintProfileConfig();
-
-        if (selectedProfileDo?.IsValid() != true)
+        if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"Not configured profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
         
-        ConsoleHelper.WriteLineInfo($"DONE - {Description} with profile [{selectedProfileName}]");
+        selectedProfileDo.PrintProfileConfig();
+
+        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}]");
 
         return Task.CompletedTask;
     }

@@ -1,11 +1,13 @@
+using System.Text;
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 
 namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
 public static class ProfileConfigExtensions
 {
     public static bool IsValid(this ProfileConfig profileConfig) =>
-        profileConfig?.Filters?.Any() == true;
+        !string.IsNullOrEmpty(profileConfig?.ProjectId);
 
     public static ProfileConfig CloneObject(this ProfileConfig profileConfig)
     {
@@ -25,5 +27,70 @@ public static class ProfileConfigExtensions
 
         Console.WriteLine(data);
         Console.WriteLine();
+    }
+    
+    public static Dictionary<string, SecretDetails> BuildSecretDetails(this ProfileConfig profileConfig,
+        ISet<string> secretIds) =>
+        secretIds
+            .ToDictionary(
+                x => x,
+                y => profileConfig.BuildSecretDetails(y));
+
+    private static SecretDetails BuildSecretDetails(this ProfileConfig profileConfig,
+        string secretId)
+    {
+        var result = new SecretDetails();
+        
+        if (string.IsNullOrEmpty(secretId))
+        {
+            return result;
+        }
+        
+        result.EnvironmentVariable = profileConfig.ConvertToEnvironmentVariableName(secretId);
+        
+        result.ConfigPath = profileConfig.ConvertToPath(secretId);
+        
+        return result;
+    }
+    
+    private static string ConvertToEnvironmentVariableName(
+        this ProfileConfig profileConfig,
+        string secretId)
+    {
+        var result = new StringBuilder();
+
+        result.Append(profileConfig.EnvironmentVariablePrefix);
+
+        if (secretId.StartsWith(profileConfig.SecretIdDelimiter))
+        {
+            secretId = secretId.TrimStart(profileConfig.SecretIdDelimiter);
+        }
+        
+        foreach (var c in secretId)
+        {
+            if (EnvironmentVariableNameValidationRule.InvalidVariableNameCharacters.Contains(c))
+            {
+                result.Append(EnvironmentVariablesConsts.VariableNameDelimeter);
+
+                continue;
+            }
+
+            result.Append(c);
+        }
+
+        return result.ToString().Trim().ToUpper();
+    }
+    
+    private static string ConvertToPath(
+        this ProfileConfig profileConfig,
+        string secretId)
+    {
+        if (profileConfig.ConfigPathDelimiter == profileConfig.SecretIdDelimiter)
+        {
+            return secretId;
+        }
+        
+        return secretId.Replace(profileConfig.SecretIdDelimiter, 
+            profileConfig.ConfigPathDelimiter);
     }
 }
