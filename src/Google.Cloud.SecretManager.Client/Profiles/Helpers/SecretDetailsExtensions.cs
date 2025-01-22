@@ -13,7 +13,7 @@ public static class SecretDetailsExtensions
         {
             table.AddRow(names.Key, 
                 names.Value.EnvironmentVariable, 
-                names.Value.ConfigPath != names.Key ? names.Value.ConfigPath : "<secret-id>");
+                names.Value.ConfigPath);
         }
 
         table.Write(Format.Minimal);

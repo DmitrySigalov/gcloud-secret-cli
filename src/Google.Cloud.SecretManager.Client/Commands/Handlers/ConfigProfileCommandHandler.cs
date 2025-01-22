@@ -67,9 +67,10 @@ public class ConfigProfileCommandHandler : ICommandHandler
             var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, Task<(bool IsChanged, ProfileConfig ProfileConfig)>>>
             {
                 { completeExitOperationKey, Exit },
-                { "Validate", pf => ValidateAsync(pf, cancellationToken) },
-                { "Change", Change },
-                { "Default", Default },
+                { "Validate (get secret ids)", pf => ValidateAsync(pf, cancellationToken) },
+                { "Set project id", SetProjectId },
+                { "Set advanced settings", SetAdvancedSettings },
+                { "Reset to defaults", ResetDefaultSettings },
                 { "Import json (paste from clipboard)", ImportJsonFromClipboard },
                 { "Export json (copy into clipboard)", ExportJsonIntoClipboard },
            };
@@ -179,7 +180,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
         return (false, profileConfig);
     }
 
-    private Task<(bool, ProfileConfig)> Change(ProfileConfig profileConfig)
+    private Task<(bool, ProfileConfig)> SetProjectId(ProfileConfig profileConfig)
     {
         var hasChanges = false;
 
@@ -191,6 +192,13 @@ public class ConfigProfileCommandHandler : ICommandHandler
             profileConfig.ProjectId = newProjectId;
             hasChanges = true;
         }
+
+        return Task.FromResult((hasChanges, profileConfig));
+    }
+
+    private Task<(bool, ProfileConfig)> SetAdvancedSettings(ProfileConfig profileConfig)
+    {
+        var hasChanges = false;
 
         var newEnvironmentVariablePrefix = Prompt.Input<string>(
             "Enter environment variable prefix",
@@ -206,25 +214,35 @@ public class ConfigProfileCommandHandler : ICommandHandler
             hasChanges = true;
         }
 
+        var newRemoveStartDelimiter = Prompt.Select(
+            "Remove start delimiter?",
+            new[] { true, false, },
+            defaultValue: profileConfig.RemoveStartDelimiter);
+        if (newRemoveStartDelimiter != profileConfig.RemoveStartDelimiter)
+        {
+            profileConfig.RemoveStartDelimiter = newRemoveStartDelimiter;
+            hasChanges = true;
+        }
+
         var newConfigPathDelimiter = Prompt.Select(
-            "Select config path delimiter",
+            "Select secret path delimiter",
             new []
             {
-                '_', profileConfig.ConfigPathDelimiter, 
+                '_', profileConfig.SecretPathDelimiter, 
                 '/', 
-                profileConfig.ConfigPathDelimiter,
+                profileConfig.SecretPathDelimiter,
             }.Distinct(),
-            defaultValue: profileConfig.ConfigPathDelimiter);
-        if (newConfigPathDelimiter != profileConfig.ConfigPathDelimiter)
+            defaultValue: profileConfig.SecretPathDelimiter);
+        if (newConfigPathDelimiter != profileConfig.SecretPathDelimiter)
         {
-            profileConfig.ConfigPathDelimiter = newConfigPathDelimiter;
+            profileConfig.SecretPathDelimiter = newConfigPathDelimiter;
             hasChanges = true;
         }
 
         return Task.FromResult((hasChanges, profileConfig));
     }
     
-    private Task<(bool, ProfileConfig)> Default(ProfileConfig profileConfig)
+    private Task<(bool, ProfileConfig)> ResetDefaultSettings(ProfileConfig profileConfig)
     {
         var newProfileConfig = new ProfileConfig();
         

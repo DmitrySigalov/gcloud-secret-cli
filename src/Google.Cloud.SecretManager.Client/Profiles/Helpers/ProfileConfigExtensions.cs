@@ -34,7 +34,7 @@ public static class ProfileConfigExtensions
         secretIds
             .ToDictionary(
                 x => x,
-                y => profileConfig.BuildSecretDetails(y));
+                profileConfig.BuildSecretDetails);
 
     private static SecretDetails BuildSecretDetails(this ProfileConfig profileConfig,
         string secretId)
@@ -61,7 +61,8 @@ public static class ProfileConfigExtensions
 
         result.Append(profileConfig.EnvironmentVariablePrefix);
 
-        if (secretId.StartsWith(profileConfig.SecretIdDelimiter))
+        if (secretId.StartsWith(profileConfig.SecretIdDelimiter) &&
+            profileConfig.RemoveStartDelimiter)
         {
             secretId = secretId.TrimStart(profileConfig.SecretIdDelimiter);
         }
@@ -85,12 +86,12 @@ public static class ProfileConfigExtensions
         this ProfileConfig profileConfig,
         string secretId)
     {
-        if (profileConfig.ConfigPathDelimiter == profileConfig.SecretIdDelimiter)
+        if (profileConfig.SecretPathDelimiter == profileConfig.SecretIdDelimiter)
         {
             return secretId;
         }
         
         return secretId.Replace(profileConfig.SecretIdDelimiter, 
-            profileConfig.ConfigPathDelimiter);
+            profileConfig.SecretPathDelimiter);
     }
 }
