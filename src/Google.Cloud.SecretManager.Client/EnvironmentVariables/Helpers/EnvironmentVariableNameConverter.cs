@@ -13,7 +13,8 @@ public static class EnvironmentVariableNameConverter
 
         result.Append(profileSettings.EnvironmentVariablePrefix);
 
-        if (secretId.StartsWith(profileSettings.SecretIdDelimiter))
+        if (secretId.StartsWith(profileSettings.SecretIdDelimiter) &&
+            profileSettings.RemoveStartDelimiter)
         {
             secretId = secretId.TrimStart(profileSettings.SecretIdDelimiter);
         }

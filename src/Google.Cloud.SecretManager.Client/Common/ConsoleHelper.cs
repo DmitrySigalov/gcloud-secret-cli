@@ -8,8 +8,14 @@ public static class ConsoleHelper
     public static void WriteLineInfo(string text) 
         => Info(() => Console.WriteLine(text));
     
+    public static void WriteError(string text) 
+        => Error(() => Console.Write(text));
+    
     public static void WriteLineError(string text) 
         => Error(() => Console.WriteLine(text));
+    
+    public static void WriteWarn(string text) 
+        => Warn(() => Console.Write(text));
     
     public static void WriteLineWarn(string text) 
         => Warn(() => Console.WriteLine(text));

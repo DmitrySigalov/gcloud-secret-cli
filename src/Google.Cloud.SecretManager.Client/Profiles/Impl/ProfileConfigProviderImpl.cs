@@ -52,13 +52,16 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
 
     public void Save(string name, ProfileConfig data)
     {
-        var fileName = ProfileFileNameResolver.BuildFileName(name);
+        var secretsFileName = SecretsFileNameResolver.BuildFileName(name);
+        var profileFileName = ProfileFileNameResolver.BuildFileName(name);
 
         try
         {
             var fileText = JsonSerializationHelper.Serialize(data);
         
-            _userFilesProvider.WriteTextFile(fileName, fileText, FolderTypeEnum.ToolUser);
+            _userFilesProvider.DeleteFile(secretsFileName, FolderTypeEnum.ToolUser);
+
+            _userFilesProvider.WriteTextFile(profileFileName, fileText, FolderTypeEnum.ToolUser);
         }
         catch (Exception e)
         {
@@ -70,17 +73,54 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
 
     public void Delete(string name)
     {
-        var fileName = ProfileFileNameResolver.BuildFileName(name);
+        var secretsFileName = SecretsFileNameResolver.BuildFileName(name);
+        var profileFileName = ProfileFileNameResolver.BuildFileName(name);
 
         try
         {
-            _userFilesProvider.DeleteFile(fileName, FolderTypeEnum.ToolUser);
+            _userFilesProvider.DeleteFile(secretsFileName, FolderTypeEnum.ToolUser);
+            _userFilesProvider.DeleteFile(profileFileName, FolderTypeEnum.ToolUser);
         }
         catch (Exception e)
         {
             _logger.LogError(
                 e,
                 "Error on attempt to delete profile file");
+        }
+    }
+
+    public IDictionary<string, SecretDetails> ReadSecrets(string name)
+    {
+        var fileName = SecretsFileNameResolver.BuildFileName(name);
+
+        try
+        {
+            var fileText = _userFilesProvider
+                .ReadTextFileIfExist(fileName, FolderTypeEnum.ToolUser);
+
+            return JsonSerializationHelper.Deserialize<Dictionary<string, SecretDetails>>(fileText);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public void DumpSecrets(string name, IDictionary<string, SecretDetails> data)
+    {
+        var fileName = SecretsFileNameResolver.BuildFileName(name);
+
+        try
+        {
+            var fileText = JsonSerializationHelper.Serialize(data);
+        
+            _userFilesProvider.WriteTextFile(fileName, fileText, FolderTypeEnum.ToolUser);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(
+                e,
+                "Error on attempt to dump secrets");
         }
     }
 }

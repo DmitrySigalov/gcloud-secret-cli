@@ -8,7 +8,9 @@ public sealed class ProfileConfig
 
     public string EnvironmentVariablePrefix { get; set; }
 
-    public char ConfigPathDelimiter { get; set; } = '_';
+    public bool RemoveStartDelimiter { get; set; } = true;
 
-    public HashSet<string> PathFilters { get; set; } = new() { "" };
+    public char SecretPathDelimiter { get; set; } = '/';
+
+    public HashSet<string> PathFilters { get; set; } = new() { "" }; // TODO: delete
 }

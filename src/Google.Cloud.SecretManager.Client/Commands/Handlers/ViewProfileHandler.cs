@@ -62,6 +62,17 @@ public class ViewProfileHandler : ICommandHandler
         
         selectedProfileDo.PrintProfileConfig();
 
+        var currentSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
+
+        if (currentSecrets == null)
+        {
+            ConsoleHelper.WriteLineNotification($"No dumped secrets according to profile [{selectedProfileName}]");
+        }
+        else
+        {
+            currentSecrets.PrintSecretsMappingIdNamesAccessValues();
+        }
+        
         ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}]");
 
         return Task.CompletedTask;
