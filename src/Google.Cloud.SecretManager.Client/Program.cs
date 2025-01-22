@@ -40,7 +40,7 @@ var serviceProvider = services.BuildServiceProvider();
 
 try
 {
-    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GClod-Secrets-Cli"));
+    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Google-Clod-Secrets-Cli"));
 
     var cliHandler = serviceProvider
         .GetRequiredService<CommandSelector>()

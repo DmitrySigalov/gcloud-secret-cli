@@ -10,6 +10,7 @@ public static class SecretDetailsExtensions
     {
         var notRetrievedSecretsIds = secrets
             .Where(x => x.Value.AccessException != null)
+            .Where(x => x.Value == null)
             .Select(x => x.Key)
             .ToHashSet();
 
@@ -89,12 +90,12 @@ public static class SecretDetailsExtensions
                 ConsoleHelper.WriteError($"{secretDetails.Value.AccessException.Status.Detail}");
             }
             
-            Console.WriteLine();
-
             if (hasChanges)
             {
                 ++changesCounter;
             }
+
+            Console.WriteLine();
         }
 
         foreach (var oldSecretDetails in oldSecrets ?? new Dictionary<string, SecretDetails>())
@@ -108,7 +109,7 @@ public static class SecretDetailsExtensions
                 ++changesCounter;
             }
         }
-        
+
         Console.WriteLine();
 
         return changesCounter;

@@ -20,7 +20,7 @@ public class GetSecretsWithProfileHandler : ICommandHandler
 
     public string CommandName => "get-secrets";
     
-    public string Description => "Get (export) secrets with profile configuration";
+    public string Description => "Get secrets with profile configuration";
     
     public async Task Handle(CancellationToken cancellationToken)
     {
@@ -90,6 +90,14 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             {
                 _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
             }
+        }
+        else if (newSecrets.Any())
+        {
+            ConsoleHelper.WriteLineWarn("Fully valid synchronized data");
+        }
+        else
+        {
+            ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
         }
 
         ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} retrieved secrets, {changesCounter} change(s)");
