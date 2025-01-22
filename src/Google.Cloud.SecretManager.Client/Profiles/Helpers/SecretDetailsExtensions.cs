@@ -1,5 +1,6 @@
 using ConsoleTables;
 using Google.Cloud.SecretManager.Client.Common;
+using Grpc.Core;
 
 namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
@@ -32,14 +33,17 @@ public static class SecretDetailsExtensions
         table.Write(Format.Minimal);
     }
     
-    public static async Task<bool> PrintProgressCompareGetSecretLatestValuesAsync(this IDictionary<string, SecretDetails> secrets,
+    public static async Task<int> PrintProgressGetSecretLatestDiffValuesAsync(this IDictionary<string, SecretDetails> secrets,
         Func<KeyValuePair<string, SecretDetails>, Task> secretValueGetter,
         IDictionary<string, SecretDetails> oldSecrets,
         CancellationToken cancellationToken)
     {
-        var compareResult = false;
+        var changesCounter = 0;
         
         ConsoleHelper.WriteLineInfo("Access to latest secret values...");
+
+        var table = new ConsoleTable("sync-status", "secret-id", "decoded value/error");
+        table.Write(Format.Minimal);
 
         foreach (var secretDetails in secrets)
         {
@@ -47,58 +51,77 @@ public static class SecretDetailsExtensions
             
             await secretValueGetter(secretDetails);
             
-            var hasChanged = oldSecrets == null || 
+            var hasChanges = oldSecrets == null || 
                              !oldSecrets.TryGetValue(secretDetails.Key, out var oldSecret) ||
-                             !oldSecret.Equals(secretDetails.Value);
+                             !secretDetails.Value.DecodedValue.Equals(oldSecret.DecodedValue);
             if (secretDetails.Value.AccessException != null)
             {
-                hasChanged = oldSecrets?.ContainsKey(secretDetails.Key) == true;
+                hasChanges = oldSecrets?.ContainsKey(secretDetails.Key) == true;
             }
+
+            Action<string> writeAction = ConsoleHelper.WriteInfo;
+            var syncStatus = "PASS";
 
             if (secretDetails.Value.AccessException != null)
             {
-                ConsoleHelper.WriteError($"{secretDetails.Value.AccessException.StatusCode}\t");
+                writeAction = ConsoleHelper.WriteError;
+                syncStatus = secretDetails.Value.AccessException.StatusCode.ToString();
             }
-            else if (hasChanged)
+            else if (hasChanges)
             {
-                var changeStatus = "CHANGED\t";
+                writeAction = ConsoleHelper.WriteWarn;
+                syncStatus = "CHANGED";
                 if (oldSecrets?.ContainsKey(secretDetails.Key) != true)
                 {
-                    changeStatus = "NEW\t";
+                    syncStatus = "NEW";
                 }
-                ConsoleHelper.WriteNotification($"{changeStatus}\t");
             }
-            else
-            {
-                Console.Write("VALID\t");
-            }
-            
-            Console.Write($"{secretDetails.Key}\t");
+            writeAction($"{syncStatus}\t");
+
+            ConsoleHelper.WriteNotification($"{secretDetails.Key}\t");
             
             if (secretDetails.Value.AccessException == null)
             {
-                Console.WriteLine($"{secretDetails.Value.DecodedValue}");
+                Console.Write($"{secretDetails.Value.DecodedValue}");
             }
             else
             {
-                Console.WriteLine($"{secretDetails.Value.AccessException.Status.Detail}");
+                ConsoleHelper.WriteError($"{secretDetails.Value.AccessException.Status.Detail}");
             }
+            
+            Console.WriteLine();
 
-            compareResult |= hasChanged;
+            if (hasChanges)
+            {
+                ++changesCounter;
+            }
+        }
+
+        foreach (var oldSecretDetails in oldSecrets ?? new Dictionary<string, SecretDetails>())
+        {
+            if (!secrets.TryGetValue(oldSecretDetails.Key, out var newSecretDetails) ||
+                newSecretDetails.AccessException != null)
+            {
+                ConsoleHelper.WriteWarn("DELETED\t");
+                ConsoleHelper.WriteNotification($"{oldSecretDetails.Key}\t");
+                Console.Write($"{oldSecretDetails.Value.DecodedValue}");
+                ++changesCounter;
+            }
         }
         
         Console.WriteLine();
 
-        return compareResult;
+        return changesCounter;
     }
 
     public static void PrintSecretsMappingIdNamesAccessValues(this IDictionary<string, SecretDetails> secrets)
     {
-        var table = new ConsoleTable("secret-id", "environment-variable", "decoded-value");
+        var table = new ConsoleTable("secret-id", "config-path", "environment-variable", "decoded-value");
 
         foreach (var secretDetails in secrets)
         {
             table.AddRow(secretDetails.Key, 
+                secretDetails.Value.ConfigPath, 
                 secretDetails.Value.EnvironmentVariable, 
                 secretDetails.Value.DecodedValue);
         }

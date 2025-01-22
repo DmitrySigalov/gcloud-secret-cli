@@ -69,7 +69,7 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         
         newSecrets.PrintSecretsMappingIdNames();
 
-        var compareResult = await newSecrets.PrintProgressCompareGetSecretLatestValuesAsync(
+        var changesCounter = await newSecrets.PrintProgressGetSecretLatestDiffValuesAsync(
             secret => _secretManagerProvider.ApplySecretLatestValueAsync(
                 selectedProfileDo.ProjectId,
                 secret.Key, secret.Value, 
@@ -79,10 +79,10 @@ public class GetSecretsWithProfileHandler : ICommandHandler
 
         newSecrets.RemoveSecretsWithNoValue();
 
-        if (compareResult)
+        if (changesCounter > 0)
         {
             var dumpSecrets = Prompt.Select(
-                "Do you want to dump changes",
+                $"Dump {changesCounter} change(s)",
                 new[] { true, false, },
                 defaultValue: true);
 
@@ -92,6 +92,6 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             }
         }
 
-        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} resolved secrets");
+        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} retrieved secrets, {changesCounter} change(s)");
     }
 }
