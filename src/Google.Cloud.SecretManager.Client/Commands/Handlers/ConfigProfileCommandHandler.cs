@@ -215,7 +215,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
         }
 
         var newRemoveStartDelimiter = Prompt.Select(
-            "Remove start delimiter?",
+            "Remove start delimiter",
             new[] { true, false, },
             defaultValue: profileConfig.RemoveStartDelimiter);
         if (newRemoveStartDelimiter != profileConfig.RemoveStartDelimiter)
@@ -228,8 +228,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             "Select secret path delimiter",
             new []
             {
-                '_', profileConfig.SecretPathDelimiter, 
-                '/', 
+                '/', '_', 
                 profileConfig.SecretPathDelimiter,
             }.Distinct(),
             defaultValue: profileConfig.SecretPathDelimiter);

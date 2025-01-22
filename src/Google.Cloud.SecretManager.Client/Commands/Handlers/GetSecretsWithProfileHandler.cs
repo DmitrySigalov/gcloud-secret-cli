@@ -58,21 +58,40 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         }
 
         selectedProfileDo.PrintProfileConfig();
+
+        var oldSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
         
         var secretIds = await _secretManagerProvider.GetSecretIdsAsync(
             selectedProfileDo.ProjectId, 
             cancellationToken);
         
-        var secrets = selectedProfileDo.BuildSecretDetails(secretIds);
+        var newSecrets = selectedProfileDo.BuildSecretDetails(secretIds);
         
-        secrets.PrintSecretsMappingIdNames();
+        newSecrets.PrintSecretsMappingIdNames();
 
-        await secrets.PrintProgressGetSecretLatestValuesAsync(
+        var compareResult = await newSecrets.PrintProgressCompareGetSecretLatestValuesAsync(
             secret => _secretManagerProvider.ApplySecretLatestValueAsync(
                 selectedProfileDo.ProjectId,
                 secret.Key, secret.Value, 
-                cancellationToken));
+                cancellationToken),
+            oldSecrets,
+            cancellationToken);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}]");
+        newSecrets.RemoveSecretsWithNoValue();
+
+        if (compareResult)
+        {
+            var dumpSecrets = Prompt.Select(
+                "Do you want to dump changes",
+                new[] { true, false, },
+                defaultValue: true);
+
+            if (dumpSecrets)
+            {
+                _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
+            }
+        }
+
+        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} resolved secrets");
     }
 }

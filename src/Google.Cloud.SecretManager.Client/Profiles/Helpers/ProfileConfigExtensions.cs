@@ -46,9 +46,9 @@ public static class ProfileConfigExtensions
             return result;
         }
         
-        result.EnvironmentVariable = profileConfig.ConvertToEnvironmentVariableName(secretId);
-        
         result.ConfigPath = profileConfig.ConvertToPath(secretId);
+        
+        result.EnvironmentVariable = profileConfig.ConvertToEnvironmentVariableName(secretId);
         
         return result;
     }

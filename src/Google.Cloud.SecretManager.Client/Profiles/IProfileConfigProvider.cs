@@ -9,4 +9,8 @@ public interface IProfileConfigProvider
     void Save(string name, ProfileConfig data);
 
     void Delete(string name);
+
+    IDictionary<string, SecretDetails> ReadSecrets(string name);
+
+    void DumpSecrets(string name, IDictionary<string, SecretDetails> data);
 }
