@@ -1,6 +1,6 @@
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;
 
-public interface IEnvironmentVariablesProvider
+public interface IEnvironmentVariablesProvider2
 {
     ISet<string> GetNames(string baseName = null);
 

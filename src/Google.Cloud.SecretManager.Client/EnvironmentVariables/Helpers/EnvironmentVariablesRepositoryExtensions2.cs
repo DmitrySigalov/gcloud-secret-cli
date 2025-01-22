@@ -3,10 +3,10 @@ using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 
-public static class EnvironmentVariablesRepositoryExtensions
+public static class EnvironmentVariablesRepositoryExtensions2
 {
     public static IDictionary<string, string> SetFromSecrets(
-        this IEnvironmentVariablesProvider environmentVariablesProvider,
+        this IEnvironmentVariablesProvider2 environmentVariablesProvider2,
         IDictionary<string, string> secrets,
         ProfileConfig profileConfig)
     {
@@ -16,7 +16,7 @@ public static class EnvironmentVariablesRepositoryExtensions
         {
             var envVarName = EnvironmentVariableNameConverter.ConvertFromSecretId(ssmParam.Key, profileConfig);
             
-            environmentVariablesProvider.Set(envVarName, ssmParam.Value);
+            environmentVariablesProvider2.Set(envVarName, ssmParam.Value);
             
             result[envVarName] = ssmParam.Value;
         }
@@ -25,7 +25,7 @@ public static class EnvironmentVariablesRepositoryExtensions
     }
     
     public static IDictionary<string, string> GetAll(
-        this IEnvironmentVariablesProvider environmentVariablesProvider,
+        this IEnvironmentVariablesProvider2 environmentVariablesProvider2,
         ProfileConfig profileConfig)
     {
         var result = new SortedDictionary<string, string>();
@@ -39,7 +39,7 @@ public static class EnvironmentVariablesRepositoryExtensions
             .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretId(x, profileConfig))
             .ToArray();
 
-        var environmentVariablesToGet = environmentVariablesProvider
+        var environmentVariablesToGet = environmentVariablesProvider2
             .GetNames(convertedEnvironmentVariableBaseNames);
 
         if (environmentVariablesToGet.Any() == false)
@@ -49,7 +49,7 @@ public static class EnvironmentVariablesRepositoryExtensions
 
         foreach (var envVarName in environmentVariablesToGet)
         {
-            var envVarValue = environmentVariablesProvider.Get(envVarName);
+            var envVarValue = environmentVariablesProvider2.Get(envVarName);
             
             result.Add(envVarName, envVarValue);
         }
@@ -58,7 +58,7 @@ public static class EnvironmentVariablesRepositoryExtensions
     }
     
     public static IDictionary<string, string> DeleteAll(
-        this IEnvironmentVariablesProvider environmentVariablesProvider,
+        this IEnvironmentVariablesProvider2 environmentVariablesProvider2,
         ProfileConfig profileConfig)
     {
         var result = new SortedDictionary<string, string>();
@@ -67,7 +67,7 @@ public static class EnvironmentVariablesRepositoryExtensions
             .Select(x => EnvironmentVariableNameConverter.ConvertFromSecretId(x, profileConfig))
             .ToArray();
 
-        var environmentVariablesToDelete = environmentVariablesProvider
+        var environmentVariablesToDelete = environmentVariablesProvider2
             .GetNames(convertedEnvironmentVariableBaseNames);
 
         if (environmentVariablesToDelete.Any() == false)
@@ -77,9 +77,9 @@ public static class EnvironmentVariablesRepositoryExtensions
 
         foreach (var envVarName in environmentVariablesToDelete)
         {
-            var envVarValue = environmentVariablesProvider.Get(envVarName);
+            var envVarValue = environmentVariablesProvider2.Get(envVarName);
             
-            environmentVariablesProvider.Set(envVarName, null);
+            environmentVariablesProvider2.Set(envVarName, null);
             
             result.Add(envVarName, envVarValue);
         }
@@ -88,11 +88,11 @@ public static class EnvironmentVariablesRepositoryExtensions
     }
     
     private static ISet<string> GetNames(
-        this IEnvironmentVariablesProvider environmentVariablesProvider,
+        this IEnvironmentVariablesProvider2 environmentVariablesProvider2,
         IEnumerable<string> baseNames)
     {
         return baseNames
-            .Select(environmentVariablesProvider.GetNames)
+            .Select(environmentVariablesProvider2.GetNames)
             .SelectMany(x => x)
             .OrderBy(x => x)
             .ToHashSet();

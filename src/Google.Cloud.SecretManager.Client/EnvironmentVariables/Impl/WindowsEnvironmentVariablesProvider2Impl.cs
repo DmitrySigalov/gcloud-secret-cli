@@ -2,7 +2,7 @@ using Microsoft.Win32;
 
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 
-public class WindowsEnvironmentVariablesProviderImpl : IEnvironmentVariablesProvider
+public class WindowsEnvironmentVariablesProvider2Impl : IEnvironmentVariablesProvider2
 {
     public ISet<string> GetNames(string baseName = null)
     {

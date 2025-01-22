@@ -1,5 +1,4 @@
 using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
@@ -10,15 +9,10 @@ public class ViewProfileHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
 
-    private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
-
     public ViewProfileHandler(
-        IProfileConfigProvider profileConfigProvider,
-        IEnvironmentVariablesProvider environmentVariablesProvider)
+        IProfileConfigProvider profileConfigProvider)
     {
         _profileConfigProvider = profileConfigProvider;
-
-        _environmentVariablesProvider = environmentVariablesProvider;
     }
     
     public string CommandName => "view";
