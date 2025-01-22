@@ -1,4 +1,5 @@
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
@@ -6,33 +7,32 @@ namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 
 public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesProvider
 {
-    private const string FILE_NAME = "environment_descriptor.json";
-    
-    private readonly ILogger _logger;
-    
     protected BaseEnvironmentVariablesProvider(
         IUserFilesProvider userFilesProvider,
         ILogger logger)
     {
         UserFilesProvider = userFilesProvider;
 
-        _logger = logger;
+        Logger = logger;
     }
 
     protected IUserFilesProvider UserFilesProvider { get; }
 
+    protected ILogger Logger { get; }
+    
     public EnvironmentDescriptor Get()
     {
         try
         {
             var fileText = UserFilesProvider
-                .ReadTextFileIfExist(FILE_NAME, FolderTypeEnum.ToolUser);
+                .ReadTextFileIfExist(EnvironmentVariablesConsts.FileNames.Descriptor, 
+                    FolderTypeEnum.ToolUser);
 
             return JsonSerializationHelper.Deserialize<EnvironmentDescriptor>(fileText);
         }
         catch (Exception ex)
         {
-            _logger?.LogError(
+            Logger?.LogError(
                 ex,
                 "Error on attempt to read descriptor file with list of active environment variables. One of possible reasons - file was corrupted.");
 
@@ -51,7 +51,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
             // Add/update new variables
             foreach (var newVariable in newData.Variables)
             {
-                OnSetEnvironmentVariable(newVariable.Key, newVariable.Value);
+                OnSetEnvironmentVariable(currentData, newVariable.Key, newVariable.Value);
             
                 currentData.Variables[newVariable.Key] = newVariable.Value;
             }
@@ -63,22 +63,42 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
                 .Select(x => x.Key);
             foreach (var varName in variableNamesToDelete)
             {
-                OnDeleteEnvironmentVariable(varName);
+                OnDeleteEnvironmentVariable(currentData, varName);
+                
+                currentData.Variables.Remove(varName);
             }
         }
         finally
         {
-            var fileText = JsonSerializationHelper.Serialize(currentData);
-        
-            UserFilesProvider.WriteTextFile(FILE_NAME, fileText, FolderTypeEnum.ToolUser);
-            
+            DumpDescriptor(currentData);
+
             OnFinishSet(currentData, outputCallback);
         }
     }
 
-    protected abstract void OnSetEnvironmentVariable(string name, string value);
+    protected abstract void OnSetEnvironmentVariable(EnvironmentDescriptor data, 
+        string name, string value);
 
-    protected abstract void OnDeleteEnvironmentVariable(string name);
+    protected abstract void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, 
+        string name);
 
     protected abstract void OnFinishSet(EnvironmentDescriptor data, Action<string> outputCallback);
+
+    private void DumpDescriptor(EnvironmentDescriptor descriptor)
+    {
+        try
+        {
+            var fileText = JsonSerializationHelper.Serialize(descriptor);
+
+            UserFilesProvider.WriteTextFile(EnvironmentVariablesConsts.FileNames.Descriptor,
+                fileText,
+                FolderTypeEnum.ToolUser);
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(
+                ex,
+                "Error on attempt to save descriptor file with list of active environment variables");
+        }
+    }
 }

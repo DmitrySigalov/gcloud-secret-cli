@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;
@@ -9,13 +10,13 @@ public static class StartupExtensions
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            // serviceCollection
-            //     .AddSingleton<IEnvironmentVariablesProvider2, WindowsEnvironmentVariablesProvider2Impl>();
+            serviceCollection
+                .AddSingleton<IEnvironmentVariablesProvider, WindowsEnvironmentVariablesProviderImpl>();
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            // serviceCollection
-            //     .AddSingleton<IEnvironmentVariablesProvider2, OsxEnvironmentVariablesProvider2Impl>();
+            serviceCollection
+                .AddSingleton<IEnvironmentVariablesProvider, OsxEnvironmentVariablesProviderImpl>();
         }
         else
         {

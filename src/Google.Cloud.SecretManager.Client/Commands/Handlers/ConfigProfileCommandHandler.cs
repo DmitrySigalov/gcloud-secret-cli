@@ -228,7 +228,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             "Select secret path delimiter",
             new []
             {
-                '/', '_', 
+                '/', '_', '\\',
                 profileConfig.SecretPathDelimiter,
             }.Distinct(),
             defaultValue: profileConfig.SecretPathDelimiter);

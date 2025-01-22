@@ -69,9 +69,9 @@ public static class ProfileConfigExtensions
         
         foreach (var c in secretId)
         {
-            if (EnvironmentVariableNameValidationRule.InvalidVariableNameCharacters.Contains(c))
+            if (EnvironmentVariablesConsts.InvalidVariableNameCharacters.Contains(c))
             {
-                result.Append(EnvironmentVariablesConsts.VariableNameDelimeter);
+                result.Append(EnvironmentVariablesConsts.VariableNameDelimiter);
 
                 continue;
             }
