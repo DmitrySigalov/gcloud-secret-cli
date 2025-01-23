@@ -11,7 +11,7 @@ public static class SecretDetailsExtensions
                 kvp => kvp.Key, 
                 kvp => kvp.Value.DecodedValue);
     
-    public static IDictionary<string, string> ToEnvironmentDictionary(this IDictionary<string, SecretDetails> secrets)
+    public static SortedDictionary<string, string> ToEnvironmentDictionary(this IDictionary<string, SecretDetails> secrets)
     {
         var result = new SortedDictionary<string, string>();
 

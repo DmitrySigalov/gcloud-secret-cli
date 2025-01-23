@@ -100,7 +100,7 @@ public class DumpSecretsHandler : ICommandHandler
 
         if (!dumpSecrets)
         {
-            ConsoleHelper.WriteLineNotification($"No dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
 
             return;
         }
@@ -142,7 +142,7 @@ public class DumpSecretsHandler : ICommandHandler
             }
             else if (hasChanges)
             {
-                writeAction = ConsoleHelper.WriteWarn;
+                writeAction = ConsoleHelper.WriteNotification;
                 syncStatus = "CHANGED";
                 if (oldSecrets?.ContainsKey(secretDetails.Key) != true)
                 {
@@ -163,7 +163,7 @@ public class DumpSecretsHandler : ICommandHandler
         {
             if (!newSecrets.ContainsKey(oldSecretDetails.Key))
             {
-                ConsoleHelper.WriteWarn("DELETED\t");
+                ConsoleHelper.WriteNotification("DELETED\t");
                 Console.WriteLine($"{oldSecretDetails.Key}\t");
                 ++changesCounter;
             }

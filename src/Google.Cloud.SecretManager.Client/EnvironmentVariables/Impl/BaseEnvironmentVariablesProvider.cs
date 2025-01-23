@@ -40,8 +40,14 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         }
     }
 
-    public void Set(EnvironmentDescriptor newData, Action<string> outputCallback)
+    public void Set(EnvironmentDescriptor newData, 
+        bool skipCheckChanges,
+        Action<string> outputCallback)
     {
+        var newCounter = 0;
+        var updateCounter = 0;
+        var deleteCounter = 0;
+        
         var currentData = Get() ?? new EnvironmentDescriptor();
         
         try
@@ -51,28 +57,63 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
             // Add/update new variables
             foreach (var newVariable in newData.Variables)
             {
-                OnSetEnvironmentVariable(currentData, outputCallback, newVariable.Key, newVariable.Value);
+                var availableStatus = currentData.Variables.TryGetValue(newVariable.Key, out var oldValue);
+                
+                if (skipCheckChanges || 
+                    !availableStatus || 
+                    newVariable.Value != oldValue)
+                {
+                    OnSetEnvironmentVariable(currentData, outputCallback, newVariable.Key, newVariable.Value);
             
-                currentData.Variables[newVariable.Key] = newVariable.Value;
+                    currentData.Variables[newVariable.Key] = newVariable.Value;
+
+                    if (availableStatus)
+                    {
+                        updateCounter++;
+                    }
+                    else
+                    {
+                        newCounter++;
+                    }
+                }
             }
         
             // Delete not actual variables
             var variableNamesToDelete = currentData
                 .Variables
                 .Where(x => !newData.Variables.ContainsKey(x.Key))
-                .Select(x => x.Key);
+                .Select(x => x.Key)
+                .ToArray();
             foreach (var varName in variableNamesToDelete)
             {
                 OnDeleteEnvironmentVariable(currentData, outputCallback, varName);
                 
                 currentData.Variables.Remove(varName);
+                
+                deleteCounter++;
             }
         }
         finally
         {
-            DumpDescriptor(currentData);
+            if (newCounter + updateCounter + deleteCounter > 0)
+            {
+                if (newCounter > 0)
+                {
+                    outputCallback($"Created {newCounter} environment variables");
+                }
+                if (updateCounter > 0)
+                {
+                    outputCallback($"Updated {updateCounter} environment variables");
+                }
+                if (deleteCounter > 0)
+                {
+                    outputCallback($"Deleted {deleteCounter} environment variables");
+                }
+                
+                DumpDescriptor(currentData);
 
-            OnFinishSet(currentData, outputCallback);
+                OnFinishSet(currentData, outputCallback);
+            }
         }
     }
 

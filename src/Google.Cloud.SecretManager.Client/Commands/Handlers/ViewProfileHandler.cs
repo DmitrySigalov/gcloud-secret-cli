@@ -1,5 +1,6 @@
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
@@ -39,12 +40,15 @@ public class ViewProfileHandler : ICommandHandler
             return Task.CompletedTask;
         }
 
+        var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
+
         var selectedProfileName =
             profileNames.Count == 1
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
-                    items: profileNames);
+                    items: profileNames,
+                    defaultValue: currentEnvironmentDescriptor.ProfileName);
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
@@ -70,8 +74,7 @@ public class ViewProfileHandler : ICommandHandler
 
         currentSecrets.PrintSecretsMappingIdNamesAccessValues();
 
-        var environmentDescriptor = _environmentVariablesProvider.Get();
-        if (!selectedProfileName.Equals(environmentDescriptor?.ProfileName, StringComparison.InvariantCultureIgnoreCase))
+        if (selectedProfileName != currentEnvironmentDescriptor.ProfileName)
         {
             ConsoleHelper.WriteLineError(
                 $"Current profile [{selectedProfileName}] is inactive in the environment variables system");
@@ -81,10 +84,10 @@ public class ViewProfileHandler : ICommandHandler
 
         var newEnvironmentVariables = currentSecrets.ToEnvironmentDictionary();
         
-        if (!newEnvironmentVariables.Equals(environmentDescriptor?.Variables ?? new SortedDictionary<string, string>()))
+        if (currentEnvironmentDescriptor.HasDiff(newEnvironmentVariables))
         {
             ConsoleHelper.WriteLineError(
-                $"Current profile [{selectedProfileName}] has differences with the environment variables system");
+                $"Current profile [{selectedProfileName}] has different secret values with the environment variables system");
 
             return Task.CompletedTask;
         }
