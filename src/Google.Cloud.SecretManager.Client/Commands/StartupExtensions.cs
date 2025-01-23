@@ -1,4 +1,5 @@
 using Google.Cloud.SecretManager.Client.Commands.Handlers;
+using Google.Cloud.SecretManager.Client.Commands.Handlers.Environment;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Google.Cloud.SecretManager.Client.Commands;
@@ -15,6 +16,7 @@ public static class StartupExtensions
             // Regular commands
             .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
             .AddSingleton<ICommandHandler, ViewProfileHandler>()
             .AddSingleton<ICommandHandler, DumpSecretsHandler>()
             .AddSingleton<ICommandHandler, ImportSecretsFromClipboardHandler>()

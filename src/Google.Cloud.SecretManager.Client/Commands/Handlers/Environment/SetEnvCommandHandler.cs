@@ -5,7 +5,7 @@ using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Environment;
 
 public class SetEnvCommandHandler : ICommandHandler
 {
@@ -55,7 +55,7 @@ public class SetEnvCommandHandler : ICommandHandler
         var newSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
         if (newSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"No secret values dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not dumped secret values according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }

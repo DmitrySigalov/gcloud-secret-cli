@@ -67,7 +67,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (currentSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"No secret values dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not dumped secret values according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }

@@ -1,4 +1,5 @@
 using Google.Cloud.SecretManager.Client.Commands.Handlers;
+using Google.Cloud.SecretManager.Client.Commands.Handlers.Environment;
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
