@@ -64,13 +64,14 @@ public class SecretManagerProviderImpl : ISecretManagerProvider
             // Decode the secret payload
             var decodedValue = response.Payload?.Data?.ToStringUtf8();
 
-            secretDetails.AccessException = null;
+            secretDetails.AccessStatusCode = StatusCode.OK;
             secretDetails.DecodedValue = decodedValue;
             
         }
         catch (RpcException e)
         {
-            secretDetails.AccessException = e;
+            secretDetails.AccessStatusCode = e.StatusCode;
+            secretDetails.DecodedValue = null;
         }
     }
 

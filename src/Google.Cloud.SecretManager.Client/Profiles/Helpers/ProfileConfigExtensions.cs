@@ -6,9 +6,6 @@ namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
 public static class ProfileConfigExtensions
 {
-    public static bool IsValid(this ProfileConfig profileConfig) =>
-        !string.IsNullOrEmpty(profileConfig?.ProjectId);
-
     public static ProfileConfig CloneObject(this ProfileConfig profileConfig)
     {
         var json = JsonSerializationHelper.Serialize(profileConfig);

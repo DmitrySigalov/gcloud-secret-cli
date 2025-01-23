@@ -1,7 +1,9 @@
+using ConsoleTables;
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
+using Grpc.Core;
 using Sharprompt;
 
 namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
@@ -69,22 +71,19 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         
         newSecrets.PrintSecretsMappingIdNames();
 
-        var changesCounter = await newSecrets.PrintProgressGetSecretLatestDiffValuesAsync(
-            secret => _secretManagerProvider.ApplySecretLatestValueAsync(
-                selectedProfileDo.ProjectId,
-                secret.Key, secret.Value, 
-                cancellationToken),
-            oldSecrets,
+        var changesCounter = await ProgressGetSecretLatestValuesAsync(selectedProfileDo.ProjectId,
+            newSecrets, oldSecrets,
             cancellationToken);
 
-        newSecrets.RemoveSecretsWithNoValue();
+        var successCounter = newSecrets.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
+        var errorCounter = newSecrets.Count(x => x.Value.AccessStatusCode != StatusCode.OK);
 
         if (changesCounter > 0)
         {
             var dumpSecrets = Prompt.Select(
-                $"Dump {changesCounter} change(s)",
+                $"Dump {changesCounter} change(s) ({successCounter} value(s), {errorCounter} error(s))",
                 new[] { true, false, },
-                defaultValue: true);
+                defaultValue: errorCounter == 0);
 
             if (dumpSecrets)
             {
@@ -93,13 +92,88 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         }
         else if (newSecrets.Any())
         {
-            ConsoleHelper.WriteLineWarn("Fully valid synchronized data");
+            ConsoleHelper.WriteLineWarn($"Fully valid synchronized data ({successCounter} value(s), {errorCounter} error(s))");
         }
         else
         {
             ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
         }
 
-        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} retrieved secrets, {changesCounter} change(s)");
+        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} retrieved secrets");
+    }
+    
+    private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,
+        IDictionary<string, SecretDetails> newSecrets,
+        IDictionary<string, SecretDetails> oldSecrets,
+        CancellationToken cancellationToken)
+    {
+        var changesCounter = 0;
+        
+        ConsoleHelper.WriteLineInfo("Access to latest secret values...");
+
+        var table = new ConsoleTable("sync-status", "secret-id", "decoded value/error");
+        table.Write(Format.Minimal);
+
+        foreach (var secretDetails in newSecrets)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            await _secretManagerProvider.ApplySecretLatestValueAsync(
+                projectId,
+                secretDetails.Key, secretDetails.Value,
+                cancellationToken);
+            
+            var hasChanges = oldSecrets == null || 
+                             !oldSecrets.TryGetValue(secretDetails.Key, out var oldSecret) ||
+                             secretDetails.Value.DecodedValue != oldSecret.DecodedValue;
+
+            Action<string> writeAction = ConsoleHelper.WriteInfo;
+            var syncStatus = "PASS";
+
+            if (secretDetails.Value.AccessStatusCode != StatusCode.OK)
+            {
+                writeAction = ConsoleHelper.WriteError;
+                syncStatus = secretDetails.Value.AccessStatusCode.ToString();
+            }
+            else if (hasChanges)
+            {
+                writeAction = ConsoleHelper.WriteWarn;
+                syncStatus = "CHANGED";
+                if (oldSecrets?.ContainsKey(secretDetails.Key) != true)
+                {
+                    syncStatus = "NEW";
+                }
+            }
+            writeAction($"{syncStatus}\t");
+
+            ConsoleHelper.WriteNotification($"{secretDetails.Key}\t");
+            
+            if (secretDetails.Value.AccessStatusCode == StatusCode.OK)
+            {
+                Console.Write($"{secretDetails.Value.DecodedValue}");
+            }
+            
+            if (hasChanges)
+            {
+                ++changesCounter;
+            }
+
+            Console.WriteLine();
+        }
+
+        foreach (var oldSecretDetails in oldSecrets ?? new Dictionary<string, SecretDetails>())
+        {
+            if (!newSecrets.ContainsKey(oldSecretDetails.Key))
+            {
+                ConsoleHelper.WriteWarn("DELETED\t");
+                ConsoleHelper.WriteNotification($"{oldSecretDetails.Key}\t");
+                Console.Write($"{oldSecretDetails.Value.DecodedValue}");
+                ++changesCounter;
+            }
+        }
+
+        Console.WriteLine();
+
+        return changesCounter;
     }
 }
