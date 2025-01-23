@@ -26,7 +26,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         {
             var fileText = UserFilesProvider
                 .ReadTextFileIfExist(EnvironmentVariablesConsts.FileNames.Descriptor, 
-                    FolderTypeEnum.ToolUser);
+                    FolderTypeEnum.UserToolConfiguration);
 
             return JsonSerializationHelper.Deserialize<EnvironmentDescriptor>(fileText);
         }
@@ -133,7 +133,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
 
             UserFilesProvider.WriteTextFile(EnvironmentVariablesConsts.FileNames.Descriptor,
                 fileText,
-                FolderTypeEnum.ToolUser);
+                FolderTypeEnum.UserToolConfiguration);
         }
         catch (Exception ex)
         {

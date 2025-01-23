@@ -23,7 +23,7 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
     public ISet<string> GetNames()
     {
         return _userFilesProvider
-            .GetFileNames(ProfileFileNameResolver.SearchFileNamePattern, FolderTypeEnum.ToolUser)
+            .GetFileNames(ProfileFileNameResolver.SearchFileNamePattern, FolderTypeEnum.UserToolConfiguration)
             .Select(ProfileFileNameResolver.ExtractProfileName)
             .OrderBy(x => x)
             .ToHashSet();
@@ -36,7 +36,7 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
         try
         {
             var fileText = _userFilesProvider
-                .ReadTextFileIfExist(fileName, FolderTypeEnum.ToolUser);
+                .ReadTextFileIfExist(fileName, FolderTypeEnum.UserToolConfiguration);
 
             return JsonSerializationHelper.Deserialize<ProfileConfig>(fileText);
         }
@@ -58,7 +58,7 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
         {
             var fileText = JsonSerializationHelper.Serialize(data);
         
-            _userFilesProvider.WriteTextFile(profileFileName, fileText, FolderTypeEnum.ToolUser);
+            _userFilesProvider.WriteTextFile(profileFileName, fileText, FolderTypeEnum.UserToolConfiguration);
         }
         catch (Exception e)
         {
@@ -75,8 +75,8 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
 
         try
         {
-            _userFilesProvider.DeleteFile(secretsFileName, FolderTypeEnum.ToolUser);
-            _userFilesProvider.DeleteFile(profileFileName, FolderTypeEnum.ToolUser);
+            _userFilesProvider.DeleteFile(secretsFileName, FolderTypeEnum.UserToolConfiguration);
+            _userFilesProvider.DeleteFile(profileFileName, FolderTypeEnum.UserToolConfiguration);
         }
         catch (Exception e)
         {
@@ -93,7 +93,7 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
         try
         {
             var fileText = _userFilesProvider
-                .ReadTextFileIfExist(fileName, FolderTypeEnum.ToolUser);
+                .ReadTextFileIfExist(fileName, FolderTypeEnum.UserToolConfiguration);
 
             return JsonSerializationHelper.Deserialize<Dictionary<string, SecretDetails>>(fileText);
         }
@@ -111,7 +111,7 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
         {
             var fileText = JsonSerializationHelper.Serialize(data);
         
-            _userFilesProvider.WriteTextFile(fileName, fileText, FolderTypeEnum.ToolUser);
+            _userFilesProvider.WriteTextFile(fileName, fileText, FolderTypeEnum.UserToolConfiguration);
         }
         catch (Exception e)
         {

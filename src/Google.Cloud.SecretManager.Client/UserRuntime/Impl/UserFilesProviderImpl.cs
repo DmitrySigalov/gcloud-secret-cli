@@ -111,7 +111,7 @@ public class UserFilesProviderImpl : IUserFilesProvider
         
         path = Path.GetFullPath(path);
 
-        if (folderType == FolderTypeEnum.ToolUser)
+        if (folderType == FolderTypeEnum.UserToolConfiguration)
         {
             path = Path.Combine(path, ".gcloud-secrets-cli");
         }

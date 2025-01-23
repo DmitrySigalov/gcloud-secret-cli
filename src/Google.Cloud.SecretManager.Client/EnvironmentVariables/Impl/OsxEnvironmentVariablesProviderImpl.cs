@@ -42,7 +42,7 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
 
             UserFilesProvider.WriteTextFile(fileScriptName, 
                 fileScriptText, 
-                FolderTypeEnum.ToolUser);
+                FolderTypeEnum.UserToolConfiguration);
             
             outputCallback($"Dumped [{fileScriptName}] file with activated environment variables");
         }
@@ -60,7 +60,7 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
         {
             var scriptFilePath = UserFilesProvider.GetFullFilePath(
                 EnvironmentVariablesConsts.FileNames.ScriptName,
-                FolderTypeEnum.ToolUser);
+                FolderTypeEnum.UserToolConfiguration);
 
             var rootFileScriptPath = UserFilesProvider.GetFullFilePath(
                 ShellHelper.GetShellScriptFileName(),
