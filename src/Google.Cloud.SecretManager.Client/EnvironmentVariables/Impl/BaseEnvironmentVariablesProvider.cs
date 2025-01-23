@@ -44,7 +44,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         bool skipCheckChanges,
         Action<string> outputCallback)
     {
-        var newCounter = 0;
+        var createCounter = 0;
         var updateCounter = 0;
         var deleteCounter = 0;
         
@@ -73,7 +73,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
                     }
                     else
                     {
-                        newCounter++;
+                        createCounter++;
                     }
                 }
             }
@@ -89,31 +89,28 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
                 OnDeleteEnvironmentVariable(currentData, outputCallback, varName);
                 
                 currentData.Variables.Remove(varName);
-                
+
                 deleteCounter++;
             }
         }
         finally
         {
-            if (newCounter + updateCounter + deleteCounter > 0)
+            if (createCounter > 0)
             {
-                if (newCounter > 0)
-                {
-                    outputCallback($"Created {newCounter} environment variables");
-                }
-                if (updateCounter > 0)
-                {
-                    outputCallback($"Updated {updateCounter} environment variables");
-                }
-                if (deleteCounter > 0)
-                {
-                    outputCallback($"Deleted {deleteCounter} environment variables");
-                }
-                
-                DumpDescriptor(currentData);
-
-                OnFinishSet(currentData, outputCallback);
+                outputCallback($"Created {createCounter} environment variables");
             }
+            if (updateCounter > 0)
+            {
+                outputCallback($"Updated {updateCounter} environment variables");
+            }
+            if (deleteCounter > 0)
+            {
+                outputCallback($"Deleted {deleteCounter} environment variables");
+            }
+                
+            DumpDescriptor(currentData);
+
+            OnFinishSet(currentData, outputCallback);
         }
     }
 

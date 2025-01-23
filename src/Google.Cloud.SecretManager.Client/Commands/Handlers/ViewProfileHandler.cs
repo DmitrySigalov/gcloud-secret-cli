@@ -67,7 +67,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (currentSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"No dumped secrets according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"No secret values dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -77,9 +77,7 @@ public class ViewProfileHandler : ICommandHandler
         if (selectedProfileName != currentEnvironmentDescriptor.ProfileName)
         {
             ConsoleHelper.WriteLineError(
-                $"Current profile [{selectedProfileName}] is inactive in the environment variables system");
-
-            return Task.CompletedTask;
+                $"Profile [{selectedProfileName}] is inactive in the environment variables system");
         }
 
         var newEnvironmentVariables = currentSecrets.ToEnvironmentDictionary();
@@ -87,13 +85,13 @@ public class ViewProfileHandler : ICommandHandler
         if (currentEnvironmentDescriptor.HasDiff(newEnvironmentVariables))
         {
             ConsoleHelper.WriteLineError(
-                $"Current profile [{selectedProfileName}] has different secret values with the environment variables system");
+                $"Profile [{selectedProfileName}] has different secret values with the environment variables system");
 
             return Task.CompletedTask;
         }
         
         ConsoleHelper.WriteLineInfo(
-            $"Current profile [{selectedProfileName}] is fully synchronized with the environment variables system");
+            $"Profile [{selectedProfileName}] is fully synchronized with the environment variables system");
 
         return Task.CompletedTask;
     }

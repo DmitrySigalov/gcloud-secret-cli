@@ -55,7 +55,7 @@ public class SetEnvCommandHandler : ICommandHandler
         var newSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
         if (newSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"No dumped secrets according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"No secret values dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -76,18 +76,14 @@ public class SetEnvCommandHandler : ICommandHandler
             return Task.CompletedTask;
         }
         
-        if (string.IsNullOrEmpty(currentEnvironmentDescriptor.ProfileName))
-        {
-            forceUpdate = true;
-        }
-        else if (!selectedProfileName.Equals(currentEnvironmentDescriptor.ProfileName, StringComparison.InvariantCultureIgnoreCase))
+        if (!string.IsNullOrEmpty(currentEnvironmentDescriptor.ProfileName) &&
+            !selectedProfileName.Equals(currentEnvironmentDescriptor.ProfileName, StringComparison.InvariantCultureIgnoreCase))
         {
             ConsoleHelper.WriteLineNotification(
                 $"Start switch profile from [{currentEnvironmentDescriptor.ProfileName}] to [{selectedProfileName}] in the environment variables system");
-
-            forceUpdate = true;
         }
-        else if (!newDescriptor.HasDiff(currentEnvironmentDescriptor.Variables))
+
+        if (!newDescriptor.HasDiff(currentEnvironmentDescriptor.Variables))
         {
             ConsoleHelper.WriteLineInfo(
                 $"Profile [{selectedProfileName}] already is fully synchronized with the environment variables system");

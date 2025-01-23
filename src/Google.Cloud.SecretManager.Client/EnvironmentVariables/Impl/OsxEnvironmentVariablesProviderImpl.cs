@@ -44,13 +44,13 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
                 fileScriptText, 
                 FolderTypeEnum.UserToolConfiguration);
             
-            outputCallback($"Dumped [{fileScriptName}] file with activated environment variables");
+            outputCallback($"Created [{fileScriptName}] file with activated environment variables");
         }
         catch (Exception e)
         {
             Logger.LogError(
                 e,
-                $"Error on attempt to dump [{fileScriptName}] file with list of activated environment variables");
+                $"Error on attempt to create [{fileScriptName}] file with list of activated environment variables");
         }
     }
     

@@ -48,7 +48,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
             ?.ToDictionary();
         if (currentSecrets?.Any() != true)
         {
-            ConsoleHelper.WriteLineNotification($"No valid secrets in the dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not valid secrets in the dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
 
