@@ -37,7 +37,7 @@ public class SetEnvCommandHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -55,7 +55,7 @@ public class SetEnvCommandHandler : ICommandHandler
         var newSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
         if (newSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"Not dumped secret values according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -71,7 +71,7 @@ public class SetEnvCommandHandler : ICommandHandler
         
         if (!newDescriptor.Variables.Any())
         {
-            ConsoleHelper.WriteLineNotification($"Not found any dumped secret values according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }

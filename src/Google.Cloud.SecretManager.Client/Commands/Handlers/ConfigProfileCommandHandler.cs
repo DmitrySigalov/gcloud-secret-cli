@@ -4,7 +4,6 @@ using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
-using TextCopy;
 
 namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
@@ -73,8 +72,6 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
                 { "Reset to defaults", ResetDefaultSettings },
-                { "Import settings (paste json from clipboard)", ImportJsonFromClipboard },
-                { "Export settings (copy json into clipboard)", ExportJsonIntoClipboard },
            };
 
             lastSelectedOperationKey = Prompt.Select(
@@ -252,39 +249,5 @@ public class ConfigProfileCommandHandler : ICommandHandler
         newProfileConfig.ProjectId = profileConfig.ProjectId ?? newProfileConfig.ProjectId;
         
         return Task.FromResult((true, newProfileConfig));
-    }
-
-    private Task<(bool, ProfileConfig)> ImportJsonFromClipboard(ProfileConfig profileConfig)
-    {
-        var newJson = ClipboardService.GetText()?.Trim(); 
-        
-        if (!string.IsNullOrWhiteSpace(newJson))
-        {
-            try
-            {
-                var newProfileConfig = JsonSerializationHelper.Deserialize<ProfileConfig>(newJson);
-
-                return Task.FromResult((newProfileConfig != null, newProfileConfig));
-            }
-            catch (Exception e)
-            {
-                ConsoleHelper.WriteLineNotification(newJson);
-
-                ConsoleHelper.WriteLineError(e.Message);
-            }
-        }
-
-        return Task.FromResult((false, profileConfig));
-    }
-    
-    private Task<(bool, ProfileConfig)>  ExportJsonIntoClipboard(ProfileConfig profileConfig)
-    {
-        var json = JsonSerializationHelper.Serialize(profileConfig);
-        
-        ClipboardService.SetText(json);
-
-        ConsoleHelper.WriteLineNotification(json);
-
-        return Task.FromResult((false, profileConfig));
     }
 }

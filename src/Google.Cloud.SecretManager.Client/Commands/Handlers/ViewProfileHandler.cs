@@ -22,7 +22,7 @@ public class ViewProfileHandler : ICommandHandler
     
     public string CommandName => "view";
     
-    public string Description => "View profile configuration and dumped secrets";
+    public string Description => "View profile full related details";
 
     public Task Handle(CancellationToken cancellationToken)
     {
@@ -67,7 +67,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (currentSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"Not dumped secret values according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -76,7 +76,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (selectedProfileName != currentEnvironmentDescriptor.ProfileName)
         {
-            ConsoleHelper.WriteLineError(
+            ConsoleHelper.WriteLineNotification(
                 $"Profile [{selectedProfileName}] is inactive in the environment variables system");
         }
 

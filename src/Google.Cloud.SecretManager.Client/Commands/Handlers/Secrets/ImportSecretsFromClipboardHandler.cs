@@ -5,7 +5,7 @@ using Grpc.Core;
 using Sharprompt;
 using TextCopy;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.SecretValues;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
 public class ImportSecretsFromClipboardHandler : ICommandHandler
 {
@@ -44,7 +44,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
             "Get profile names");
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -61,7 +61,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
             $"Read profile [{selectedProfileName}]");
         if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }

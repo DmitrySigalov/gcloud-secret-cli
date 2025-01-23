@@ -4,7 +4,7 @@ using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 using TextCopy;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.SecretValues;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
 public class ExportSecretsToClipboardHandler : ICommandHandler
 {
@@ -31,7 +31,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -48,7 +48,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
             ?.ToDictionary();
         if (currentSecrets?.Any() != true)
         {
-            ConsoleHelper.WriteLineNotification($"Not valid secrets in the dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
 

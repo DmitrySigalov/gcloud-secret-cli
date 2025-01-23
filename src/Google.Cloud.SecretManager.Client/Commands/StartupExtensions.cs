@@ -1,6 +1,6 @@
 using Google.Cloud.SecretManager.Client.Commands.Handlers;
 using Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.Commands.Handlers.SecretValues;
+using Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Google.Cloud.SecretManager.Client.Commands;

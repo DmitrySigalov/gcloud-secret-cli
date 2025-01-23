@@ -5,7 +5,7 @@ using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Grpc.Core;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.SecretValues;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
 public class DumpSecretsHandler : ICommandHandler
 {
@@ -21,7 +21,7 @@ public class DumpSecretsHandler : ICommandHandler
 
     public string CommandName => "dump-secrets";
     
-    public string Description => "Get and dump google secrets";
+    public string Description => "Get and save secrets from google";
 
     public async Task Handle(CancellationToken cancellationToken)
     {
@@ -52,7 +52,7 @@ public class DumpSecretsHandler : ICommandHandler
 
         if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
             return;
         }
