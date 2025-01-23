@@ -1,4 +1,3 @@
-using ConsoleTables;
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
@@ -8,22 +7,22 @@ using Sharprompt;
 
 namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
-public class GetSecretsWithProfileHandler : ICommandHandler
+public class DumpSecretsHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
-    public GetSecretsWithProfileHandler(IProfileConfigProvider profileConfigProvider,
+    public DumpSecretsHandler(IProfileConfigProvider profileConfigProvider,
         ISecretManagerProvider secretManagerProvider)
     {
         _profileConfigProvider = profileConfigProvider;
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "get-secrets";
+    public string CommandName => "dump-secrets";
     
-    public string Description => "Get secrets with profile configuration";
-    
+    public string Description => "Get and dump google secrets";
+
     public async Task Handle(CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
@@ -40,13 +39,12 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             return;
         }
 
-        var selectedProfileName = 
+        var selectedProfileName =
             profileNames.Count == 1
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
-                    items: profileNames,
-                    defaultValue: profileNames.First());
+                    items: profileNames);
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
@@ -62,14 +60,19 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         selectedProfileDo.PrintProfileConfig();
 
         var oldSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
-        
+
         var secretIds = await _secretManagerProvider.GetSecretIdsAsync(
-            selectedProfileDo.ProjectId, 
+            selectedProfileDo.ProjectId,
             cancellationToken);
-        
+
         var newSecrets = selectedProfileDo.BuildSecretDetails(secretIds);
-        
-        newSecrets.PrintSecretsMappingIdNames();
+
+        if (!newSecrets.Any())
+        {
+            ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
+
+            return;
+        }
 
         var changesCounter = await ProgressGetSecretLatestValuesAsync(selectedProfileDo.ProjectId,
             newSecrets, oldSecrets,
@@ -78,30 +81,35 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         var successCounter = newSecrets.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
         var errorCounter = newSecrets.Count(x => x.Value.AccessStatusCode != StatusCode.OK);
 
-        if (changesCounter > 0)
+        if (changesCounter == 0)
         {
-            var dumpSecrets = Prompt.Select(
-                $"Dump {changesCounter} change(s) ({successCounter} value(s), {errorCounter} error(s))",
-                new[] { true, false, },
-                defaultValue: errorCounter == 0);
+            newSecrets.PrintSecretsMappingIdNamesAccessValues();
 
-            if (dumpSecrets)
-            {
-                _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
-            }
-        }
-        else if (newSecrets.Any())
-        {
-            ConsoleHelper.WriteLineWarn($"Fully valid synchronized data ({successCounter} value(s), {errorCounter} error(s))");
-        }
-        else
-        {
-            ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
+            ConsoleHelper.WriteLineInfo(
+                $"NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
+            
+            return;
         }
 
-        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} total secrets");
+        var dumpSecrets = Prompt.Select(
+            $"Dump {changesCounter} changes ({successCounter} values, {errorCounter} errors)",
+            new[] { true, false, },
+            defaultValue: errorCounter == 0);
+
+        newSecrets.PrintSecretsMappingIdNamesAccessValues();
+
+        if (!dumpSecrets)
+        {
+            ConsoleHelper.WriteLineNotification($"No dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+
+            return;
+        }
+
+        _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
+
+        ConsoleHelper.WriteLineInfo($"DONE - Dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
     }
-    
+
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,
         IDictionary<string, SecretDetails> newSecrets,
         IDictionary<string, SecretDetails> oldSecrets,
@@ -110,9 +118,6 @@ public class GetSecretsWithProfileHandler : ICommandHandler
         var changesCounter = 0;
         
         ConsoleHelper.WriteLineInfo("Access to latest secret values...");
-
-        var table = new ConsoleTable("sync-status", "secret-id", "decoded value/error");
-        table.Write(Format.Minimal);
 
         foreach (var secretDetails in newSecrets)
         {
@@ -128,12 +133,12 @@ public class GetSecretsWithProfileHandler : ICommandHandler
                              secretDetails.Value.DecodedValue != oldSecret.DecodedValue;
 
             Action<string> writeAction = ConsoleHelper.WriteInfo;
-            var syncStatus = "PASS";
+            
+            var syncStatus = secretDetails.Value.AccessStatusCode.ToString();
 
             if (secretDetails.Value.AccessStatusCode != StatusCode.OK)
             {
                 writeAction = ConsoleHelper.WriteError;
-                syncStatus = secretDetails.Value.AccessStatusCode.ToString();
             }
             else if (hasChanges)
             {
@@ -146,19 +151,12 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             }
             writeAction($"{syncStatus}\t");
 
-            ConsoleHelper.WriteNotification($"{secretDetails.Key}\t");
-            
-            if (secretDetails.Value.AccessStatusCode == StatusCode.OK)
-            {
-                Console.Write($"{secretDetails.Value.DecodedValue}");
-            }
+            Console.WriteLine($"{secretDetails.Key}\t");
             
             if (hasChanges)
             {
                 ++changesCounter;
             }
-
-            Console.WriteLine();
         }
 
         foreach (var oldSecretDetails in oldSecrets ?? new Dictionary<string, SecretDetails>())
@@ -166,8 +164,7 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             if (!newSecrets.ContainsKey(oldSecretDetails.Key))
             {
                 ConsoleHelper.WriteWarn("DELETED\t");
-                ConsoleHelper.WriteNotification($"{oldSecretDetails.Key}\t");
-                Console.Write($"{oldSecretDetails.Value.DecodedValue}");
+                Console.WriteLine($"{oldSecretDetails.Key}\t");
                 ++changesCounter;
             }
         }

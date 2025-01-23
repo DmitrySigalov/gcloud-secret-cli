@@ -71,8 +71,8 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
                 { "Reset to defaults", ResetDefaultSettings },
-                { "Import json (paste from clipboard)", ImportJsonFromClipboard },
-                { "Export json (copy into clipboard)", ExportJsonIntoClipboard },
+                { "Import settings (paste json from clipboard)", ImportJsonFromClipboard },
+                { "Export settings (copy json into clipboard)", ExportJsonIntoClipboard },
            };
 
             lastSelectedOperationKey = Prompt.Select(
@@ -140,8 +140,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
-                    items: profileNames,
-                    defaultValue: profileNames.FirstOrDefault());
+                    items: profileNames);
 
         profileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(profileName),

@@ -5,6 +5,24 @@ namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
 
 public static class SecretDetailsExtensions
 {
+    public static IDictionary<string, string> ToSecretsDictionary(this IDictionary<string, SecretDetails> secrets) =>
+        secrets
+            .ToDictionary(
+                kvp => kvp.Key, 
+                kvp => kvp.Value.DecodedValue);
+    
+    public static IDictionary<string, string> ToEnvironmentDictionary(this IDictionary<string, SecretDetails> secrets)
+    {
+        var result = new SortedDictionary<string, string>();
+
+        foreach (var secret in secrets)
+        {
+            result[secret.Value.EnvironmentVariable] = secret.Value.DecodedValue;
+        }
+        
+        return result;
+    }
+    
     public static void PrintSecretsMappingIdNames(this IDictionary<string, SecretDetails> secrets)
     {
         var table = new ConsoleTable("secret-id", "config-path", "environment-variable");

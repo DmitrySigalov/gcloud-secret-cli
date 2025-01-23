@@ -15,8 +15,10 @@ public static class StartupExtensions
             .AddSingleton<ConfigProfileCommandHandler>()
             // First after predefined command(s) is default
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, GetSecretsWithProfileHandler>()
-            .AddSingleton<ICommandHandler, ViewProfileHandler>();
+            .AddSingleton<ICommandHandler, ViewProfileHandler>()
+            .AddSingleton<ICommandHandler, DumpSecretsHandler>()
+            .AddSingleton<ICommandHandler, ImportSecretsFromClipboardHandler>()
+            .AddSingleton<ICommandHandler, ExportSecretsToClipboardHandler>();
 
         return serviceCollection;
     }

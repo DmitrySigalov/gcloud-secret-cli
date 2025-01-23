@@ -17,7 +17,7 @@ public class ViewProfileHandler : ICommandHandler
     
     public string CommandName => "view";
     
-    public string Description => "View profile configuration";
+    public string Description => "View profile configuration and dumped secrets";
     
     public Task Handle(CancellationToken cancellationToken)
     {
@@ -40,8 +40,7 @@ public class ViewProfileHandler : ICommandHandler
             ? profileNames.Single()
             : Prompt.Select(
                 "Select profile",
-                items: profileNames,
-                defaultValue: profileNames.First());
+                items: profileNames);
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
@@ -61,13 +60,11 @@ public class ViewProfileHandler : ICommandHandler
         if (currentSecrets == null)
         {
             ConsoleHelper.WriteLineNotification($"No dumped secrets according to profile [{selectedProfileName}]");
+            
+            return Task.CompletedTask;
         }
-        else
-        {
-            currentSecrets.PrintSecretsMappingIdNamesAccessValues();
-        }
-        
-        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}]");
+
+        currentSecrets.PrintSecretsMappingIdNamesAccessValues();
 
         return Task.CompletedTask;
     }
