@@ -5,7 +5,7 @@ using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Environment;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
 
 public class SetEnvCommandHandler : ICommandHandler
 {

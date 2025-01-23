@@ -1,7 +1,7 @@
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Environment;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
 
 public class CleanEnvCommandHandler : ICommandHandler
 {
