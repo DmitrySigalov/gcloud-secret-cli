@@ -11,12 +11,14 @@ public static class StartupExtensions
             .AddSingleton<CommandSelector>();
 
         serviceCollection
-            .AddSingleton<HelpCommandHandler>()
-            // First after help command is default
+            .AddSingleton<HelpCommandHandler>() // To prevent circular dependencies register as class
+            // Regular commands
+            .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, GetSecretsWithProfileHandler>()
             .AddSingleton<ICommandHandler, ViewProfileHandler>()
-            .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>();
+            .AddSingleton<ICommandHandler, DumpSecretsHandler>()
+            .AddSingleton<ICommandHandler, ImportSecretsFromClipboardHandler>()
+            .AddSingleton<ICommandHandler, ExportSecretsToClipboardHandler>();
 
         return serviceCollection;
     }

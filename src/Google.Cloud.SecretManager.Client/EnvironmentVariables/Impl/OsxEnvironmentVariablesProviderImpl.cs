@@ -1,163 +1,102 @@
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
 namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
 
-public class OsxEnvironmentVariablesProviderImpl : IEnvironmentVariablesProvider
+public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvider
 {
-    private readonly IUserFilesProvider _userFilesProvider;
-
-    private readonly ILogger<OsxEnvironmentVariablesProviderImpl> _logger;
-
-    private SortedDictionary<string, string> _loadedDescriptor = null;
-
     public OsxEnvironmentVariablesProviderImpl(
-        IUserFilesProvider userFilesProvider,
-        ILogger<OsxEnvironmentVariablesProviderImpl> logger)
+        IUserFilesProvider userFilesProvider, 
+        ILogger<OsxEnvironmentVariablesProviderImpl> logger) : base(userFilesProvider, logger)
     {
-        _userFilesProvider = userFilesProvider;
-
-        _logger = logger;
     }
 
-    public ISet<string> GetNames(string baseName = null)
+    protected override void OnSetEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
+        string name, string value)
     {
-        baseName = baseName?.Trim();
-        
-        var result = LoadEnvironmentVariablesFromDescriptor()
-            .Keys
-            .ToHashSet();
-
-        if (!string.IsNullOrEmpty(baseName))
-        {
-            result.ExceptWith(result.Where(x => !x.StartsWith(baseName, StringComparison.InvariantCulture)));
-        }
-
-        return result;
-    }
-
-    public string Get(string name)
-    {
-        var environmentVariables = LoadEnvironmentVariablesFromDescriptor();
-
-        if (environmentVariables.TryGetValue(name, out var result))
-        {
-            return result;
-        }
-
-        return null;
-    }
-
-    public void Set(string name, string value)
-    {
-        var environmentVariables = LoadEnvironmentVariablesFromDescriptor();
-
-        if (value == null)
-        {
-            environmentVariables.Remove(name);
-        }
-        else
-        {
-            environmentVariables[name] = value;
-        }
-        
-        DumpEnvironmentVariables(environmentVariables);
-        
         Environment.SetEnvironmentVariable(name, value, EnvironmentVariableTarget.Process);
     }
 
-    public string CompleteActivationEnvironmentVariables()
+    protected override void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
+        string name)
     {
-        var updatedScript = _userFilesProvider.GetFullFilePath(
-            EnvironmentVariablesConsts.FileNames.ScriptName,
-            FolderTypeEnum.ToolUser);
+        Environment.SetEnvironmentVariable(name, null, EnvironmentVariableTarget.Process);
+    }
 
-        var resultComment = $"Updated: {updatedScript}";
+    protected override void OnFinishSet(EnvironmentDescriptor data, Action<string> outputCallback)
+    {
+        DumpScriptFile(data, outputCallback);
+        
+        ConfigureShellScript(data, outputCallback);
+    }
 
-        var rootFileScriptPath = _userFilesProvider.GetFullFilePath(
-            ShellHelper.GetShellScriptFileName(),
-            FolderTypeEnum.RootUser);
-
-        if (!File.Exists(rootFileScriptPath))
+    private void DumpScriptFile(EnvironmentDescriptor descriptor, Action<string> outputCallback)
+    {
+        var fileScriptName = EnvironmentVariablesConsts.FileNames.ScriptName;
+        
+        try
         {
-            resultComment += Environment.NewLine +
-                             $"No found script file '{rootFileScriptPath}' according to shell configuration";
+            var fileScriptText = EnvironmentVariablesScriptTextBuilder.Build(descriptor.Variables);
+
+            UserFilesProvider.WriteTextFile(fileScriptName, 
+                fileScriptText, 
+                FolderTypeEnum.UserToolConfiguration);
+            
+            outputCallback($"Created [{fileScriptName}] file with activated environment variables");
         }
-
-        var fileScriptAllText = _userFilesProvider.ReadTextFileIfExist(
-            EnvironmentVariablesConsts.FileNames.ScriptExtension,
-            FolderTypeEnum.RootUser);
-
-        var partialScriptText = $"source {updatedScript}";
-        if (fileScriptAllText?.Contains(partialScriptText) != true)
+        catch (Exception e)
         {
-            fileScriptAllText += Environment.NewLine +
-                                 partialScriptText +
-                                 Environment.NewLine;
+            Logger.LogError(
+                e,
+                $"Error on attempt to create [{fileScriptName}] file with list of activated environment variables");
+        }
+    }
+    
+    private void ConfigureShellScript(EnvironmentDescriptor data, Action<string> outputCallback)
+    {
+        try
+        {
+            var scriptFilePath = UserFilesProvider.GetFullFilePath(
+                EnvironmentVariablesConsts.FileNames.ScriptName,
+                FolderTypeEnum.UserToolConfiguration);
 
-            _userFilesProvider.WriteTextFile(
-                EnvironmentVariablesConsts.FileNames.ScriptExtension,
-                fileScriptAllText,
+            var rootFileScriptPath = UserFilesProvider.GetFullFilePath(
+                ShellHelper.GetShellScriptFileName(),
                 FolderTypeEnum.RootUser);
 
-            resultComment += Environment.NewLine +
-                             $"Updated: {rootFileScriptPath}";
-        }
-
-        resultComment += Environment.NewLine +
-                         $"Reopen application (terminal/rider) or run command in the terminal: source {rootFileScriptPath}";
-
-        return resultComment;
-    }
-
-    private SortedDictionary<string, string> LoadEnvironmentVariablesFromDescriptor()
-    {
-        if (_loadedDescriptor != null)
-        {
-            return _loadedDescriptor;
-        }
-        
-        var fileDescriptorName = EnvironmentVariablesConsts.FileNames.Descriptor;
-
-        try
-        {
-            var fileDescriptorText = _userFilesProvider.ReadTextFileIfExist(fileDescriptorName, FolderTypeEnum.ToolUser);
-
-            if (!string.IsNullOrEmpty(fileDescriptorText))
+            if (!File.Exists(rootFileScriptPath))
             {
-                _loadedDescriptor = JsonSerializationHelper.Deserialize<SortedDictionary<string, string>>(fileDescriptorText);
+                outputCallback($"No found script file '{rootFileScriptPath}' according to shell configuration");
             }
+
+            var fileScriptAllText = UserFilesProvider.ReadTextFileIfExist(
+                EnvironmentVariablesConsts.FileNames.ScriptExtension,
+                FolderTypeEnum.RootUser);
+
+            var partialScriptText = $"source {scriptFilePath}";
+            if (fileScriptAllText?.Contains(partialScriptText) != true)
+            {
+                fileScriptAllText += Environment.NewLine +
+                                     partialScriptText +
+                                     Environment.NewLine;
+
+                UserFilesProvider.WriteTextFile(
+                    EnvironmentVariablesConsts.FileNames.ScriptExtension,
+                    fileScriptAllText,
+                    FolderTypeEnum.RootUser);
+
+                outputCallback($"Added/configured [{partialScriptText}] in the {EnvironmentVariablesConsts.FileNames.ScriptExtension} file");
+            }
+
+            outputCallback($"Reopen application (terminal/rider) or run command in the terminal: source {rootFileScriptPath}");
         }
         catch (Exception e)
         {
-            _logger.LogError(
+            Logger.LogError(
                 e,
-                "Error on attempt to read descriptor file with list of active environment variables");
-        }
-
-        return _loadedDescriptor ?? new SortedDictionary<string, string>();
-    }
-
-    private void DumpEnvironmentVariables(SortedDictionary<string, string> environmentVariables)
-    {
-        var fileDescriptorName = EnvironmentVariablesConsts.FileNames.Descriptor;
-        var fileScriptName = EnvironmentVariablesConsts.FileNames.ScriptName;
-
-        try
-        {
-            var fileDescriptorText = JsonSerializationHelper.Serialize(environmentVariables);
-            _userFilesProvider.WriteTextFile(fileDescriptorName, fileDescriptorText, FolderTypeEnum.ToolUser);
-
-            var fileScriptText = EnvironmentVariablesScriptTextBuilder.Build(environmentVariables);
-            _userFilesProvider.WriteTextFile(fileScriptName, fileScriptText, FolderTypeEnum.ToolUser);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(
-                e,
-                "Error on attempt to dump descriptor/script file(s) with list of active environment variables");
+                "Error on attempt to configure/connect shell to script file with environment variables");
         }
     }
 }

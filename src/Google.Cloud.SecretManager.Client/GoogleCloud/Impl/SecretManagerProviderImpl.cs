@@ -3,7 +3,7 @@ using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.V1;
 using Grpc.Core;
 
-namespace Google.Cloud.SecretManager.Client.GCloud.Impl;
+namespace Google.Cloud.SecretManager.Client.GoogleCloud.Impl;
 
 public class SecretManagerProviderImpl : ISecretManagerProvider
 {
@@ -64,13 +64,14 @@ public class SecretManagerProviderImpl : ISecretManagerProvider
             // Decode the secret payload
             var decodedValue = response.Payload?.Data?.ToStringUtf8();
 
-            secretDetails.AccessException = null;
+            secretDetails.AccessStatusCode = StatusCode.OK;
             secretDetails.DecodedValue = decodedValue;
             
         }
         catch (RpcException e)
         {
-            secretDetails.AccessException = e;
+            secretDetails.AccessStatusCode = e.StatusCode;
+            secretDetails.DecodedValue = null;
         }
     }
 

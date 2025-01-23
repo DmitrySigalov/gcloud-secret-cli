@@ -1,6 +1,6 @@
 ﻿using Google.Cloud.SecretManager.Client.Commands;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.GCloud;
+using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +40,7 @@ var serviceProvider = services.BuildServiceProvider();
 
 try
 {
-    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GClod-Secrets-Cli"));
+    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Google-Clod-Secrets-Cli"));
 
     var cliHandler = serviceProvider
         .GetRequiredService<CommandSelector>()

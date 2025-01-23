@@ -15,9 +15,9 @@ public static class ProfileNameValidationRule
 
         check = check.Trim();
 
-        if (check.Length >= 20)
+        if (check.Length >= 100)
         {
-            return new ValidationResult("Too long name (exceeded 20 characters)");
+            return new ValidationResult("Too long name (exceeded 100 characters)");
         }
         
         if (Path.GetInvalidFileNameChars().Any(check.Contains))

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.GCloud;
+using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
@@ -10,6 +10,8 @@ namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
 public class ConfigProfileCommandHandler : ICommandHandler
 {
+    public const string COMMAND_NAME = "config";
+    
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
@@ -27,7 +29,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "config";
+    public string CommandName => COMMAND_NAME;
     
     public string Description => "Profile(s) configuration";
     
@@ -71,8 +73,8 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
                 { "Reset to defaults", ResetDefaultSettings },
-                { "Import json (paste from clipboard)", ImportJsonFromClipboard },
-                { "Export json (copy into clipboard)", ExportJsonIntoClipboard },
+                { "Import settings (paste json from clipboard)", ImportJsonFromClipboard },
+                { "Export settings (copy json into clipboard)", ExportJsonIntoClipboard },
            };
 
             lastSelectedOperationKey = Prompt.Select(
@@ -88,12 +90,14 @@ public class ConfigProfileCommandHandler : ICommandHandler
             {
                 SpinnerHelper.Run(
                     () => _profileConfigProvider.Save(profileDetails.ProfileName, operationResult.ProfileConfig),
-                    $"Save profile [{profileDetails.ProfileName}] configuration new settings, reset secrets dump");
+                    $"Save profile [{profileDetails.ProfileName}] configuration new settings");
             
                 operationResult.ProfileConfig.PrintProfileConfig();
                 
                 profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
+
+            Console.WriteLine();
         }
 
         ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{profileDetails.ProfileName}]");
@@ -138,8 +142,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
-                    items: profileNames,
-                    defaultValue: profileNames.FirstOrDefault());
+                    items: profileNames);
 
         profileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(profileName),
@@ -228,7 +231,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             "Select secret path delimiter",
             new []
             {
-                '/', '_', 
+                '/', '_', '\\',
                 profileConfig.SecretPathDelimiter,
             }.Distinct(),
             defaultValue: profileConfig.SecretPathDelimiter);

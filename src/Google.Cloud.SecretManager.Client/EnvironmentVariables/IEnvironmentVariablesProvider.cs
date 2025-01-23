@@ -2,11 +2,9 @@ namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;
 
 public interface IEnvironmentVariablesProvider
 {
-    ISet<string> GetNames(string baseName = null);
+    EnvironmentDescriptor Get();
 
-    string Get(string name);
-
-    void Set(string name, string value);
-
-    string CompleteActivationEnvironmentVariables();
+    void Set(EnvironmentDescriptor newData,
+        bool skipCheckChanges,
+        Action<string> outputCallback);
 }

@@ -8,7 +8,7 @@ public class UserFilesProviderImplTests
     [Fact]
     public void GetFullFilePath_IsOSXPlatform_WithToolUser()
     {
-        var folderType = FolderTypeEnum.ToolUser;
+        var folderType = FolderTypeEnum.UserToolConfiguration;
         var fileName = "test.txt";
 
         var testComponent = new UserFilesProviderImpl();
