@@ -4,7 +4,7 @@ using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 using TextCopy;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.SecretValues;
 
 public class ExportSecretsToClipboardHandler : ICommandHandler
 {

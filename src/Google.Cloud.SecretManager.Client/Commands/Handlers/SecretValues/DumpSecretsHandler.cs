@@ -5,7 +5,7 @@ using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Grpc.Core;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.SecretValues;
 
 public class DumpSecretsHandler : ICommandHandler
 {
