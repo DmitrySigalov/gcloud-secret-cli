@@ -51,7 +51,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
             // Add/update new variables
             foreach (var newVariable in newData.Variables)
             {
-                OnSetEnvironmentVariable(currentData, newVariable.Key, newVariable.Value);
+                OnSetEnvironmentVariable(currentData, outputCallback, newVariable.Key, newVariable.Value);
             
                 currentData.Variables[newVariable.Key] = newVariable.Value;
             }
@@ -63,7 +63,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
                 .Select(x => x.Key);
             foreach (var varName in variableNamesToDelete)
             {
-                OnDeleteEnvironmentVariable(currentData, varName);
+                OnDeleteEnvironmentVariable(currentData, outputCallback, varName);
                 
                 currentData.Variables.Remove(varName);
             }
@@ -76,10 +76,10 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         }
     }
 
-    protected abstract void OnSetEnvironmentVariable(EnvironmentDescriptor data, 
+    protected abstract void OnSetEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
         string name, string value);
 
-    protected abstract void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, 
+    protected abstract void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
         string name);
 
     protected abstract void OnFinishSet(EnvironmentDescriptor data, Action<string> outputCallback);

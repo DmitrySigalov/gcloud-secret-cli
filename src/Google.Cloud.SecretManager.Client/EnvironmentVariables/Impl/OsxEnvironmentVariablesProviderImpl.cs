@@ -13,13 +13,13 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
     {
     }
 
-    protected override void OnSetEnvironmentVariable(EnvironmentDescriptor data, 
+    protected override void OnSetEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
         string name, string value)
     {
         Environment.SetEnvironmentVariable(name, value, EnvironmentVariableTarget.Process);
     }
 
-    protected override void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, 
+    protected override void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
         string name)
     {
         Environment.SetEnvironmentVariable(name, null, EnvironmentVariableTarget.Process);

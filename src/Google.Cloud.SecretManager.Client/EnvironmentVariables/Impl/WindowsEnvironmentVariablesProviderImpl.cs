@@ -13,11 +13,12 @@ public class WindowsEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesP
     {
     }
 
-    protected override void OnSetEnvironmentVariable(EnvironmentDescriptor data, string name, string value)
+    protected override void OnSetEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
+        string name, string value)
     {
         if (value is null)
         {
-            OnDeleteEnvironmentVariable(data, name);
+            OnDeleteEnvironmentVariable(data, outputCallback, name);
             
             return;
         }
@@ -31,7 +32,8 @@ public class WindowsEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesP
 #pragma warning restore CA1416 // The code runs only on Windows
     }
 
-    protected override void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, string name)
+    protected override void OnDeleteEnvironmentVariable(EnvironmentDescriptor data, Action<string> outputCallback, 
+        string name)
     {
 #pragma warning disable CA1416 // The code runs only on Windows
         
