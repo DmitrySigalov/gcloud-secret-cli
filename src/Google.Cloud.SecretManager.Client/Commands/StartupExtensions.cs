@@ -12,11 +12,11 @@ public static class StartupExtensions
 
         serviceCollection
             .AddSingleton<HelpCommandHandler>()
-            // First after help command is default
+            .AddSingleton<ConfigProfileCommandHandler>()
+            // First after predefined command(s) is default
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
             .AddSingleton<ICommandHandler, GetSecretsWithProfileHandler>()
-            .AddSingleton<ICommandHandler, ViewProfileHandler>()
-            .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>();
+            .AddSingleton<ICommandHandler, ViewProfileHandler>();
 
         return serviceCollection;
     }

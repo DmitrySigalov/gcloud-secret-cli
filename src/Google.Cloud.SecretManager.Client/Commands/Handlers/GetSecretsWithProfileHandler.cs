@@ -99,7 +99,7 @@ public class GetSecretsWithProfileHandler : ICommandHandler
             ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
         }
 
-        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} retrieved secrets");
+        ConsoleHelper.WriteLineInfo($"DONE - Selected profile [{selectedProfileName}], {newSecrets.Count} total secrets");
     }
     
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,

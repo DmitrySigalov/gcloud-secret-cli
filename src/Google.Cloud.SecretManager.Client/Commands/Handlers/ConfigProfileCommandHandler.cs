@@ -94,6 +94,8 @@ public class ConfigProfileCommandHandler : ICommandHandler
                 
                 profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
+
+            Console.WriteLine();
         }
 
         ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{profileDetails.ProfileName}]");
