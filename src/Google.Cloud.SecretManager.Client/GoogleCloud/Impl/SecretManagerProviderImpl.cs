@@ -3,7 +3,7 @@ using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.V1;
 using Grpc.Core;
 
-namespace Google.Cloud.SecretManager.Client.GCloud.Impl;
+namespace Google.Cloud.SecretManager.Client.GoogleCloud.Impl;
 
 public class SecretManagerProviderImpl : ISecretManagerProvider
 {

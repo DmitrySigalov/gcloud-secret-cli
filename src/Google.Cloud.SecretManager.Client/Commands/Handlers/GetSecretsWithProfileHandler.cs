@@ -1,5 +1,5 @@
 using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.GCloud;
+using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
