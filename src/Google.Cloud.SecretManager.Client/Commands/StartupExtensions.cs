@@ -11,9 +11,9 @@ public static class StartupExtensions
             .AddSingleton<CommandSelector>();
 
         serviceCollection
-            .AddSingleton<HelpCommandHandler>()
-            .AddSingleton<ConfigProfileCommandHandler>()
-            // First after predefined command(s) is default
+            .AddSingleton<HelpCommandHandler>() // To prevent circular dependencies register as class
+            // Regular commands
+            .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
             .AddSingleton<ICommandHandler, ViewProfileHandler>()
             .AddSingleton<ICommandHandler, DumpSecretsHandler>()

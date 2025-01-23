@@ -13,7 +13,6 @@ public class CommandSelector
     
     private readonly ICommandHandler _helpCommandHandler;
     private readonly ICommandHandler _configCommandHandler;
-
     private readonly ICommandHandler _defaultCommandHandler;
 
     private readonly IDictionary<string, ICommandHandler> _allCommandHandlers;
@@ -22,22 +21,21 @@ public class CommandSelector
         UserParameters userParameters,
         IProfileConfigProvider profileConfigProvider,
         IEnumerable<ICommandHandler> handlers,
-        HelpCommandHandler helpCommandHandler,
-        ConfigProfileCommandHandler configCommandHandler)
+        HelpCommandHandler helpCommandHandler)
     {
         _userParameters = userParameters;
         _profileConfigProvider = profileConfigProvider;
         
         handlers = handlers.ToArray();
-
-        _defaultCommandHandler = handlers.FirstOrDefault();
         
         _helpCommandHandler = helpCommandHandler;
-        _configCommandHandler = configCommandHandler;
 
-        _allCommandHandlers = new [] { _helpCommandHandler, _configCommandHandler, } 
+        _allCommandHandlers = new [] { helpCommandHandler, } 
             .Union(handlers)
             .ToDictionary(h => h.CommandName, h => h);
+
+        _configCommandHandler = handlers.Single(x => x.CommandName == ConfigProfileCommandHandler.COMMAND_NAME);
+        _defaultCommandHandler = handlers.Single(x => x.CommandName == SetEnvCommandHandler.COMMAND_NAME);
     }
     
     public ICommandHandler Get()

@@ -10,6 +10,8 @@ namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
 public class ConfigProfileCommandHandler : ICommandHandler
 {
+    public const string COMMAND_NAME = "config";
+    
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
@@ -27,7 +29,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "config";
+    public string CommandName => COMMAND_NAME;
     
     public string Description => "Profile(s) configuration";
     
