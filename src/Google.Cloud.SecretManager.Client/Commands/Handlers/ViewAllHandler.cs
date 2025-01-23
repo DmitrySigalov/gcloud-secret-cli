@@ -7,12 +7,12 @@ using Sharprompt;
 
 namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
-public class ViewProfileHandler : ICommandHandler
+public class ViewAllHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public ViewProfileHandler(
+    public ViewAllHandler(
         IProfileConfigProvider profileConfigProvider,
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
@@ -20,7 +20,7 @@ public class ViewProfileHandler : ICommandHandler
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "view";
+    public string CommandName => "view-all";
     
     public string Description => "View profile full related details";
 
@@ -35,7 +35,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -56,7 +56,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }

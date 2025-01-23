@@ -81,7 +81,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
 
         newSecrets.PrintSecretsMappingIdNamesAccessValues();
         
-        ConsoleHelper.WriteLineInfo($"DONE - Imported {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Imported/saved/dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
 
         return Task.CompletedTask;
     }

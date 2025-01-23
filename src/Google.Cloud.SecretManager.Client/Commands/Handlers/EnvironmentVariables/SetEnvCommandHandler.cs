@@ -24,7 +24,7 @@ public class SetEnvCommandHandler : ICommandHandler
     
     public string CommandName => COMMAND_NAME;
     
-    public string Description => "Set environment variables";
+    public string Description => "Set environment variables from secrets dump";
     
     public Task Handle(CancellationToken cancellationToken)
     {

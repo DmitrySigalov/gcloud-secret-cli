@@ -9,7 +9,7 @@ namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
 public class ConfigProfileCommandHandler : ICommandHandler
 {
-    public const string COMMAND_NAME = "config";
+    public const string COMMAND_NAME = "config-profile";
     
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;

@@ -18,7 +18,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
     
     public string CommandName => "export-secrets";
     
-    public string Description => "Export secrets (copy into clipboard)";
+    public string Description => "Export secrets (copy into clipboard) from the secrets dump";
 
     public Task Handle(CancellationToken cancellationToken)
     {
@@ -48,7 +48,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
             ?.ToDictionary();
         if (currentSecrets?.Any() != true)
         {
-            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in the dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
 

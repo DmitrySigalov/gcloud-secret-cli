@@ -1,4 +1,5 @@
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
@@ -7,21 +8,24 @@ using Sharprompt;
 
 namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
-public class DumpSecretsHandler : ICommandHandler
+public class GetSecretsHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
+    private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
-    public DumpSecretsHandler(IProfileConfigProvider profileConfigProvider,
+    public GetSecretsHandler(IProfileConfigProvider profileConfigProvider,
+        IEnvironmentVariablesProvider environmentVariablesProvider,
         ISecretManagerProvider secretManagerProvider)
     {
         _profileConfigProvider = profileConfigProvider;
+        _environmentVariablesProvider = environmentVariablesProvider;
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "dump-secrets";
+    public string CommandName => "get-secrets";
     
-    public string Description => "Get and save secrets from google";
+    public string Description => "Get and save/dump secrets from google";
 
     public async Task Handle(CancellationToken cancellationToken)
     {
@@ -34,17 +38,20 @@ public class DumpSecretsHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return;
         }
+
+        var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
 
         var selectedProfileName =
             profileNames.Count == 1
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
-                    items: profileNames);
+                    items: profileNames,
+                    defaultValue: currentEnvironmentDescriptor.ProfileName);
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
@@ -92,7 +99,7 @@ public class DumpSecretsHandler : ICommandHandler
         }
 
         var dumpSecrets = Prompt.Select(
-            $"Dump {changesCounter} changes ({successCounter} values, {errorCounter} errors)",
+            $"Create and dump {changesCounter} changes ({successCounter} values, {errorCounter} errors)",
             new[] { true, false, },
             defaultValue: errorCounter == 0);
 
@@ -100,14 +107,12 @@ public class DumpSecretsHandler : ICommandHandler
 
         if (!dumpSecrets)
         {
-            ConsoleHelper.WriteLineNotification($"Not dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
-
             return;
         }
 
         _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
     }
 
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,
