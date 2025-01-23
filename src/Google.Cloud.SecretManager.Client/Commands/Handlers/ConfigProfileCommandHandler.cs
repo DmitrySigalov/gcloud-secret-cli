@@ -90,7 +90,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             {
                 SpinnerHelper.Run(
                     () => _profileConfigProvider.Save(profileDetails.ProfileName, operationResult.ProfileConfig),
-                    $"Save profile [{profileDetails.ProfileName}] configuration new settings, reset secrets dump");
+                    $"Save profile [{profileDetails.ProfileName}] configuration new settings");
             
                 operationResult.ProfileConfig.PrintProfileConfig();
                 

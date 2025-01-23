@@ -52,15 +52,12 @@ public class ProfileConfigProviderImpl : IProfileConfigProvider
 
     public void Save(string name, ProfileConfig data)
     {
-        var secretsFileName = SecretsFileNameResolver.BuildFileName(name);
         var profileFileName = ProfileFileNameResolver.BuildFileName(name);
 
         try
         {
             var fileText = JsonSerializationHelper.Serialize(data);
         
-            _userFilesProvider.DeleteFile(secretsFileName, FolderTypeEnum.ToolUser);
-
             _userFilesProvider.WriteTextFile(profileFileName, fileText, FolderTypeEnum.ToolUser);
         }
         catch (Exception e)
