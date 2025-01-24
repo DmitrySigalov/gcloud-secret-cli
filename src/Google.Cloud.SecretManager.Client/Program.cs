@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.SecretManager.Client.Commands;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
+using Google.Cloud.SecretManager.Client.GitHub;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
@@ -23,12 +24,15 @@ var configuration = new ConfigurationBuilder()
 var services = new ServiceCollection();
 
 services
+    .AddSingleton<IConfiguration>(configuration)
     .AddLogging(builder =>
     {
         builder.ClearProviders();
-        builder.AddConsole();
-    })
-    .AddSingleton<IConfiguration>(configuration);
+
+        builder
+            .SetMinimumLevel(LogLevel.Error)
+            .AddConsole();
+    });
 
 services
     .AddCommands()
@@ -36,7 +40,8 @@ services
     .AddUserRuntimeServices(args)
     .AddEnvironmentVariablesServices()
     .AddProfileServices()
-    .AddVersionControlServices();
+    .AddVersionControlServices()
+    .AddGitHubServices();
 
 var serviceProvider = services.BuildServiceProvider();
 
