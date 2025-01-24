@@ -61,14 +61,14 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         string lastSelectedOperationKey = null;        
 
-        var exitOperationKey = "Exit"; 
+        var saveOperationKey = "Save"; 
 
-        while (lastSelectedOperationKey != exitOperationKey)
+        while (lastSelectedOperationKey != saveOperationKey)
         {
             var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, Task<(bool IsChanged, ProfileConfig ProfileConfig)>>>
             {
-                { exitOperationKey, Exit },
-                { "Validate (get secret ids)", pf => ValidateAsync(pf, cancellationToken) },
+                { saveOperationKey, pf => Save(profileDetails.ProfileName, pf) },
+                { "Validate and get secret ids", pf => GetSecretIdsAsync(pf, false, cancellationToken) },
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
                 { "Reset to defaults", ResetDefaultSettings },
@@ -77,7 +77,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             lastSelectedOperationKey = Prompt.Select(
                 "Select operation",
                 items: manageOperationsLookup.Keys,
-                defaultValue: exitOperationKey);
+                defaultValue: saveOperationKey);
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
@@ -85,21 +85,15 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
             if (operationResult.HasChanges)
             {
-                SpinnerHelper.Run(
-                    () => _profileConfigProvider.Save(profileDetails.ProfileName, operationResult.ProfileConfig),
-                    $"Save profile [{profileDetails.ProfileName}] configuration new settings");
-            
-                operationResult.ProfileConfig.PrintProfileConfig();
-                
                 profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
 
             Console.WriteLine();
         }
         
-        await ValidateAsync(profileDetails.ProfileDo, cancellationToken);
+        await GetSecretIdsAsync(profileDetails.ProfileDo, true, cancellationToken);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{profileDetails.ProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Configured valid profile [{profileDetails.ProfileName}]");
         Console.WriteLine();
     }
     
@@ -151,11 +145,17 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         return (operation, profileName, profileDo);
     }
+
+    private Task<(bool, ProfileConfig)> Save(string profileName, ProfileConfig profileConfig)
+    {
+        SpinnerHelper.Run(
+            () => _profileConfigProvider.Save(profileName, profileConfig),
+            $"Save profile [{profileName}] configuration new settings");
+        
+        return Task.FromResult((false, profileConfig));
+    }
     
-    private Task<(bool, ProfileConfig)> Exit(ProfileConfig profileConfig) => 
-        Task.FromResult((false, profileConfig));
-    
-    private async Task<(bool, ProfileConfig)> ValidateAsync(ProfileConfig profileConfig, CancellationToken cancellationToken)
+    private async Task<(bool, ProfileConfig)> GetSecretIdsAsync(ProfileConfig profileConfig, bool throwOnException, CancellationToken cancellationToken)
     {
         profileConfig.PrintProfileConfig();
 
@@ -169,6 +169,11 @@ public class ConfigProfileCommandHandler : ICommandHandler
         }
         catch (Exception e)
         {
+            if (throwOnException)
+            {
+                throw;
+            }
+            
             ConsoleHelper.WriteLineError(e.Message);
         }
 

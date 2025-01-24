@@ -22,16 +22,8 @@ public class CleanEnvCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
-
         var newDescriptor = new EnvironmentDescriptor(); // Empty descriptor
         
-        if (!string.IsNullOrEmpty(currentEnvironmentDescriptor?.ProfileName))
-        {
-            ConsoleHelper.WriteLineNotification(
-                $"Start to deactivate profile [{currentEnvironmentDescriptor.ProfileName}] in the environment variables system");
-        }
-
         _environmentVariablesProvider.Set(newDescriptor,
             ConsoleHelper.WriteLineNotification);
 

@@ -18,7 +18,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
     
     public string CommandName => "export-secrets";
     
-    public string Description => "Export secrets (copy into clipboard) from the secrets dump";
+    public string Description => "Export secrets (copy json into clipboard) from the secrets dump";
 
     public Task Handle(CancellationToken cancellationToken)
     {

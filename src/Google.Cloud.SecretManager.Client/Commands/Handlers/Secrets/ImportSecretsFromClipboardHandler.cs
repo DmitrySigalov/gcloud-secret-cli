@@ -19,7 +19,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
     
     public string CommandName => "import-secrets";
     
-    public string Description => "Import secrets (from the clipboard)";
+    public string Description => "Import secrets (json from the clipboard)";
     
     public Task Handle(CancellationToken cancellationToken)
     {

@@ -46,7 +46,7 @@ try
         .GetRequiredService<IVersionControl>()
         .CheckVersionAsync(cts.Token);
     
-    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Google-Clod-Secrets-Cli"));
+    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GClod-Secrets-Cli"));
 
     var cliHandler = serviceProvider
         .GetRequiredService<CommandSelector>()
