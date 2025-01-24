@@ -61,13 +61,13 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         string lastSelectedOperationKey = null;        
 
-        var completeExitOperationKey = "Complete/exit configuration"; 
+        var exitOperationKey = "Exit"; 
 
-        while (lastSelectedOperationKey != completeExitOperationKey)
+        while (lastSelectedOperationKey != exitOperationKey)
         {
             var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, Task<(bool IsChanged, ProfileConfig ProfileConfig)>>>
             {
-                { completeExitOperationKey, Exit },
+                { exitOperationKey, Exit },
                 { "Validate (get secret ids)", pf => ValidateAsync(pf, cancellationToken) },
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
@@ -77,7 +77,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             lastSelectedOperationKey = Prompt.Select(
                 "Select operation",
                 items: manageOperationsLookup.Keys,
-                defaultValue: completeExitOperationKey);
+                defaultValue: exitOperationKey);
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
@@ -96,6 +96,8 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
             Console.WriteLine();
         }
+        
+        await ValidateAsync(profileDetails.ProfileDo, cancellationToken);
 
         ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{profileDetails.ProfileName}]");
         Console.WriteLine();

@@ -10,6 +10,8 @@ namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
 public class GetSecretsHandler : ICommandHandler
 {
+    public const string COMMAND_NAME = "get-secrets";
+    
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
@@ -23,7 +25,7 @@ public class GetSecretsHandler : ICommandHandler
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "get-secrets";
+    public string CommandName => COMMAND_NAME;
     
     public string Description => "Get and save/dump secrets from google";
 

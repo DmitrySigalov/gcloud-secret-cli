@@ -1,5 +1,6 @@
 using Google.Cloud.SecretManager.Client.Commands.Handlers;
 using Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
+using Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
@@ -36,7 +37,7 @@ public class CommandSelector
             .ToDictionary(h => h.CommandName, h => h);
 
         _configCommandHandler = handlers.Single(x => x.CommandName == ConfigProfileCommandHandler.COMMAND_NAME);
-        _defaultCommandHandler = handlers.Single(x => x.CommandName == SetEnvCommandHandler.COMMAND_NAME);
+        _defaultCommandHandler = handlers.Single(x => x.CommandName == GetSecretsHandler.COMMAND_NAME);
     }
     
     public ICommandHandler Get()

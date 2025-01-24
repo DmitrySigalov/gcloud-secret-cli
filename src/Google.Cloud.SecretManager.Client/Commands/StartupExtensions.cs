@@ -15,10 +15,10 @@ public static class StartupExtensions
         serviceCollection
             .AddSingleton<HelpCommandHandler>() // To prevent circular dependencies register as class
             // Regular commands
-            .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, ViewAllHandler>()
             .AddSingleton<ICommandHandler, GetSecretsHandler>()
+            .AddSingleton<ICommandHandler, ViewAllHandler>()
+            .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
             .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()
             .AddSingleton<ICommandHandler, ImportSecretsFromClipboardHandler>()
             .AddSingleton<ICommandHandler, ExportSecretsToClipboardHandler>();
