@@ -3,12 +3,13 @@ using Google.Cloud.SecretManager.Client.EnvironmentVariables;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
+using Google.Cloud.SecretManager.Client.VersionControl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 var cts = new CancellationTokenSource();
-Console.CancelKeyPress += (s, e) =>
+Console.CancelKeyPress += (_, e) =>
 {
     cts.Cancel();
     e.Cancel = true;
@@ -34,12 +35,17 @@ services
     .AddGoogleCloudServices()
     .AddUserRuntimeServices(args)
     .AddEnvironmentVariablesServices()
-    .AddProfileServices();
+    .AddProfileServices()
+    .AddVersionControlServices();
 
 var serviceProvider = services.BuildServiceProvider();
 
 try
 {
+    await serviceProvider
+        .GetRequiredService<IVersionControl>()
+        .CheckVersionAsync(cts.Token);
+    
     Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Google-Clod-Secrets-Cli"));
 
     var cliHandler = serviceProvider
