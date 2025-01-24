@@ -5,6 +5,5 @@ public interface IEnvironmentVariablesProvider
     EnvironmentDescriptor Get();
 
     void Set(EnvironmentDescriptor newData,
-        bool skipCheckChanges,
         Action<string> outputCallback);
 }

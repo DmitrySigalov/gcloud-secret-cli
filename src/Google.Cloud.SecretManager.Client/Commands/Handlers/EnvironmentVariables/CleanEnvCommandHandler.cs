@@ -33,7 +33,6 @@ public class CleanEnvCommandHandler : ICommandHandler
         }
 
         _environmentVariablesProvider.Set(newDescriptor,
-            skipCheckChanges: true,
             ConsoleHelper.WriteLineNotification);
 
         Console.WriteLine();

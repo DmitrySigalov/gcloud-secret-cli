@@ -1,6 +1,5 @@
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
@@ -67,7 +66,6 @@ public class SetEnvCommandHandler : ICommandHandler
             ProfileName = selectedProfileName,
             Variables = newSecrets.ToEnvironmentDictionary(),
         };
-        var forceUpdate = false;
         
         if (!newDescriptor.Variables.Any())
         {
@@ -75,32 +73,8 @@ public class SetEnvCommandHandler : ICommandHandler
 
             return Task.CompletedTask;
         }
-        
-        if (!string.IsNullOrEmpty(currentEnvironmentDescriptor.ProfileName) &&
-            !selectedProfileName.Equals(currentEnvironmentDescriptor.ProfileName, StringComparison.InvariantCultureIgnoreCase))
-        {
-            ConsoleHelper.WriteLineNotification(
-                $"Start switch profile from [{currentEnvironmentDescriptor.ProfileName}] to [{selectedProfileName}] in the environment variables system");
-        }
-
-        if (!newDescriptor.HasDiff(currentEnvironmentDescriptor.Variables))
-        {
-            ConsoleHelper.WriteLineInfo(
-                $"Profile [{selectedProfileName}] already is fully synchronized with the environment variables system");
-
-            forceUpdate = Prompt.Select(
-                "Force to update all environment variables",
-                new[] { true, false, },
-                defaultValue: false);
-
-            if (!forceUpdate)
-            {
-                return Task.CompletedTask;
-            }
-        }
 
         _environmentVariablesProvider.Set(newDescriptor,
-            skipCheckChanges: forceUpdate,
             ConsoleHelper.WriteLineNotification);
 
         Console.WriteLine();

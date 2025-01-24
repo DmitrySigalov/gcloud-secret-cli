@@ -5,14 +5,14 @@ using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
-public class ViewAllHandler : ICommandHandler
+public class ViewSecretsHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public ViewAllHandler(
+    public ViewSecretsHandler(
         IProfileConfigProvider profileConfigProvider,
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
@@ -20,9 +20,9 @@ public class ViewAllHandler : ICommandHandler
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "view-all";
+    public string CommandName => "view-secrets";
     
-    public string Description => "View profile full related details";
+    public string Description => "View profile secrets details";
 
     public Task Handle(CancellationToken cancellationToken)
     {

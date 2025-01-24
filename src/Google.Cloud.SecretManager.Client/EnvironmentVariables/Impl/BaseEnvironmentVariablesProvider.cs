@@ -41,7 +41,6 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
     }
 
     public void Set(EnvironmentDescriptor newData, 
-        bool skipCheckChanges,
         Action<string> outputCallback)
     {
         var createCounter = 0;
@@ -52,15 +51,18 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         
         try
         {
-            currentData.ProfileName = newData.ProfileName;
+            if (currentData.ProfileName != newData.ProfileName)
+            {
+                currentData.ProfileName = newData.ProfileName;
+                outputCallback($"Changed active profile to {currentData.ProfileName}");
+            }
 
             // Add/update new variables
             foreach (var newVariable in newData.Variables)
             {
                 var availableStatus = currentData.Variables.TryGetValue(newVariable.Key, out var oldValue);
                 
-                if (skipCheckChanges || 
-                    !availableStatus || 
+                if (!availableStatus || 
                     newVariable.Value != oldValue)
                 {
                     OnSetEnvironmentVariable(currentData, outputCallback, newVariable.Key, newVariable.Value);
@@ -110,7 +112,10 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
                 
             DumpDescriptor(currentData);
 
-            OnFinishSet(currentData, outputCallback);
+            if (createCounter + updateCounter + deleteCounter > 0)
+            {
+                OnFinishSet(currentData, outputCallback);
+            }
         }
     }
 

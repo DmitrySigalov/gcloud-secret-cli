@@ -16,7 +16,7 @@ public static class StartupExtensions
             .AddSingleton<HelpCommandHandler>() // To prevent circular dependencies register as class
             // Regular commands
             .AddSingleton<ICommandHandler, GetSecretsHandler>()
-            .AddSingleton<ICommandHandler, ViewAllHandler>()
+            .AddSingleton<ICommandHandler, ViewSecretsHandler>()
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
             .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
             .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()

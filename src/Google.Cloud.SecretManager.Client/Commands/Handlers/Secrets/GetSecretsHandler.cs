@@ -90,31 +90,27 @@ public class GetSecretsHandler : ICommandHandler
         var successCounter = newSecrets.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
         var errorCounter = newSecrets.Count(x => x.Value.AccessStatusCode != StatusCode.OK);
 
+        if (successCounter == 0)
+        {
+            ConsoleHelper.WriteLineNotification(
+                $"NO DATA - Not retrieved any valid secret value ({errorCounter} errors)");
+            
+            return;
+        }
+
+        newSecrets.PrintSecretsMappingIdNamesAccessValues();
+
         if (changesCounter == 0)
         {
-            newSecrets.PrintSecretsMappingIdNamesAccessValues();
-
             ConsoleHelper.WriteLineInfo(
                 $"NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
             
             return;
         }
 
-        var dumpSecrets = Prompt.Select(
-            $"Create and dump {changesCounter} changes ({successCounter} values, {errorCounter} errors)",
-            new[] { true, false, },
-            defaultValue: errorCounter == 0);
-
-        newSecrets.PrintSecretsMappingIdNamesAccessValues();
-
-        if (!dumpSecrets)
-        {
-            return;
-        }
-
         _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {newSecrets.Count} secrets ({successCounter} values, {errorCounter} errors) according to profile [{selectedProfileName}]");
     }
 
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,
