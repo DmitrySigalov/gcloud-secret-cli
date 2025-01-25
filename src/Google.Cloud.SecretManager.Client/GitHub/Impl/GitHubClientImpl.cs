@@ -5,41 +5,51 @@ namespace Google.Cloud.SecretManager.Client.GitHub.Impl;
 
 public class GitHubClientImpl : IGitHubClient
 {
-    private const string BASE_URI = "https://api.github.com/repos/DmitrySigalov/gclod-secret-manager-cli";
+    private const string BASE_URI = "https://api.github.com/repos/nizanrosh/okta-aws-cli";
+    // private const string BASE_URI = "https://api.github.com/repos/DmitrySigalov/gclod-secret-manager-cli";
     
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
 
-    public GitHubClientImpl(HttpClient httpClient, ILogger<GitHubClientImpl> logger)
+    public GitHubClientImpl(HttpClient httpClient,
+        ILogger<GitHubClientImpl> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
     }
 
-    public async Task<GitHubModel.Release> GetLatestReleaseAsync(CancellationToken cancellationToken)
+    public async Task<GitHubModel.Response<GitHubModel.Release>> GetLatestReleaseAsync(CancellationToken cancellationToken)
     {
+        var result = new GitHubModel.Response<GitHubModel.Release>
+        {
+            RequestUrl = BuildRequestUrl("releases", "latest"),
+            RequestTime = DateTime.UtcNow,
+        };
+        
         try
         {
-            _logger.LogTrace("Getting latest release from GitHub API");
-            
             var request = BuildHttpRequestMessage("releases", "latest");
             
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new InvalidOperationException($"Request failed, status code: {response.StatusCode}.");
-            }
-            
-            var result = await response.Content.ReadFromJsonAsync<GitHubModel.Release>(cancellationToken: cancellationToken);
 
-            return result;
+            result.StatusCode = response.StatusCode;
+            result.IsSuccessStatusCode = response.IsSuccessStatusCode;
+            
+            if (result.IsSuccessStatusCode)
+            {
+                result.Data = await response.Content.ReadFromJsonAsync<GitHubModel.Release>(cancellationToken: cancellationToken);
+            }
+            else
+            {
+                _logger.LogError($"Get latest release from GitHub request failed, status code: {response.StatusCode}");
+            }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error has occurred while trying to get latest release from GitHub.");
+            _logger.LogError(e, "An error has occurred while trying to get latest release from GitHub");
         }
 
-        return null;
+        return result;
     }
 
     private HttpRequestMessage BuildHttpRequestMessage(params string[] queryParameters)

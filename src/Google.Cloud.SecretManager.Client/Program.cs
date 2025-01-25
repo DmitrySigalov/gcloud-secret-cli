@@ -31,7 +31,7 @@ services
 
         builder
             .SetMinimumLevel(LogLevel.Error)
-            .AddConsole();
+            .AddSimpleConsole();
     });
 
 services
