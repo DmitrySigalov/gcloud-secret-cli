@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if [ ! -n "${AWS_SSM_CLI_HOME+x}" ]; then
+  # echo "AWS_SSM_CLI_HOME is not set."
+
+  ## resolve links - $0 may be a symlink
+  PRG="$0"
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+    else
+    PRG=`dirname "$PRG"`"/$link"
+    fi
+  done
+
+
+  AWS_SSM_CLI_HOME=`dirname "$PRG"`
+
+  # make it fully qualified
+  AWS_SSM_CLI_HOME=`cd "$AWS_SSM_CLI_HOME" && pwd`
+  # echo "aws-ssm-cli Home: $AWS_SSM_CLI_HOME"
+fi
+
+export AWS_SSM_CLI_HOME
+$AWS_SSM_CLI_HOME/aws-ssm-cli ${1+"$@"}
