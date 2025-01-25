@@ -25,4 +25,32 @@ Verify your dotnet version:
 
 The Installer publishes the code to the machine applications directory and adds it to your system's path.
 
+- Download latest release to local machine
+- Un-puck sources
+- Open terminal/cmd
+- Set current directory to un-packed sources (cd command) 
+- Run installation command
+
+- ### Windows
+  - Terminal/cmd should be run as Administrator
+  - Installation command
+```
+dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
+```
+
+- ### macOS
+    - Installation command
+```
+sudo dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
+```
+
+- Reopen terminal/cmd and run
+```
+gscli help
+```
+or
+```
+gc-secret-manager-cli help
+```
+
 TODO
