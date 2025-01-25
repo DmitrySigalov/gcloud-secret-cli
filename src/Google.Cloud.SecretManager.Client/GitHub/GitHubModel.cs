@@ -8,8 +8,6 @@ public class GitHubModel
     {
         public string RequestUrl { get; set; }
         
-        public DateTime RequestTime { get; set; } = DateTime.UtcNow;
-        
         public bool IsSuccessStatusCode { get; set; }
         
         public HttpStatusCode StatusCode { get; set; }

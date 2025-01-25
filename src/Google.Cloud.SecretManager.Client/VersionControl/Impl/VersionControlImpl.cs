@@ -24,37 +24,47 @@ public class VersionControlImpl : IVersionControl
 
     public async Task CheckVersionAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine($"Current version is '{Assembly.GetEntryAssembly()?.GetName().Version}'");
+        var checkVersionInfo = await GetCheckVersionInfoAsync(cancellationToken);
 
-        var gitHubRelease = await GetLatestReleaseResponseAsync(cancellationToken);
+        Console.WriteLine($"Current version is '{checkVersionInfo.LastCheckVersion}'");
 
-        if (gitHubRelease.Data == null)
+        if (checkVersionInfo.LatestRelease == null)
         {
-            ConsoleHelper.WriteLineError($"Unavailable information about Latest official release version");
+            ConsoleHelper.WriteLineError($"Unavailable information about latest official release version");
+
             return;
         }
 
-        Console.WriteLine($"Latest release version is '{gitHubRelease.Data.Tag_Name}'");
-        Console.WriteLine($"{gitHubRelease.Data.Html_Url}");
+        Console.WriteLine($"Latest release version is '{checkVersionInfo.LatestRelease.Tag_Name}'");
+        Console.WriteLine($"{checkVersionInfo.LatestRelease.Html_Url}");
     }
 
-    private async Task<GitHubModel.Response<GitHubModel.Release>> GetLatestReleaseResponseAsync(CancellationToken cancellationToken)
+    private async Task<CheckVersionInfo> GetCheckVersionInfoAsync(CancellationToken cancellationToken)
     {
-        var currentGitHubRelease = ReadReleaseVersionDump();
-
-        // if (currentDump != null)
-        // {
-        //     return currentDump;
-        // }
+        var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
         
-        var newGitHubRelease = await _gitHubClient.GetLatestReleaseAsync(cancellationToken);
+        var currentCheckVersionDump = ReadReleaseVersionDump();
 
-        SaveReleaseVersionDump(newGitHubRelease);
+        if (currentCheckVersionDump != null &&
+            currentCheckVersionDump.LastCheckVersion == currentVersion)
+        {
+            return currentCheckVersionDump;
+        }
 
-        return newGitHubRelease;
+        var gitHubResponse = await _gitHubClient.GetLatestReleaseAsync(cancellationToken);
+
+        var newCheckVersionDump = new CheckVersionInfo
+        {
+            LastCheckVersion = currentVersion,
+            LatestRelease = gitHubResponse?.Data,
+        };
+
+        SaveReleaseVersionDump(newCheckVersionDump);
+
+        return newCheckVersionDump;
     }
 
-    private GitHubModel.Response<GitHubModel.Release> ReadReleaseVersionDump()
+    private CheckVersionInfo ReadReleaseVersionDump()
     {
         try
         {
@@ -63,7 +73,7 @@ public class VersionControlImpl : IVersionControl
 
             if (!string.IsNullOrWhiteSpace(json))
             {
-                return JsonSerializationHelper.Deserialize<GitHubModel.Response<GitHubModel.Release>>(json);
+                return JsonSerializationHelper.Deserialize<CheckVersionInfo>(json);
             }
         }
         catch (Exception e)
@@ -74,8 +84,10 @@ public class VersionControlImpl : IVersionControl
         return null;
     }
 
-    private void SaveReleaseVersionDump(GitHubModel.Response<GitHubModel.Release> newDump)
+    private void SaveReleaseVersionDump(CheckVersionInfo newDump)
     {
+        newDump.LastRequestTime = DateTime.UtcNow;
+        
         var json = JsonSerializationHelper.Serialize(newDump);
         
         _userFilesProvider.WriteTextFile(VersionControlConsts.FILE_NAME,

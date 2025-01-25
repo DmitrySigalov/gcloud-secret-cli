@@ -5,8 +5,7 @@ namespace Google.Cloud.SecretManager.Client.GitHub.Impl;
 
 public class GitHubClientImpl : IGitHubClient
 {
-    private const string BASE_URI = "https://api.github.com/repos/nizanrosh/okta-aws-cli";
-    // private const string BASE_URI = "https://api.github.com/repos/DmitrySigalov/gclod-secret-manager-cli";
+    private const string BASE_URI = "https://api.github.com/repos/DmitrySigalov/gclod-secret-manager-cli";
     
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
@@ -23,7 +22,6 @@ public class GitHubClientImpl : IGitHubClient
         var result = new GitHubModel.Response<GitHubModel.Release>
         {
             RequestUrl = BuildRequestUrl("releases", "latest"),
-            RequestTime = DateTime.UtcNow,
         };
         
         try

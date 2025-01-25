@@ -47,16 +47,12 @@ var serviceProvider = services.BuildServiceProvider();
 
 try
 {
-    await serviceProvider
-        .GetRequiredService<IVersionControl>()
-        .CheckVersionAsync(cts.Token);
-    
     Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GClod-Secrets-Cli"));
 
     var cliHandler = serviceProvider
         .GetRequiredService<CommandSelector>()
         .Get();
-    
+
     await cliHandler.Handle(cts.Token);
 }
 catch (Exception e)
@@ -67,5 +63,12 @@ catch (Exception e)
 }
 finally
 {
+    Thread.Sleep(1000);
+    
     Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Goodbye"));
+    
+    await serviceProvider
+        .GetRequiredService<IVersionControl>()
+        .CheckVersionAsync(cts.Token);
 }
+
