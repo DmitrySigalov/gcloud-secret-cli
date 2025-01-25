@@ -1,4 +1,3 @@
-using System.Reflection;
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.GitHub;
 using Google.Cloud.SecretManager.Client.UserRuntime;
@@ -24,8 +23,6 @@ public class VersionControlImpl : IVersionControl
 
     public async Task CheckVersionAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine($"Runtime version is '{VersionHelper.RuntimeVersion}'");
-
         var checkVersionInfo = await GetCheckVersionInfoAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(checkVersionInfo.LatestRelease?.Tag_Name))
@@ -39,8 +36,8 @@ public class VersionControlImpl : IVersionControl
         if (!checkVersionInfo.LatestRelease.Tag_Name.Equals(VersionHelper.RuntimeVersion))
         {
             ConsoleHelper.WriteWarn("Warning: ");
-            Console.WriteLine($"A new official release version '{checkVersionInfo.LatestRelease.Tag_Name}' is available.");
-            Console.WriteLine($"Visit {checkVersionInfo.LatestRelease.Html_Url}");
+            Console.WriteLine($"A new official release version is available.");
+            Console.WriteLine($"To upgrade from version '{VersionHelper.RuntimeVersion}' to '{checkVersionInfo.LatestRelease.Tag_Name}', visit {checkVersionInfo.LatestRelease.Html_Url}");
         }
     }
 
@@ -53,8 +50,6 @@ public class VersionControlImpl : IVersionControl
             return currentCheckVersionDump;
         }
         
-        ConsoleHelper.WriteLineNotification("Check latest release version");
-
         var gitHubResponse = await _gitHubClient.GetLatestReleaseAsync(cancellationToken);
 
         var newCheckVersionDump = new CheckVersionInfo
