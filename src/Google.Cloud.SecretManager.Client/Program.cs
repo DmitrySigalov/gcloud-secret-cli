@@ -1,14 +1,16 @@
 ﻿using Google.Cloud.SecretManager.Client.Commands;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
+using Google.Cloud.SecretManager.Client.GitHub;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.UserRuntime;
+using Google.Cloud.SecretManager.Client.VersionControl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 var cts = new CancellationTokenSource();
-Console.CancelKeyPress += (s, e) =>
+Console.CancelKeyPress += (_, e) =>
 {
     cts.Cancel();
     e.Cancel = true;
@@ -22,30 +24,35 @@ var configuration = new ConfigurationBuilder()
 var services = new ServiceCollection();
 
 services
+    .AddSingleton<IConfiguration>(configuration)
     .AddLogging(builder =>
     {
         builder.ClearProviders();
-        builder.AddConsole();
-    })
-    .AddSingleton<IConfiguration>(configuration);
+
+        builder
+            .SetMinimumLevel(LogLevel.Error)
+            .AddSimpleConsole();
+    });
 
 services
     .AddCommands()
     .AddGoogleCloudServices()
     .AddUserRuntimeServices(args)
     .AddEnvironmentVariablesServices()
-    .AddProfileServices();
+    .AddProfileServices()
+    .AddVersionControlServices()
+    .AddGitHubServices();
 
 var serviceProvider = services.BuildServiceProvider();
 
 try
 {
-    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Google-Clod-Secrets-Cli"));
+    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GClod-Secrets-Cli"));
 
     var cliHandler = serviceProvider
         .GetRequiredService<CommandSelector>()
         .Get();
-    
+
     await cliHandler.Handle(cts.Token);
 }
 catch (Exception e)
@@ -56,5 +63,12 @@ catch (Exception e)
 }
 finally
 {
+    Thread.Sleep(1000);
+    
     Console.WriteLine(Figgle.FiggleFonts.Standard.Render("Goodbye"));
+    
+    await serviceProvider
+        .GetRequiredService<IVersionControl>()
+        .CheckVersionAsync(cts.Token);
 }
+

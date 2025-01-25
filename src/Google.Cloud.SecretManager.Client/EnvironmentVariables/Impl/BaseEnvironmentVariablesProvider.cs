@@ -41,10 +41,9 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
     }
 
     public void Set(EnvironmentDescriptor newData, 
-        bool skipCheckChanges,
         Action<string> outputCallback)
     {
-        var createCounter = 0;
+        var addCounter = 0;
         var updateCounter = 0;
         var deleteCounter = 0;
         
@@ -52,6 +51,11 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         
         try
         {
+            if (!string.IsNullOrEmpty(newData.ProfileName) &&
+                newData.ProfileName != currentData.ProfileName)
+            {
+                outputCallback($"Changed active profile to [{newData.ProfileName}]");
+            }
             currentData.ProfileName = newData.ProfileName;
 
             // Add/update new variables
@@ -59,8 +63,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
             {
                 var availableStatus = currentData.Variables.TryGetValue(newVariable.Key, out var oldValue);
                 
-                if (skipCheckChanges || 
-                    !availableStatus || 
+                if (!availableStatus || 
                     newVariable.Value != oldValue)
                 {
                     OnSetEnvironmentVariable(currentData, outputCallback, newVariable.Key, newVariable.Value);
@@ -73,7 +76,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
                     }
                     else
                     {
-                        createCounter++;
+                        addCounter++;
                     }
                 }
             }
@@ -95,22 +98,29 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         }
         finally
         {
-            if (createCounter > 0)
-            {
-                outputCallback($"Created {createCounter} environment variables");
-            }
-            if (updateCounter > 0)
-            {
-                outputCallback($"Updated {updateCounter} environment variables");
-            }
-            if (deleteCounter > 0)
-            {
-                outputCallback($"Deleted {deleteCounter} environment variables");
-            }
-                
             DumpDescriptor(currentData);
 
-            OnFinishSet(currentData, outputCallback);
+            if (updateCounter + addCounter + deleteCounter > 0)
+            {
+                if (updateCounter > 0)
+                {
+                    outputCallback($"{updateCounter} updated environment variables");
+                }
+                if (addCounter > 0)
+                {
+                    outputCallback($"{addCounter} added environment variables");
+                }
+                if (deleteCounter > 0)
+                {
+                    outputCallback($"{deleteCounter} deleted environment variables");
+                }
+
+                OnFinishSet(currentData, outputCallback);
+            }
+            else
+            {
+                outputCallback("No changes in environment variables");
+            }
         }
     }
 

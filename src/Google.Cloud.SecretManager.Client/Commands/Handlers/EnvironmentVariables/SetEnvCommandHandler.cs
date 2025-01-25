@@ -1,11 +1,10 @@
 using Google.Cloud.SecretManager.Client.Common;
 using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
 
 public class SetEnvCommandHandler : ICommandHandler
 {
@@ -24,7 +23,7 @@ public class SetEnvCommandHandler : ICommandHandler
     
     public string CommandName => COMMAND_NAME;
     
-    public string Description => "Set environment variables";
+    public string Description => "Set environment variables from secrets dump";
     
     public Task Handle(CancellationToken cancellationToken)
     {
@@ -37,7 +36,7 @@ public class SetEnvCommandHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -55,7 +54,7 @@ public class SetEnvCommandHandler : ICommandHandler
         var newSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
         if (newSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"No secret values dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -67,40 +66,15 @@ public class SetEnvCommandHandler : ICommandHandler
             ProfileName = selectedProfileName,
             Variables = newSecrets.ToEnvironmentDictionary(),
         };
-        var forceUpdate = false;
         
         if (!newDescriptor.Variables.Any())
         {
-            ConsoleHelper.WriteLineNotification($"Not found any dumped secret values according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
-        
-        if (!string.IsNullOrEmpty(currentEnvironmentDescriptor.ProfileName) &&
-            !selectedProfileName.Equals(currentEnvironmentDescriptor.ProfileName, StringComparison.InvariantCultureIgnoreCase))
-        {
-            ConsoleHelper.WriteLineNotification(
-                $"Start switch profile from [{currentEnvironmentDescriptor.ProfileName}] to [{selectedProfileName}] in the environment variables system");
-        }
-
-        if (!newDescriptor.HasDiff(currentEnvironmentDescriptor.Variables))
-        {
-            ConsoleHelper.WriteLineInfo(
-                $"Profile [{selectedProfileName}] already is fully synchronized with the environment variables system");
-
-            forceUpdate = Prompt.Select(
-                "Force to update all environment variables",
-                new[] { true, false, },
-                defaultValue: false);
-
-            if (!forceUpdate)
-            {
-                return Task.CompletedTask;
-            }
-        }
 
         _environmentVariablesProvider.Set(newDescriptor,
-            skipCheckChanges: forceUpdate,
             ConsoleHelper.WriteLineNotification);
 
         Console.WriteLine();

@@ -11,6 +11,4 @@ public sealed class ProfileConfig
     public bool RemoveStartDelimiter { get; set; } = true;
 
     public char SecretPathDelimiter { get; set; } = '/';
-
-    public HashSet<string> PathFilters { get; set; } = new() { "" }; // TODO: delete
 }

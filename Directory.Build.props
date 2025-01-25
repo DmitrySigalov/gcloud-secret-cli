@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VersionPrefix>0.0.0-alpha</VersionPrefix>
+    <LangVersion>preview</LangVersion>
+    <Authors>Dmitry V. Sigalov</Authors>
+    <Copyright>Copyright © 2025-present Dmitry V. Sigalov</Copyright>
+    <PackageProjectUrl>https://github.com/DmitrySigalov/gclod-secret-manager-cli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DmitrySigalov/gclod-secret-manager-cli</RepositoryUrl>
+    <Description>A dotnet open source which provides connect to the Google Cloud secret manager</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>

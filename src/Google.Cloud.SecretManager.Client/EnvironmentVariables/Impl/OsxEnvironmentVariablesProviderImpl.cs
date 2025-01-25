@@ -44,7 +44,7 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
                 fileScriptText, 
                 FolderTypeEnum.UserToolConfiguration);
             
-            outputCallback($"Created [{fileScriptName}] file with activated environment variables");
+            outputCallback($"Updated [{fileScriptName}] file with environment variables");
         }
         catch (Exception e)
         {
@@ -68,7 +68,7 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
 
             if (!File.Exists(rootFileScriptPath))
             {
-                outputCallback($"No found script file '{rootFileScriptPath}' according to shell configuration");
+                outputCallback($"Not found script file '{rootFileScriptPath}' according to shell configuration");
             }
 
             var fileScriptAllText = UserFilesProvider.ReadTextFileIfExist(

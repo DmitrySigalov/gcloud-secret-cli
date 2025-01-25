@@ -1,27 +1,33 @@
 using Google.Cloud.SecretManager.Client.Common;
+using Google.Cloud.SecretManager.Client.EnvironmentVariables;
 using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Grpc.Core;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
-public class DumpSecretsHandler : ICommandHandler
+public class GetSecretsHandler : ICommandHandler
 {
+    public const string COMMAND_NAME = "get-secrets";
+    
     private readonly IProfileConfigProvider _profileConfigProvider;
+    private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
-    public DumpSecretsHandler(IProfileConfigProvider profileConfigProvider,
+    public GetSecretsHandler(IProfileConfigProvider profileConfigProvider,
+        IEnvironmentVariablesProvider environmentVariablesProvider,
         ISecretManagerProvider secretManagerProvider)
     {
         _profileConfigProvider = profileConfigProvider;
+        _environmentVariablesProvider = environmentVariablesProvider;
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "dump-secrets";
+    public string CommandName => COMMAND_NAME;
     
-    public string Description => "Get and dump google secrets";
+    public string Description => "Get and save/dump secrets from google";
 
     public async Task Handle(CancellationToken cancellationToken)
     {
@@ -34,17 +40,20 @@ public class DumpSecretsHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return;
         }
+
+        var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
 
         var selectedProfileName =
             profileNames.Count == 1
                 ? profileNames.Single()
                 : Prompt.Select(
                     "Select profile",
-                    items: profileNames);
+                    items: profileNames,
+                    defaultValue: currentEnvironmentDescriptor.ProfileName);
 
         var selectedProfileDo = SpinnerHelper.Run(
             () => _profileConfigProvider.GetByName(selectedProfileName),
@@ -52,7 +61,7 @@ public class DumpSecretsHandler : ICommandHandler
 
         if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
             return;
         }
@@ -81,33 +90,27 @@ public class DumpSecretsHandler : ICommandHandler
         var successCounter = newSecrets.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
         var errorCounter = newSecrets.Count(x => x.Value.AccessStatusCode != StatusCode.OK);
 
+        if (successCounter == 0)
+        {
+            ConsoleHelper.WriteLineNotification(
+                $"NO DATA - Not retrieved any valid secret value ({errorCounter} errors)");
+            
+            return;
+        }
+
+        newSecrets.PrintSecretsMappingIdNamesAccessValues();
+
         if (changesCounter == 0)
         {
-            newSecrets.PrintSecretsMappingIdNamesAccessValues();
-
             ConsoleHelper.WriteLineInfo(
                 $"NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
             
             return;
         }
 
-        var dumpSecrets = Prompt.Select(
-            $"Dump {changesCounter} changes ({successCounter} values, {errorCounter} errors)",
-            new[] { true, false, },
-            defaultValue: errorCounter == 0);
-
-        newSecrets.PrintSecretsMappingIdNamesAccessValues();
-
-        if (!dumpSecrets)
-        {
-            ConsoleHelper.WriteLineNotification($"Not dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
-
-            return;
-        }
-
         _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {newSecrets.Count} secrets ({successCounter} values, {errorCounter} errors) according to profile [{selectedProfileName}]");
     }
 
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,
@@ -143,10 +146,10 @@ public class DumpSecretsHandler : ICommandHandler
             else if (hasChanges)
             {
                 writeAction = ConsoleHelper.WriteNotification;
-                syncStatus = "CHANGED";
+                syncStatus = "UPDATED";
                 if (oldSecrets?.ContainsKey(secretDetails.Key) != true)
                 {
-                    syncStatus = "NEW";
+                    syncStatus = "ADDED";
                 }
             }
             writeAction($"{syncStatus}\t");

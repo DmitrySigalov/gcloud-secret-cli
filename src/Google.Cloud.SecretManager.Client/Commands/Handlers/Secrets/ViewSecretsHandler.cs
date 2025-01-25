@@ -5,14 +5,14 @@ using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
-public class ViewProfileHandler : ICommandHandler
+public class ViewSecretsHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public ViewProfileHandler(
+    public ViewSecretsHandler(
         IProfileConfigProvider profileConfigProvider,
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
@@ -20,9 +20,9 @@ public class ViewProfileHandler : ICommandHandler
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "view";
+    public string CommandName => "view-secrets";
     
-    public string Description => "View profile configuration and dumped secrets";
+    public string Description => "View profile secrets details";
 
     public Task Handle(CancellationToken cancellationToken)
     {
@@ -35,7 +35,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -56,7 +56,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -67,7 +67,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (currentSecrets == null)
         {
-            ConsoleHelper.WriteLineNotification($"No secret values dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -76,7 +76,7 @@ public class ViewProfileHandler : ICommandHandler
 
         if (selectedProfileName != currentEnvironmentDescriptor.ProfileName)
         {
-            ConsoleHelper.WriteLineError(
+            ConsoleHelper.WriteLineNotification(
                 $"Profile [{selectedProfileName}] is inactive in the environment variables system");
         }
 

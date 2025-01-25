@@ -4,13 +4,12 @@ using Google.Cloud.SecretManager.Client.GoogleCloud;
 using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.Client.Profiles.Helpers;
 using Sharprompt;
-using TextCopy;
 
 namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
 
 public class ConfigProfileCommandHandler : ICommandHandler
 {
-    public const string COMMAND_NAME = "config";
+    public const string COMMAND_NAME = "config-profile";
     
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
@@ -62,25 +61,23 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         string lastSelectedOperationKey = null;        
 
-        var completeExitOperationKey = "Complete/exit configuration"; 
+        var saveOperationKey = "Save"; 
 
-        while (lastSelectedOperationKey != completeExitOperationKey)
+        while (lastSelectedOperationKey != saveOperationKey)
         {
             var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, Task<(bool IsChanged, ProfileConfig ProfileConfig)>>>
             {
-                { completeExitOperationKey, Exit },
-                { "Validate (get secret ids)", pf => ValidateAsync(pf, cancellationToken) },
+                { saveOperationKey, pf => Save(profileDetails.ProfileName, pf) },
+                { "Validate and get secret ids", pf => GetSecretIdsAsync(pf, false, cancellationToken) },
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
                 { "Reset to defaults", ResetDefaultSettings },
-                { "Import settings (paste json from clipboard)", ImportJsonFromClipboard },
-                { "Export settings (copy json into clipboard)", ExportJsonIntoClipboard },
            };
 
             lastSelectedOperationKey = Prompt.Select(
                 "Select operation",
                 items: manageOperationsLookup.Keys,
-                defaultValue: completeExitOperationKey);
+                defaultValue: saveOperationKey);
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
@@ -88,19 +85,15 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
             if (operationResult.HasChanges)
             {
-                SpinnerHelper.Run(
-                    () => _profileConfigProvider.Save(profileDetails.ProfileName, operationResult.ProfileConfig),
-                    $"Save profile [{profileDetails.ProfileName}] configuration new settings");
-            
-                operationResult.ProfileConfig.PrintProfileConfig();
-                
                 profileDetails.ProfileDo = operationResult.ProfileConfig;
             }
 
             Console.WriteLine();
         }
+        
+        await GetSecretIdsAsync(profileDetails.ProfileDo, true, cancellationToken);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{profileDetails.ProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Configured valid profile [{profileDetails.ProfileName}]");
         Console.WriteLine();
     }
     
@@ -152,11 +145,17 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         return (operation, profileName, profileDo);
     }
+
+    private Task<(bool, ProfileConfig)> Save(string profileName, ProfileConfig profileConfig)
+    {
+        SpinnerHelper.Run(
+            () => _profileConfigProvider.Save(profileName, profileConfig),
+            $"Save profile [{profileName}] configuration new settings");
+        
+        return Task.FromResult((false, profileConfig));
+    }
     
-    private Task<(bool, ProfileConfig)> Exit(ProfileConfig profileConfig) => 
-        Task.FromResult((false, profileConfig));
-    
-    private async Task<(bool, ProfileConfig)> ValidateAsync(ProfileConfig profileConfig, CancellationToken cancellationToken)
+    private async Task<(bool, ProfileConfig)> GetSecretIdsAsync(ProfileConfig profileConfig, bool throwOnException, CancellationToken cancellationToken)
     {
         profileConfig.PrintProfileConfig();
 
@@ -170,6 +169,11 @@ public class ConfigProfileCommandHandler : ICommandHandler
         }
         catch (Exception e)
         {
+            if (throwOnException)
+            {
+                throw;
+            }
+            
             ConsoleHelper.WriteLineError(e.Message);
         }
 
@@ -252,39 +256,5 @@ public class ConfigProfileCommandHandler : ICommandHandler
         newProfileConfig.ProjectId = profileConfig.ProjectId ?? newProfileConfig.ProjectId;
         
         return Task.FromResult((true, newProfileConfig));
-    }
-
-    private Task<(bool, ProfileConfig)> ImportJsonFromClipboard(ProfileConfig profileConfig)
-    {
-        var newJson = ClipboardService.GetText()?.Trim(); 
-        
-        if (!string.IsNullOrWhiteSpace(newJson))
-        {
-            try
-            {
-                var newProfileConfig = JsonSerializationHelper.Deserialize<ProfileConfig>(newJson);
-
-                return Task.FromResult((newProfileConfig != null, newProfileConfig));
-            }
-            catch (Exception e)
-            {
-                ConsoleHelper.WriteLineNotification(newJson);
-
-                ConsoleHelper.WriteLineError(e.Message);
-            }
-        }
-
-        return Task.FromResult((false, profileConfig));
-    }
-    
-    private Task<(bool, ProfileConfig)>  ExportJsonIntoClipboard(ProfileConfig profileConfig)
-    {
-        var json = JsonSerializationHelper.Serialize(profileConfig);
-        
-        ClipboardService.SetText(json);
-
-        ConsoleHelper.WriteLineNotification(json);
-
-        return Task.FromResult((false, profileConfig));
     }
 }

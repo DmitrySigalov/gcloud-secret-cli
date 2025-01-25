@@ -5,7 +5,7 @@ using Grpc.Core;
 using Sharprompt;
 using TextCopy;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
 
 public class ImportSecretsFromClipboardHandler : ICommandHandler
 {
@@ -19,7 +19,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
     
     public string CommandName => "import-secrets";
     
-    public string Description => "Import secrets (from the clipboard)";
+    public string Description => "Import secrets (json from the clipboard)";
     
     public Task Handle(CancellationToken cancellationToken)
     {
@@ -44,7 +44,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
             "Get profile names");
         if (profileNames.Any() == false)
         {
-            ConsoleHelper.WriteLineError("No found any profile");
+            ConsoleHelper.WriteLineError("Not found any profile");
 
             return Task.CompletedTask;
         }
@@ -61,7 +61,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
             $"Read profile [{selectedProfileName}]");
         if (selectedProfileDo == null)
         {
-            ConsoleHelper.WriteLineError($"No found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
             return Task.CompletedTask;
         }
@@ -81,7 +81,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
 
         newSecrets.PrintSecretsMappingIdNamesAccessValues();
         
-        ConsoleHelper.WriteLineInfo($"DONE - Imported {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Imported/saved/dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
 
         return Task.CompletedTask;
     }

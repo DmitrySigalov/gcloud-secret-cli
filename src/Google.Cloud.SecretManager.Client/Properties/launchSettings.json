@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Google.Cloud.SecretManager.Client": {
+    "Client": {
       "commandName": "Project",
       "commandLineArgs": "",
       "environmentVariables": {
