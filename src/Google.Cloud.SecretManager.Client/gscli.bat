@@ -3,8 +3,8 @@ if "%OS%" == "Windows_NT" setlocal
 
 setlocal enabledelayedexpansion
 
-set AWS_SSM_CLI_HOME="%~dp0"
+set GCLOUD_SECRET_MANAGER_CLI_HOME="%~dp0"
 
 setlocal DISABLEDELAYEDEXPANSION
 
-%AWS_SSM_CLI_HOME%aws-ssm-cli.exe %*
+%GCLOUD_SECRET_MANAGER_CLI_HOME%gcloud-secret-manager-cli.exe %*
