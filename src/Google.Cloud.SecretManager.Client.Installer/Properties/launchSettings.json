@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Installer": {
+      "commandName": "Project",
+      "commandLineArgs": "--buildWorkingDirectory . --appHomePath app"
+    }
+  }
+}
