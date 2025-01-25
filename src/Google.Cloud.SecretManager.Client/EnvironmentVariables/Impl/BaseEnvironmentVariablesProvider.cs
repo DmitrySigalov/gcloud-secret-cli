@@ -43,6 +43,7 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
     public void Set(EnvironmentDescriptor newData, 
         Action<string> outputCallback)
     {
+        var addCounter = 0;
         var updateCounter = 0;
         var deleteCounter = 0;
         
@@ -69,7 +70,14 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
             
                     currentData.Variables[newVariable.Key] = newVariable.Value;
 
-                    updateCounter++;
+                    if (availableStatus)
+                    {
+                        updateCounter++;
+                    }
+                    else
+                    {
+                        addCounter++;
+                    }
                 }
             }
         
@@ -92,9 +100,21 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
         {
             DumpDescriptor(currentData);
 
-            if (updateCounter + deleteCounter > 0)
+            if (updateCounter + addCounter + deleteCounter > 0)
             {
-                outputCallback($"Changes: {updateCounter} updated and {deleteCounter} deleted environment variables");
+                if (updateCounter > 0)
+                {
+                    outputCallback($"{updateCounter} updated environment variables");
+                }
+                if (addCounter > 0)
+                {
+                    outputCallback($"{addCounter} added environment variables");
+                }
+                if (deleteCounter > 0)
+                {
+                    outputCallback($"{deleteCounter} deleted environment variables");
+                }
+
                 OnFinishSet(currentData, outputCallback);
             }
             else

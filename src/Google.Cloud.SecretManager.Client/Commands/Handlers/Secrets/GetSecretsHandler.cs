@@ -146,10 +146,10 @@ public class GetSecretsHandler : ICommandHandler
             else if (hasChanges)
             {
                 writeAction = ConsoleHelper.WriteNotification;
-                syncStatus = "CHANGED";
+                syncStatus = "UPDATED";
                 if (oldSecrets?.ContainsKey(secretDetails.Key) != true)
                 {
-                    syncStatus = "NEW";
+                    syncStatus = "ADDED";
                 }
             }
             writeAction($"{syncStatus}\t");
