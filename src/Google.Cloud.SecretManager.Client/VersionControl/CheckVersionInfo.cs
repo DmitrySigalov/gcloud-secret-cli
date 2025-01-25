@@ -4,9 +4,9 @@ namespace Google.Cloud.SecretManager.Client.VersionControl;
 
 public class CheckVersionInfo
 {
-    public DateTime LastRequestTime { get; set; } = DateTime.UtcNow;
+    public DateTime LastCheckTime { get; set; }
     
-    public Version LastCheckVersion { get; set; }
+    public string LastCheckRuntimeReleaseVersion { get; set; }
     
     public GitHubModel.Release LatestRelease { get; set; }
 }
