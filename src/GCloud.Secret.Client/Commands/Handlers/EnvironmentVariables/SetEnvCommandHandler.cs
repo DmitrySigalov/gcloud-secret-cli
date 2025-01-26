@@ -25,7 +25,7 @@ public class SetEnvCommandHandler : ICommandHandler
     
     public string Description => "Set environment variables from secrets dump";
     
-    public Task Handle(CancellationToken cancellationToken)
+    public Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -38,7 +38,7 @@ public class SetEnvCommandHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError("Not found any profile");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
 
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
@@ -56,7 +56,7 @@ public class SetEnvCommandHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
 
         newSecrets.PrintSecretsMappingIdNamesAccessValues();
@@ -71,7 +71,7 @@ public class SetEnvCommandHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{selectedProfileName}]");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
 
         _environmentVariablesProvider.Set(newDescriptor,
@@ -81,6 +81,6 @@ public class SetEnvCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineInfo(
             $"DONE - Profile [{selectedProfileName}] ({newDescriptor.Variables.Count} secrets with value) has synchronized with the environment variables system");
 
-        return Task.CompletedTask;
+        return Task.FromResult(ResultStatusEnum.AllDone);
     }
 }

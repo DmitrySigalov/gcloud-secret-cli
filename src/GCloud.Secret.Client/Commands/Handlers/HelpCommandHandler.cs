@@ -18,7 +18,7 @@ public class HelpCommandHandler : ICommandHandler
 
     public string Description => "";
 
-    public Task Handle(CancellationToken cancellationToken)
+    public Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"Supported commands:");
 
@@ -34,6 +34,6 @@ public class HelpCommandHandler : ICommandHandler
 
         ConsoleHelper.Warn(() => table.Write(Format.Minimal));
 
-        return Task.CompletedTask;
+        return Task.FromResult(ResultStatusEnum.AllDone);
     }
 }

@@ -6,5 +6,5 @@ public interface ICommandHandler
 
     string Description { get; }
 
-    Task Handle(CancellationToken cancellationToken);
+    Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken);
 }

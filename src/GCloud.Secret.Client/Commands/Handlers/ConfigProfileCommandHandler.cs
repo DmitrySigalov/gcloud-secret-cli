@@ -33,7 +33,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
     
     public string Description => "Profile(s) configuration";
     
-    public async Task Handle(CancellationToken cancellationToken)
+    public async Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -57,7 +57,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
             
             ConsoleHelper.WriteLineInfo($"DONE - Deleted profile [{profileDetails.ProfileName}]");
 
-            return;
+            return ResultStatusEnum.AllDone;
         }
 
         string lastSelectedOperationKey = null;        
@@ -96,6 +96,8 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         ConsoleHelper.WriteLineInfo($"DONE - Configured valid profile [{profileDetails.ProfileName}]");
         Console.WriteLine();
+
+        return ResultStatusEnum.AllDone;
     }
     
     private (OperationEnum Operation, string ProfileName, ProfileConfig ProfileDo) GetProfileDetailsForConfiguration()

@@ -24,7 +24,7 @@ public class ViewSecretsHandler : ICommandHandler
     
     public string Description => "View profile secrets details";
 
-    public Task Handle(CancellationToken cancellationToken)
+    public Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -37,7 +37,7 @@ public class ViewSecretsHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError("Not found any profile");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
 
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
@@ -58,7 +58,7 @@ public class ViewSecretsHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
 
         selectedProfileDo.PrintProfileConfig();
@@ -69,7 +69,7 @@ public class ViewSecretsHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
 
         currentSecrets.PrintSecretsMappingIdNamesAccessValues();
@@ -87,12 +87,12 @@ public class ViewSecretsHandler : ICommandHandler
             ConsoleHelper.WriteLineError(
                 $"Profile [{selectedProfileName}] has different secret values with the environment variables system");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ResultStatusEnum.AllDone);
         }
         
         ConsoleHelper.WriteLineInfo(
             $"Profile [{selectedProfileName}] is fully synchronized with the environment variables system");
 
-        return Task.CompletedTask;
+        return Task.FromResult(ResultStatusEnum.AllDone);
     }
 }
