@@ -25,11 +25,6 @@ public class VersionControlImpl : IVersionControl
     {
         Console.WriteLine($"Runtime version is '{VersionHelper.RuntimeVersion}'.");
         
-        // TODO: Delete in next version
-        Console.WriteLine($"Assembly location is '{typeof(VersionControlImpl).Assembly.Location}'.");
-        Console.WriteLine($"{FolderTypeEnum.RootUser} is '{_userFilesProvider.GetFolderPath(FolderTypeEnum.RootUser)}'.");
-        Console.WriteLine($"{FolderTypeEnum.UserToolConfiguration} is '{_userFilesProvider.GetFolderPath(FolderTypeEnum.UserToolConfiguration)}'.");
-        
         var checkVersionInfo = await GetCheckVersionInfoAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(checkVersionInfo.LatestRelease?.Tag_Name))

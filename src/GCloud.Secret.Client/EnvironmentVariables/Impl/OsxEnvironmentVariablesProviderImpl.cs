@@ -83,14 +83,6 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
                     FolderTypeEnum.RootUser);
 
                 outputCallback($"Added [{partialScriptText}] in the {ShellHelper.GetShellScriptFileName()} file");
-
-                // TODO: delete
-                outputCallback("--------------------------------------");
-                fileScriptAllText = UserFilesProvider.ReadTextFileIfExist(
-                    ShellHelper.GetShellScriptFileName(),
-                    FolderTypeEnum.RootUser);
-                outputCallback($"{fileScriptAllText}");
-                outputCallback("--------------------------------------");
             }
 
             outputCallback($"Reopen application (terminal/rider) or run command in the terminal: source {rootFileScriptPathForLog}");
