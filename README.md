@@ -42,7 +42,7 @@ dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
 sudo dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
 ```
 
-Reopen terminal/cmd and run
+Reopen terminal / cmd and run
 ```
 gcloud-secret-manager-cli help
 ```
