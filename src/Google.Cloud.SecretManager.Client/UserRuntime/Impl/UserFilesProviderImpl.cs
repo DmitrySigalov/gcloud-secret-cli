@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 
@@ -41,7 +40,7 @@ public class UserFilesProviderImpl : IUserFilesProvider
 
         if (folderType == FolderTypeEnum.UserToolConfiguration)
         {
-            path = Path.Combine(path, $".{Assembly.GetEntryAssembly()?.GetName().Name}");
+            path = Path.Combine(path, $".{typeof(UserFilesProviderImpl).Assembly.GetName().Name}");
         }
 
         if (!Directory.Exists(path))
