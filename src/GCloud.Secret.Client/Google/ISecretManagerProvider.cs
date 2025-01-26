@@ -1,6 +1,6 @@
 using GCloud.Secret.Client.Profiles;
 
-namespace GCloud.Secret.Client.GoogleCloud;
+namespace GCloud.Secret.Client.Google;
 
 public interface ISecretManagerProvider
 {

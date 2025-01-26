@@ -3,7 +3,7 @@ using Google.Api.Gax.ResourceNames;
 using Google.Cloud.SecretManager.V1;
 using Grpc.Core;
 
-namespace GCloud.Secret.Client.GoogleCloud.Impl;
+namespace GCloud.Secret.Client.Google.Impl;
 
 public class SecretManagerProviderImpl : ISecretManagerProvider
 {

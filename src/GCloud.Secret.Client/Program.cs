@@ -1,7 +1,7 @@
 ﻿using GCloud.Secret.Client.Commands;
 using GCloud.Secret.Client.EnvironmentVariables;
 using GCloud.Secret.Client.GitHub;
-using GCloud.Secret.Client.GoogleCloud;
+using GCloud.Secret.Client.Google;
 using GCloud.Secret.Client.Profiles;
 using GCloud.Secret.Client.UserRuntime;
 using GCloud.Secret.Client.VersionControl;
