@@ -29,20 +29,17 @@ The Installer publishes the code to the machine applications directory and adds 
 Guideline:
 1. Download latest release to local machine
 2. Un-puck sources (installer and src folders)
-3. Open terminal / cmd (as administrator)
-4. Set current directory to <installer> folder (cd command)
-5. Run installation command:
 
 - ### Windows
-  - Run Installer.exe
+  - Run Installer.exe (as Administrator)
 
 - ### macOS
-    - It will be easier to run the installer correctly with the following command, while in its directory:
+    - It will be easier to run the installer correctly with the following command, while in its directory (cd command):
 ```
-sudo dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
+sudo dotnet Installer.dll
 ```
 
-Reopen terminal / cmd and run
+3. eopen terminal / cmd and run
 ```
 gcloud-secret-manager-cli help
 ```
