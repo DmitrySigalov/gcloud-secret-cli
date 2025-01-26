@@ -17,6 +17,41 @@ public class UserFilesProviderImpl : IUserFilesProvider
         _configuration = configuration;
     }
     
+    public string GetFolderPath(FolderTypeEnum folderType)
+    {
+        var path = _configuration?.GetValue<string>("USER_FOLDER_PATH");
+        
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                path = $"C:/Users/{_configuration?["USERNAME"]}";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                path = $"/Users/{Environment.UserName}";
+            }
+            else
+            {
+                throw new NotSupportedException("Not supported for operation system");
+            }
+        }
+        
+        path = Path.GetFullPath(path);
+
+        if (folderType == FolderTypeEnum.UserToolConfiguration)
+        {
+            path = Path.Combine(path, $".{Assembly.GetEntryAssembly()?.GetName().Name}");
+        }
+
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        return path;
+    }
+
     public string GetFullFilePath(string fileName, FolderTypeEnum folderType)
     {
         if (string.IsNullOrEmpty(fileName))
@@ -88,40 +123,5 @@ public class UserFilesProviderImpl : IUserFilesProvider
         {
             File.Move(fullFilePath, backupFullFilePath);
         }
-    }
-    
-    private string GetFolderPath(FolderTypeEnum folderType)
-    {
-        var path = _configuration?.GetValue<string>("USER_FOLDER_PATH");
-        
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                path = $"C:/Users/{_configuration?["USERNAME"]}";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                path = $"/Users/{Environment.UserName}";
-            }
-            else
-            {
-                throw new NotSupportedException("Not supported for operation system");
-            }
-        }
-        
-        path = Path.GetFullPath(path);
-
-        if (folderType == FolderTypeEnum.UserToolConfiguration)
-        {
-            path = Path.Combine(path, $".{Assembly.GetEntryAssembly()?.GetName().Name}");
-        }
-
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-
-        return path;
     }
 }

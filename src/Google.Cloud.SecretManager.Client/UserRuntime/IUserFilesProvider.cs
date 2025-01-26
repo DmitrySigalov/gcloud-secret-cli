@@ -2,6 +2,8 @@ namespace Google.Cloud.SecretManager.Client.UserRuntime;
 
 public interface IUserFilesProvider
 {
+    string GetFolderPath(FolderTypeEnum folderType);
+    
     string GetFullFilePath(string fileName, FolderTypeEnum folderType);
     
     IEnumerable<string> GetFileNames(string searchPattern, FolderTypeEnum folderType);

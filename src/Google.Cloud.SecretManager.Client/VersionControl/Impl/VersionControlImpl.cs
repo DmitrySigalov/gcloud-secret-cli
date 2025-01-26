@@ -23,6 +23,12 @@ public class VersionControlImpl : IVersionControl
 
     public async Task CheckVersionAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Runtime version check is '{VersionHelper.RuntimeVersion}'.");
+        // TODO: Delete in next version
+        Console.WriteLine($"Assembly location is '{typeof(VersionControlImpl).Assembly.Location}'.");
+        Console.WriteLine($"{FolderTypeEnum.RootUser} is '{_userFilesProvider.GetFolderPath(FolderTypeEnum.RootUser)}'.");
+        Console.WriteLine($"{FolderTypeEnum.UserToolConfiguration} is '{_userFilesProvider.GetFolderPath(FolderTypeEnum.UserToolConfiguration)}'.");
+        
         var checkVersionInfo = await GetCheckVersionInfoAsync(cancellationToken);
 
         if (string.IsNullOrWhiteSpace(checkVersionInfo.LatestRelease?.Tag_Name))
@@ -35,9 +41,9 @@ public class VersionControlImpl : IVersionControl
 
         if (!checkVersionInfo.LatestRelease.Tag_Name.Equals(VersionHelper.RuntimeVersion))
         {
-            ConsoleHelper.WriteWarn("Warning: ");
-            Console.WriteLine($"A new official release version is available.");
-            Console.WriteLine($"To upgrade from version '{VersionHelper.RuntimeVersion}' to '{checkVersionInfo.LatestRelease.Tag_Name}', visit {checkVersionInfo.LatestRelease.Html_Url}");
+            ConsoleHelper.WriteNotification("Warning: ");
+            Console.Write($"New release version '{checkVersionInfo.LatestRelease.Tag_Name}' is available. ");
+            Console.WriteLine($"To upgrade '{checkVersionInfo.LatestRelease.Tag_Name}', visit {checkVersionInfo.LatestRelease.Html_Url}");
         }
     }
 
