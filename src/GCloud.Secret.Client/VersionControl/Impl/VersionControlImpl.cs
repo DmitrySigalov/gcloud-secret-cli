@@ -23,7 +23,7 @@ public class VersionControlImpl : IVersionControl
 
     public async Task CheckVersionAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine($"Runtime version check is '{VersionHelper.RuntimeVersion}'.");
+        Console.WriteLine($"Runtime version is '{VersionHelper.RuntimeVersion}'.");
         
         // TODO: Delete in next version
         Console.WriteLine($"Assembly location is '{typeof(VersionControlImpl).Assembly.Location}'.");
