@@ -57,8 +57,8 @@ If everything ran smoothly, you should see the list of supported commands.
 - Create and send pull request to review
 - After merge into main 
 - Create a new release:
-  - Create new tag named version prefix with added prefix 'v'. Example - 'v1.0.0'
-  - Release name has based on created tag name
+  - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
+  - Release name is based on created tag name
   - Mark a new release as latest
 - Once in day command line check if changed a new latest release and indicate about changes with instructions.
 
