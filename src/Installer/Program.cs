@@ -20,8 +20,10 @@ var installerArgs = new InstallerArgs
 };
 
 Console.WriteLine($"Installing {ApplicationSettings.AppName}...");
+Console.WriteLine();
 
 await installer.RunAsync(installerArgs);
 
+Console.WriteLine();
 Console.WriteLine("Done, press any key to exit...");
 Console.ReadKey();

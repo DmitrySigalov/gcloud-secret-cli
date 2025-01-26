@@ -37,9 +37,11 @@ public static class InstallerArgsExtensions
         
         Console.WriteLine("Publishing...");
         
+        Console.WriteLine();
         Console.WriteLine($"Build working directory: {buildWorkingDirectory}");
         Console.WriteLine($"Build project path: {projectPath}");
         Console.WriteLine($"Application path: {appPath}");
+        Console.WriteLine();
 
         var process = Process.Start(new ProcessStartInfo
         {

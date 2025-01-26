@@ -42,8 +42,8 @@ public class VersionControlImpl : IVersionControl
         if (!checkVersionInfo.LatestRelease.Tag_Name.Equals(VersionHelper.RuntimeVersion))
         {
             ConsoleHelper.WriteNotification("Warning: ");
-            Console.Write($"New release version '{checkVersionInfo.LatestRelease.Tag_Name}' is available. ");
-            Console.WriteLine($"To upgrade '{checkVersionInfo.LatestRelease.Tag_Name}', visit {checkVersionInfo.LatestRelease.Html_Url}");
+            Console.Write($"New release version is available. ");
+            Console.WriteLine($"To upgrade version to '{checkVersionInfo.LatestRelease.Tag_Name}', visit {checkVersionInfo.LatestRelease.Html_Url}");
         }
     }
 
