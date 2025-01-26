@@ -39,7 +39,7 @@ Guideline:
 sudo dotnet Installer.dll
 ```
 
-3. eopen terminal / cmd and run
+3. Reopen terminal / cmd and run
 ```
 gcloud-secret-manager-cli help
 ```
