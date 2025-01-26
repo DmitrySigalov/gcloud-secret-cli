@@ -32,12 +32,12 @@ Guideline:
 4. Set current directory to un-packed folder with sources and installer (cd command)
 5. Run installation command:
 
-### Windows
+- ### Windows
 ```
 dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
 ```
 
-### macOS
+- ### macOS
 ```
 sudo dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
 ```
