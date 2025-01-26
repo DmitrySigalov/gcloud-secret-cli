@@ -62,17 +62,12 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
                 EnvironmentVariablesConsts.FileNames.ScriptName,
                 FolderTypeEnum.UserToolConfiguration);
 
-            var rootFileScriptPath = UserFilesProvider.GetFullFilePath(
+            var rootFileScriptPathForLog = UserFilesProvider.GetFullFilePath(
                 ShellHelper.GetShellScriptFileName(),
                 FolderTypeEnum.RootUser);
 
-            if (!File.Exists(rootFileScriptPath))
-            {
-                outputCallback($"Not found script file '{rootFileScriptPath}' according to shell configuration");
-            }
-
             var fileScriptAllText = UserFilesProvider.ReadTextFileIfExist(
-                EnvironmentVariablesConsts.FileNames.ScriptExtension,
+                ShellHelper.GetShellScriptFileName(),
                 FolderTypeEnum.RootUser);
 
             var partialScriptText = $"source {scriptFilePath}";
@@ -83,14 +78,22 @@ public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvi
                                      Environment.NewLine;
 
                 UserFilesProvider.WriteTextFile(
-                    EnvironmentVariablesConsts.FileNames.ScriptExtension,
+                    ShellHelper.GetShellScriptFileName(),
                     fileScriptAllText,
                     FolderTypeEnum.RootUser);
 
-                outputCallback($"Added/configured [{partialScriptText}] in the {EnvironmentVariablesConsts.FileNames.ScriptExtension} file");
+                outputCallback($"Added [{partialScriptText}] in the {ShellHelper.GetShellScriptFileName()} file");
+
+                // TODO: delete
+                outputCallback("--------------------------------------");
+                fileScriptAllText = UserFilesProvider.ReadTextFileIfExist(
+                    ShellHelper.GetShellScriptFileName(),
+                    FolderTypeEnum.RootUser);
+                outputCallback($"{fileScriptAllText}");
+                outputCallback("--------------------------------------");
             }
 
-            outputCallback($"Reopen application (terminal/rider) or run command in the terminal: source {rootFileScriptPath}");
+            outputCallback($"Reopen application (terminal/rider) or run command in the terminal: source {rootFileScriptPathForLog}");
         }
         catch (Exception e)
         {
