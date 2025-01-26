@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "Installer": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    },
+    "Installer.Osx_Test": {
+      "commandName": "Project",
+      "commandLineArgs": "--BuildWorkingDirectory ../../../../.. --OsxAppPath test-cloud-secret-manager-cli --OsxPathsD test-cloud-secret-manager-cli.d --OsxShortcut test-gscli"
+    },
+    "Installer.Windows_Test": {
+      "commandName": "Project",
+      "commandLineArgs": "--BuildWorkingDirectory ../../../../.. --WinAppPath test-cloud-secret-manager-cli"
+    }
+  }
+}
