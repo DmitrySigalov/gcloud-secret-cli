@@ -6,11 +6,11 @@
     },
     "Installer.Osx_Test": {
       "commandName": "Project",
-      "commandLineArgs": "--BuildWorkingDirectory ../../../../.. --OsxAppPath test-cloud-secret-manager-cli --OsxPathsD test-cloud-secret-manager-cli.d --OsxShortcut test-gscli"
+      "commandLineArgs": "--BuildWorkingDirectory ../../../../.. --OsxAppPath cloud-manager-cli-test --OsxPathsD cloud-secret-cli-test.d --OsxShortcut gscli-test"
     },
     "Installer.Windows_Test": {
       "commandName": "Project",
-      "commandLineArgs": "--BuildWorkingDirectory ../../../../.. --WinAppPath test-cloud-secret-manager-cli"
+      "commandLineArgs": "--BuildWorkingDirectory ../../../../.. --WinAppPath cloud-secret-cli-test"
     }
   }
 }

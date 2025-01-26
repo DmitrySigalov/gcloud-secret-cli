@@ -17,7 +17,7 @@ public class UserFilesProviderImplTests
         {
             var expectedFullPath = Path.Combine(
                 Path.GetFullPath($"/Users/{Environment.UserName}"),
-                ".gcloud-secret-manager-cli",
+                ".gcloud-secret-cli",
                 fileName);
 
             var result = testComponent.GetFullFilePath(fileName, folderType);

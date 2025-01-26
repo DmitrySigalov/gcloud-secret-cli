@@ -2,7 +2,7 @@ namespace Installer;
 
 public static class ApplicationSettings
 {
-    public static string AppName => "gcloud-secret-manager-cli";
+    public static string AppName => "gcloud-secret-cli";
 
     public static string Shortcut => "gscli";
 

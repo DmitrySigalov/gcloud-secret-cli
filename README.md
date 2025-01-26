@@ -1,4 +1,4 @@
-# gclod-secret-manager-cli
+# gclod-secret-cli
 
 [![Build](https://github.com/dmitrysigalov/gclod-secret-manager-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-manager-cli/actions/workflows/build.yml)
 [![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-manager-cli)](https://github.com/DmitrySigalov/gclod-secret-manager-cli/blob/main/LICENSE)
@@ -41,7 +41,7 @@ sudo dotnet Installer.dll
 
 3. Reopen terminal / cmd and run
 ```
-gcloud-secret-manager-cli help
+gcloud-secret-cli help
 ```
 or
 ```

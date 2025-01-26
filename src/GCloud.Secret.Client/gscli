@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [ ! -n "${GCLOUD_SECRET_MANAGER_CLI_HOME+x}" ]; then
-  # echo "GCLOUD_SECRET_MANAGER_CLI_HOME is not set."
+if [ ! -n "${GCLOUD_SECRET_CLI_HOME+x}" ]; then
+  # echo "GCLOUD_SECRET_CLI_HOME is not set."
 
   ## resolve links - $0 may be a symlink
   PRG="$0"
@@ -16,12 +16,12 @@ if [ ! -n "${GCLOUD_SECRET_MANAGER_CLI_HOME+x}" ]; then
   done
 
 
-  GCLOUD_SECRET_MANAGER_CLI_HOME=`dirname "$PRG"`
+  GCLOUD_SECRET_CLI_HOME=`dirname "$PRG"`
 
   # make it fully qualified
-  GCLOUD_SECRET_MANAGER_CLI_HOME=`cd "$GCLOUD_SECRET_MANAGER_CLI_HOME" && pwd`
-  # echo "gcloud-secret-manager-cli Home: $GCLOUD_SECRET_MANAGER_CLI_HOME"
+  GCLOUD_SECRET_CLI_HOME=`cd "$GCLOUD_SECRET_CLI_HOME" && pwd`
+  # echo "gcloud-secret-cli Home: $GCLOUD_SECRET_CLI_HOME"
 fi
 
-export GCLOUD_SECRET_MANAGER_CLI_HOME
-$GCLOUD_SECRET_MANAGER_CLI_HOME/gcloud-secret-manager-cli ${1+"$@"}
+export GCLOUD_SECRET_CLI_HOME
+$GCLOUD_SECRET_CLI_HOME/gcloud-secret-cli ${1+"$@"}
