@@ -25,23 +25,21 @@ Verify your dotnet version:
 
 The Installer publishes the code to the machine applications directory and adds it to your system's path.
 
-- Download latest release to local machine
-- Un-puck sources
-- Open terminal / cmd (as administrator)
-- Set current directory to un-packed folder with sources and installer (cd command) 
-- Run installation command
-
+Steps:
+1. Download latest release to local machine
+2. Un-puck sources
+3. Open terminal / cmd (as administrator)
+4. Set current directory to un-packed folder with sources and installer (cd command)
+5. Run installation command:
   - ### Windows
 ```
 dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
 ```
-
   - ### macOS
   ```
   sudo dotnet run --project src/Aws.Ssm.Cli.Installer/Aws.Ssm.Cli.Installer.csproj
   ```
-
-- Reopen terminal/cmd and run
+6. Reopen terminal/cmd and run
 ```
 gcloud-secret-manager-cli help
 ```
