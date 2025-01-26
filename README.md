@@ -52,7 +52,7 @@ gscli help
 ```
 If everything ran smoothly, you should see the list of supported commands.
 
-#### Create a New Release Process
+#### New Release Creation Process
 
 - In the new branch to implement fix/new feature
 - Update readme
@@ -60,9 +60,10 @@ If everything ran smoothly, you should see the list of supported commands.
 - Create and send pull request to review
 - After merge into main 
 - Create a new release:
-  - Create new tag name 'v<Major>.<Minor>.<Build>'
+  - Create new tag named 'v<Major>.<Minor>.<Build>'
+  - Release name has base name with tag name
   - Mark a new release as latest
-- Once in day command line check if changed a new latest release and notify about changes with instructions.
+- Once in day command line check if changed a new latest release and indicate about changes with instructions.
 
 
 ## :tada: Usage

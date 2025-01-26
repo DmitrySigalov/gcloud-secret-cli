@@ -33,6 +33,8 @@ public class OsxInstallerImpl : IInstaller
         await File.WriteAllTextAsync(pathsFileName, appPath, cancellationToken: args.CancellationToken);
         
         Console.WriteLine($"Created paths file: {pathsFileName}");
+        
+        Console.WriteLine();
     }
     
     private static async Task MakeShortcutExecutableAsync(InstallerArgs args, string appPath)
@@ -54,5 +56,7 @@ public class OsxInstallerImpl : IInstaller
         {
             throw new InvalidOperationException($"Making '{shortcut}' execution failed with exit code {process.ExitCode}");
         }
+        
+        Console.WriteLine();
     }
 }

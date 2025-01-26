@@ -55,5 +55,7 @@ public static class InstallerArgsExtensions
         {
             throw new InvalidOperationException($"Publishing failed with exit code {process.ExitCode}");
         }
+        
+        Console.WriteLine();
     }
 }

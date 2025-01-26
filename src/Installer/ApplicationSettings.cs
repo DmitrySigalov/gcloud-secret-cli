@@ -15,5 +15,10 @@ public static class ApplicationSettings
             ["OsxAppPath"] = () => string.Format($"/opt/{AppName}"),
             ["OsxPathsD"] = () => string.Format($"/etc/paths.d/{AppName}"),
             ["OsxShortcut"] = () => Shortcut,
+            ["WinAppPath"] = () =>
+            {
+                var path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+                return Path.Combine(path, AppName);
+            },
         };
 }
