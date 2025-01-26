@@ -1,7 +1,7 @@
-using Google.Cloud.SecretManager.Client.GitHub.Impl;
+using GCloud.Secret.Client.GitHub.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.GitHub;
+namespace GCloud.Secret.Client.GitHub;
 
 public static class StartupExtensions
 {

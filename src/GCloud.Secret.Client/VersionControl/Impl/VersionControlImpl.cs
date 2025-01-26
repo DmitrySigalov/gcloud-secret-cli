@@ -1,10 +1,10 @@
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.GitHub;
-using Google.Cloud.SecretManager.Client.UserRuntime;
-using Google.Cloud.SecretManager.Client.VersionControl.Helpers;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.GitHub;
+using GCloud.Secret.Client.UserRuntime;
+using GCloud.Secret.Client.VersionControl.Helpers;
 using Microsoft.Extensions.Logging;
 
-namespace Google.Cloud.SecretManager.Client.VersionControl.Impl;
+namespace GCloud.Secret.Client.VersionControl.Impl;
 
 public class VersionControlImpl : IVersionControl
 {
@@ -24,6 +24,7 @@ public class VersionControlImpl : IVersionControl
     public async Task CheckVersionAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Runtime version check is '{VersionHelper.RuntimeVersion}'.");
+        
         // TODO: Delete in next version
         Console.WriteLine($"Assembly location is '{typeof(VersionControlImpl).Assembly.Location}'.");
         Console.WriteLine($"{FolderTypeEnum.RootUser} is '{_userFilesProvider.GetFolderPath(FolderTypeEnum.RootUser)}'.");
@@ -34,7 +35,7 @@ public class VersionControlImpl : IVersionControl
         if (string.IsNullOrWhiteSpace(checkVersionInfo.LatestRelease?.Tag_Name))
         {
             ConsoleHelper.WriteWarn("Warning: ");
-            Console.WriteLine("Missing information about latest official release version");
+            Console.WriteLine("Missing information about latest release version");
 
             return;
         }

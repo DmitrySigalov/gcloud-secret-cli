@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
+namespace GCloud.Secret.Client.EnvironmentVariables.Helpers;
 
 public static class EnvironmentVariablesScriptTextBuilder
 {

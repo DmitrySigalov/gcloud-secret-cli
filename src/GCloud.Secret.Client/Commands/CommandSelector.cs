@@ -1,12 +1,12 @@
-using Google.Cloud.SecretManager.Client.Commands.Handlers;
-using Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.Profiles;
-using Google.Cloud.SecretManager.Client.UserRuntime;
+using GCloud.Secret.Client.Commands.Handlers;
+using GCloud.Secret.Client.Commands.Handlers.Secrets;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.Profiles;
+using GCloud.Secret.Client.UserRuntime;
+using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands;
+namespace GCloud.Secret.Client.Commands;
 
 public class CommandSelector
 {

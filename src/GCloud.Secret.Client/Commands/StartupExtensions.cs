@@ -1,9 +1,9 @@
-using Google.Cloud.SecretManager.Client.Commands.Handlers;
-using Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
+using GCloud.Secret.Client.Commands.Handlers;
+using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
+using GCloud.Secret.Client.Commands.Handlers.Secrets;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.Commands;
+namespace GCloud.Secret.Client.Commands;
 
 public static class StartupExtensions
 {

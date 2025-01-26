@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.VersionControl;
+namespace GCloud.Secret.Client.VersionControl;
 
 public interface IVersionControl
 {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.VersionControl;
+namespace GCloud.Secret.Client.VersionControl;
 
 public static class StartupExtensions
 {

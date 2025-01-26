@@ -1,6 +1,6 @@
 using Grpc.Core;
 
-namespace Google.Cloud.SecretManager.Client.Profiles;
+namespace GCloud.Secret.Client.Profiles;
 
 public class SecretDetails
 {

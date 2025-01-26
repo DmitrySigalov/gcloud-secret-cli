@@ -1,7 +1,7 @@
-using Google.Cloud.SecretManager.Client.Common;
+using GCloud.Secret.Client.Common;
 using Xunit;
 
-namespace Google.Cloud.SecretManager.Client.Profiles;
+namespace GCloud.Secret.Client.Profiles;
 
 public class ProfileConfigTests
 {

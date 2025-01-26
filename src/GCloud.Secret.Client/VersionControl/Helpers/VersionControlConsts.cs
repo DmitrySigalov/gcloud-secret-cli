@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.VersionControl.Helpers;
+namespace GCloud.Secret.Client.VersionControl.Helpers;
 
 public static class VersionControlConsts
 {

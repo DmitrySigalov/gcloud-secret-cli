@@ -1,11 +1,11 @@
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.Profiles;
-using Google.Cloud.SecretManager.Client.Profiles.Helpers;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.Profiles;
+using GCloud.Secret.Client.Profiles.Helpers;
 using Grpc.Core;
 using Sharprompt;
 using TextCopy;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
+namespace GCloud.Secret.Client.Commands.Handlers.Secrets;
 
 public class ImportSecretsFromClipboardHandler : ICommandHandler
 {

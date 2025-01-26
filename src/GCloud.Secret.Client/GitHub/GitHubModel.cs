@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Google.Cloud.SecretManager.Client.GitHub;
+namespace GCloud.Secret.Client.GitHub;
 
 public class GitHubModel
 {

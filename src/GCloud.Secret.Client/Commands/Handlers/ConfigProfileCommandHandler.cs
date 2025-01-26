@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.GoogleCloud;
-using Google.Cloud.SecretManager.Client.Profiles;
-using Google.Cloud.SecretManager.Client.Profiles.Helpers;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.GoogleCloud;
+using GCloud.Secret.Client.Profiles;
+using GCloud.Secret.Client.Profiles.Helpers;
 using Sharprompt;
+using IProfileConfigProvider = GCloud.Secret.Client.Profiles.IProfileConfigProvider;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace GCloud.Secret.Client.Commands.Handlers;
 
 public class ConfigProfileCommandHandler : ICommandHandler
 {
@@ -65,7 +66,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
         while (lastSelectedOperationKey != saveOperationKey)
         {
-            var manageOperationsLookup = new Dictionary<string, Func<ProfileConfig, Task<(bool IsChanged, ProfileConfig ProfileConfig)>>>
+            var manageOperationsLookup = new Dictionary<string, Func<Profiles.ProfileConfig, Task<(bool IsChanged, Profiles.ProfileConfig ProfileConfig)>>>
             {
                 { saveOperationKey, pf => Save(profileDetails.ProfileName, pf) },
                 { "Validate and get secret ids", pf => GetSecretIdsAsync(pf, false, cancellationToken) },
@@ -81,7 +82,7 @@ public class ConfigProfileCommandHandler : ICommandHandler
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
-            (bool HasChanges, ProfileConfig ProfileConfig) operationResult = await operationFunction(profileDetails.ProfileDo);
+            (bool HasChanges, Profiles.ProfileConfig ProfileConfig) operationResult = await operationFunction(profileDetails.ProfileDo);
 
             if (operationResult.HasChanges)
             {

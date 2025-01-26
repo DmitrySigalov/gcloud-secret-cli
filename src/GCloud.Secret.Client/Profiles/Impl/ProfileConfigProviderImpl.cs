@@ -1,9 +1,9 @@
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.Profiles.Helpers;
-using Google.Cloud.SecretManager.Client.UserRuntime;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.Profiles.Helpers;
+using GCloud.Secret.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
-namespace Google.Cloud.SecretManager.Client.Profiles.Impl;
+namespace GCloud.Secret.Client.Profiles.Impl;
 
 public class ProfileConfigProviderImpl : IProfileConfigProvider
 {

@@ -1,9 +1,9 @@
+using GCloud.Secret.Client.Profiles;
 using Google.Api.Gax.ResourceNames;
-using Google.Cloud.SecretManager.Client.Profiles;
 using Google.Cloud.SecretManager.V1;
 using Grpc.Core;
 
-namespace Google.Cloud.SecretManager.Client.GoogleCloud.Impl;
+namespace GCloud.Secret.Client.GoogleCloud.Impl;
 
 public class SecretManagerProviderImpl : ISecretManagerProvider
 {

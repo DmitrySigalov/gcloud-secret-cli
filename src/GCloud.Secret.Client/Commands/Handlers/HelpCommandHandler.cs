@@ -1,7 +1,7 @@
 using ConsoleTables;
-using Google.Cloud.SecretManager.Client.Common;
+using GCloud.Secret.Client.Common;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers;
+namespace GCloud.Secret.Client.Commands.Handlers;
 
 public class HelpCommandHandler : ICommandHandler
 {

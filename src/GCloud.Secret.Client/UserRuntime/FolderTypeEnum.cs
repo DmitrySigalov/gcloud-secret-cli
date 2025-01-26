@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.UserRuntime;
+namespace GCloud.Secret.Client.UserRuntime;
 
 public enum FolderTypeEnum
 {

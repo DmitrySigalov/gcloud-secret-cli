@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Google.Cloud.SecretManager.Client.VersionControl.Helpers;
+namespace GCloud.Secret.Client.VersionControl.Helpers;
 
 public class VersionHelperTests
 {

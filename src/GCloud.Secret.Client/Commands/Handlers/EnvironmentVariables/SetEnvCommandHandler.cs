@@ -1,10 +1,10 @@
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.Profiles;
-using Google.Cloud.SecretManager.Client.Profiles.Helpers;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.EnvironmentVariables;
+using GCloud.Secret.Client.Profiles;
+using GCloud.Secret.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.EnvironmentVariables;
+namespace GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 
 public class SetEnvCommandHandler : ICommandHandler
 {

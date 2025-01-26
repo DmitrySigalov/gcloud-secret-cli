@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.Commands;
+namespace GCloud.Secret.Client.Commands;
 
 public interface ICommandHandler
 {

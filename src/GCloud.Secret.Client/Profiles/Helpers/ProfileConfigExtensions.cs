@@ -1,8 +1,8 @@
 using System.Text;
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.EnvironmentVariables.Helpers;
 
-namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
+namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class ProfileConfigExtensions
 {

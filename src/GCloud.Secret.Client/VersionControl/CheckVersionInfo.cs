@@ -1,6 +1,6 @@
-using Google.Cloud.SecretManager.Client.GitHub;
+using GCloud.Secret.Client.GitHub;
 
-namespace Google.Cloud.SecretManager.Client.VersionControl;
+namespace GCloud.Secret.Client.VersionControl;
 
 public class CheckVersionInfo
 {

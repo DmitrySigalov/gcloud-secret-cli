@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;
+namespace GCloud.Secret.Client.EnvironmentVariables;
 
 public class EnvironmentDescriptor
 {

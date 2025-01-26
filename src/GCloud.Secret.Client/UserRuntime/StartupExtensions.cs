@@ -1,7 +1,7 @@
-using Google.Cloud.SecretManager.Client.UserRuntime.Impl;
+using GCloud.Secret.Client.UserRuntime.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.UserRuntime;
+namespace GCloud.Secret.Client.UserRuntime;
 
 public static class StartupExtensions
 {

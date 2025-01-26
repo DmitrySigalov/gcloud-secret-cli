@@ -1,11 +1,11 @@
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
-using Google.Cloud.SecretManager.Client.Profiles;
-using Google.Cloud.SecretManager.Client.Profiles.Helpers;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.EnvironmentVariables;
+using GCloud.Secret.Client.Profiles;
+using GCloud.Secret.Client.EnvironmentVariables.Helpers;
+using GCloud.Secret.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace Google.Cloud.SecretManager.Client.Commands.Handlers.Secrets;
+namespace GCloud.Secret.Client.Commands.Handlers.Secrets;
 
 public class ViewSecretsHandler : ICommandHandler
 {

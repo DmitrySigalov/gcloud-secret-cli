@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
+using GCloud.Secret.Client.EnvironmentVariables.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables;
+namespace GCloud.Secret.Client.EnvironmentVariables;
 
 public static class StartupExtensions
 {

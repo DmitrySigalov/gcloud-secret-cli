@@ -1,7 +1,7 @@
-using Google.Cloud.SecretManager.Client.Profiles.Impl;
+using GCloud.Secret.Client.Profiles.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Google.Cloud.SecretManager.Client.Profiles;
+namespace GCloud.Secret.Client.Profiles;
 
 public static class StartupExtensions
 {

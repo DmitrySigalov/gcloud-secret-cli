@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.GitHub;
+namespace GCloud.Secret.Client.GitHub;
 
 public interface IGitHubClient
 {

@@ -1,9 +1,9 @@
-using Google.Cloud.SecretManager.Client.Common;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables.Helpers;
-using Google.Cloud.SecretManager.Client.UserRuntime;
+using GCloud.Secret.Client.Common;
+using GCloud.Secret.Client.EnvironmentVariables.Helpers;
+using GCloud.Secret.Client.UserRuntime;
 using Microsoft.Extensions.Logging;
 
-namespace Google.Cloud.SecretManager.Client.EnvironmentVariables.Impl;
+namespace GCloud.Secret.Client.EnvironmentVariables.Impl;
 
 public class OsxEnvironmentVariablesProviderImpl : BaseEnvironmentVariablesProvider
 {

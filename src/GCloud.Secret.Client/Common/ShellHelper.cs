@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.Common;
+namespace GCloud.Secret.Client.Common;
 
 public static class ShellHelper
 {

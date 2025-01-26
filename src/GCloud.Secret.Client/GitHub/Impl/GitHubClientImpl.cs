@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 
-namespace Google.Cloud.SecretManager.Client.GitHub.Impl;
+namespace GCloud.Secret.Client.GitHub.Impl;
 
 public class GitHubClientImpl : IGitHubClient
 {

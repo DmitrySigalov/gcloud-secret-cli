@@ -1,10 +1,10 @@
-﻿using Google.Cloud.SecretManager.Client.Commands;
-using Google.Cloud.SecretManager.Client.EnvironmentVariables;
-using Google.Cloud.SecretManager.Client.GitHub;
-using Google.Cloud.SecretManager.Client.GoogleCloud;
-using Google.Cloud.SecretManager.Client.Profiles;
-using Google.Cloud.SecretManager.Client.UserRuntime;
-using Google.Cloud.SecretManager.Client.VersionControl;
+﻿using GCloud.Secret.Client.Commands;
+using GCloud.Secret.Client.EnvironmentVariables;
+using GCloud.Secret.Client.GitHub;
+using GCloud.Secret.Client.GoogleCloud;
+using GCloud.Secret.Client.Profiles;
+using GCloud.Secret.Client.UserRuntime;
+using GCloud.Secret.Client.VersionControl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

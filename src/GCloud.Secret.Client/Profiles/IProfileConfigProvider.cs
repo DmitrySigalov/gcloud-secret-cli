@@ -1,4 +1,4 @@
-namespace Google.Cloud.SecretManager.Client.Profiles;
+namespace GCloud.Secret.Client.Profiles;
 
 public interface IProfileConfigProvider
 {

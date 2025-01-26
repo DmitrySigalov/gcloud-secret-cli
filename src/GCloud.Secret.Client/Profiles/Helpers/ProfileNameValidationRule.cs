@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Google.Cloud.SecretManager.Client.Profiles.Helpers;
+namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class ProfileNameValidationRule
 {
