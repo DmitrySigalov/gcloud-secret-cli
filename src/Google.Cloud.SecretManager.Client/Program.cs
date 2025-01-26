@@ -47,7 +47,7 @@ var serviceProvider = services.BuildServiceProvider();
 
 try
 {
-    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GClod-Secrets-Cli"));
+    Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GCloud-Secret-Cli"));
 
     var cliHandler = serviceProvider
         .GetRequiredService<CommandSelector>()
