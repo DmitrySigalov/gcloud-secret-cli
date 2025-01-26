@@ -6,7 +6,7 @@ public static class ApplicationSettings
 
     public static string Shortcut => "gscli";
 
-    public static string ProjectPath => "src/Google.Cloud.SecretManager.Client/Google.Cloud.SecretManager.Client.csproj";
+    public static string ProjectPath => "src/GCloud.Secret.Client/GCloud.Secret.Client.csproj";
 
     public static Dictionary<string, Func<string>> DefaultArguments => 
         new()
