@@ -27,39 +27,40 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var profileNames = SpinnerHelper.Run(
-            _profileConfigProvider.GetNames,
-            "Get profile names");
-
-        if (profileNames.Any() == false)
+        if (string.IsNullOrEmpty(commandState.ProfileName))
         {
-            ConsoleHelper.WriteLineError("Not found any profile");
+            var profileNames = SpinnerHelper.Run(
+                _profileConfigProvider.GetNames,
+                "Get profile names");
 
-            return Task.FromResult(ContinueStatusEnum.Exit);
+            if (profileNames.Any() == false)
+            {
+                ConsoleHelper.WriteLineError("Not found any profile");
+
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
+
+            commandState.ProfileName =Prompt.Select(
+                "Select profile",
+                items: profileNames);
         }
 
-        var selectedProfileName =
-            profileNames.Count == 1
-                ? profileNames.Single()
-                : Prompt.Select(
-                    "Select profile",
-                    items: profileNames);
-
-        var currentSecrets = _profileConfigProvider
-            .ReadSecrets(selectedProfileName)
-            ?.ToDictionary();
-        if (currentSecrets?.Any() != true)
+        if (commandState.SecretsDump == null)
         {
-            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in the dump according to profile [{selectedProfileName}]");
+            commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
+            if (commandState.SecretsDump == null)
+            {
+                ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{commandState.ProfileName}]");
 
-            return Task.FromResult(ContinueStatusEnum.Exit);
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
         }
 
-        var json = JsonSerializationHelper.Serialize(currentSecrets.ToSecretsDictionary());
+        var json = JsonSerializationHelper.Serialize(commandState.SecretsDump.ToSecretsDictionary());
         ClipboardService.SetText(json);
         Console.WriteLine(json);
 
-        ConsoleHelper.WriteLineInfo($"DONE - Exported {currentSecrets.Count} secrets from dump according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Exported {commandState.SecretsDump.Count} secrets from dump according to profile [{commandState.ProfileName}]");
 
         return Task.FromResult(ContinueStatusEnum.Exit);
     }
