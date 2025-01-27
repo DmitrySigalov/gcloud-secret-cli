@@ -32,46 +32,52 @@ public class SetEnvCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var profileNames = SpinnerHelper.Run(
-            _profileConfigProvider.GetNames,
-            "Get profile names");
-
-        if (profileNames.Any() == false)
-        {
-            ConsoleHelper.WriteLineError("Not found any profile");
-
-            return Task.FromResult(ContinueStatusEnum.Exit);
-        }
-
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
 
-        var selectedProfileName =
-            profileNames.Count == 1
-                ? profileNames.Single()
-                : Prompt.Select(
-                    "Select profile",
-                    items: profileNames,
-                    defaultValue: currentEnvironmentDescriptor.ProfileName);
-
-        var newSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
-        if (newSecrets == null)
+        if (string.IsNullOrEmpty(commandState.ProfileName))
         {
-            ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
+            var profileNames = SpinnerHelper.Run(
+                _profileConfigProvider.GetNames,
+                "Get profile names");
 
-            return Task.FromResult(ContinueStatusEnum.Exit);
+            if (profileNames.Any() == false)
+            {
+                ConsoleHelper.WriteLineError("Not found any profile");
+
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
+
+            commandState.ProfileName =
+                profileNames.Count == 1
+                    ? profileNames.Single()
+                    : Prompt.Select(
+                        "Select profile",
+                        items: profileNames,
+                        defaultValue: currentEnvironmentDescriptor.ProfileName);
         }
 
-        newSecrets.PrintSecretsMappingIdNamesAccessValues();
+        if (commandState.SecretsDump == null)
+        {
+            commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
+            if (commandState.SecretsDump == null)
+            {
+                ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{commandState.ProfileName}]");
+
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
+        }
+
+        commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
 
         var newDescriptor = new EnvironmentDescriptor
         {
-            ProfileName = selectedProfileName,
-            Variables = newSecrets.ToEnvironmentDictionary(),
+            ProfileName = commandState.ProfileName,
+            Variables = commandState.SecretsDump.ToEnvironmentDictionary(),
         };
         
         if (!newDescriptor.Variables.Any())
         {
-            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{commandState.ProfileName}]");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }
@@ -81,7 +87,7 @@ public class SetEnvCommandHandler : ICommandHandler
 
         Console.WriteLine();
         ConsoleHelper.WriteLineInfo(
-            $"DONE - Profile [{selectedProfileName}] ({newDescriptor.Variables.Count} secrets with value) has synchronized with the environment variables system");
+            $"DONE - Profile [{commandState.ProfileName}] ({newDescriptor.Variables.Count} secrets with value) has synchronized with the environment variables system");
 
         return Task.FromResult(ContinueStatusEnum.Exit);
     }

@@ -65,7 +65,7 @@ public class EditProfileCommandHandler : ICommandHandler
             Console.WriteLine();
         }
         
-        ConsoleHelper.WriteLineInfo($"DONE - Configured valid profile [{commandState.ProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Configured profile [{commandState.ProfileName}]");
         Console.WriteLine();
 
         return ContinueStatusEnum.Exit;
@@ -121,7 +121,8 @@ public class EditProfileCommandHandler : ICommandHandler
         }
         catch (Exception e)
         {
-            ConsoleHelper.WriteLineError(e.Message);
+            ConsoleHelper.WriteLineError("Error on attempt to get secret ids:");
+            ConsoleHelper.WriteLineWarn(e.Message);
         }
 
         if (secretIds.Any())

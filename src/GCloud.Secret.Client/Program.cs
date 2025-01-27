@@ -57,6 +57,7 @@ try
     var commandState = new CommandState
     {
         CancellationToken = cts.Token,
+        ProfileName = args.Skip(1).FirstOrDefault(),
     };
 
     while (continueStatus != ContinueStatusEnum.Exit)
