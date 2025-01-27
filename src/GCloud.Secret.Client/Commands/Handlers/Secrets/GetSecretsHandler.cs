@@ -31,7 +31,7 @@ public class GetSecretsHandler : ICommandHandler
     
     public string Description => "Get and save/dump secrets from google";
 
-    public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -74,7 +74,7 @@ public class GetSecretsHandler : ICommandHandler
 
         var secretIds = await _secretManagerProvider.GetSecretIdsAsync(
             selectedProfileDo.ProjectId,
-            cancellationToken);
+            commandState.CancellationToken);
 
         var newSecrets = selectedProfileDo.BuildSecretDetails(secretIds);
 
@@ -87,7 +87,7 @@ public class GetSecretsHandler : ICommandHandler
 
         var changesCounter = await ProgressGetSecretLatestValuesAsync(selectedProfileDo.ProjectId,
             newSecrets, oldSecrets,
-            cancellationToken);
+            commandState.CancellationToken);
 
         var successCounter = newSecrets.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
         var errorCounter = newSecrets.Count(x => x.Value.AccessStatusCode != StatusCode.OK);

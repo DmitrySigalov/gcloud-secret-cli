@@ -23,7 +23,7 @@ public class CreateProfileCommandHandler : ICommandHandler
 
     public string Description => "Create profile configuration";
     
-    public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

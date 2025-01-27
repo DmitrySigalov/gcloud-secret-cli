@@ -20,7 +20,7 @@ public class HelpCommandHandler : ICommandHandler
 
     public string Description => "";
 
-    public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"Supported commands:");
 

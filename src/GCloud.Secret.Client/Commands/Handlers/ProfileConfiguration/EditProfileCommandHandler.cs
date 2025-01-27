@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using GCloud.Secret.Client.Common;
 using GCloud.Secret.Client.Google;
 using GCloud.Secret.Client.Profiles;
@@ -26,7 +25,7 @@ public class EditProfileCommandHandler : ICommandHandler
 
     public string Description => "Edit profile configuration";
     
-    public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

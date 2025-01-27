@@ -23,7 +23,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
     
     public string Description => "Import secrets (json from the clipboard)";
     
-    public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

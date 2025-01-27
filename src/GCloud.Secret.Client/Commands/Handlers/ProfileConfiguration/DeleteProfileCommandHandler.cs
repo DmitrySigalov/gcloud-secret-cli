@@ -19,7 +19,7 @@ public class DeleteProfileCommandHandler : ICommandHandler
 
     public string Description => "Delete profile configuration";
     
-    public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

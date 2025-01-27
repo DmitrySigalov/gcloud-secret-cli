@@ -26,7 +26,7 @@ public class ViewSecretsHandler : ICommandHandler
 
     public string Description => "View profile secrets dump details";
 
-    public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

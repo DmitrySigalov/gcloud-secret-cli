@@ -8,5 +8,5 @@ public interface ICommandHandler
 
     string Description { get; }
 
-    Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken);
+    Task<ContinueStatusEnum> Handle(CommandState commandState);
 }

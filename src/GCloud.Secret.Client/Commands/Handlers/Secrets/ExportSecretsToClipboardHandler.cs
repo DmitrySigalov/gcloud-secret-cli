@@ -22,7 +22,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
     
     public string Description => "Export secrets (copy json into clipboard) from the secrets dump";
 
-    public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

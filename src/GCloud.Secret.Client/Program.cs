@@ -52,21 +52,19 @@ try
     var commandSelector = serviceProvider
         .GetRequiredService<CommandSelector>();
 
-    var nextCommand = ContinueStatusEnum.SelectCommand;
+    var continueStatus = ContinueStatusEnum.SelectCommand;
 
     var commandState = new CommandState
     {
         CancellationToken = cts.Token,
     };
 
-    while (nextCommand != ContinueStatusEnum.Exit)
+    while (continueStatus != ContinueStatusEnum.Exit)
     {
         var cliHandler = commandSelector
-            .Get(nextCommand);
+            .Get(continueStatus);
 
-        nextCommand = await cliHandler.Handle(
-            commandState,
-            cts.Token);
+        continueStatus = await cliHandler.Handle(commandState);
     }
 }
 catch (Exception e)
