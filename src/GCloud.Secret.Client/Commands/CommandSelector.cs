@@ -52,15 +52,15 @@ public class CommandSelector
     {
         if (continueStatus is ContinueStatusEnum.SelectCommand)
         {
-            if (!_profileConfigProvider.GetNames().Any())
-            {
-                return GetTypedCommandHandler<CreateProfileCommandHandler>();
-            }
-
             var commandName = _userParameters.CommandName;
 
             if (commandName == "*" || string.IsNullOrEmpty(commandName))
             {
+                if (!_profileConfigProvider.GetNames().Any())
+                {
+                    return GetTypedCommandHandler<CreateProfileCommandHandler>();
+                }
+
                 commandName = Prompt.Select(
                     "Select command",
                     _allCommandHandlersByFullNames.Select(x => x.Key),
