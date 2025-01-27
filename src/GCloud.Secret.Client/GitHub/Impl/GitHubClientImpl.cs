@@ -5,7 +5,7 @@ namespace GCloud.Secret.Client.GitHub.Impl;
 
 public class GitHubClientImpl : IGitHubClient
 {
-    private const string BASE_URI = "https://api.github.com/repos/DmitrySigalov/gclod-secret-manager-cli";
+    private const string BASE_URI = "https://api.github.com/repos/DmitrySigalov/gclod-secret-cli";
     
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
