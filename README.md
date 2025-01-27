@@ -83,9 +83,10 @@ Commands:
   - Access to secret values
   - Dump file
   - Run command 'set-env-var'
-- If you does not have a access to the secret values use the following commands:
-  - 'set/clean-env-var' - sync environment variables with selected profile secrets dump (without connect to Google)
-  - 'import/export-secrets' - import/export accessed secret values (without connect to Google)
+- 'clean-env-var' - clean active environment variables
+- If you does not have a access to the secret values, use the following commands:
+  - 'set/clean-env-var' - sync environment variables with selected profile secrets dump
+  - 'import/export-secrets' - import/export accessed secret values
 
 
 ## :gift: New Release Creation Process
