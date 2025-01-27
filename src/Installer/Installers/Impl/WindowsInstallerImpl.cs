@@ -26,16 +26,17 @@ public class WindowsInstallerImpl : IInstaller
 
         var name = "PATH";
         var scope = EnvironmentVariableTarget.Machine;
-        var oldValue = Environment.GetEnvironmentVariable(name, scope);
+        var oldValue = Environment.GetEnvironmentVariable(name, scope)
+            ?? string.Empty;
 
-        if (oldValue?.Contains(appPath) == true)
+        if (oldValue.Contains(appPath + ";"))
         {
             Console.WriteLine($"No changed {name}: {oldValue}");
             Console.WriteLine();
             return;
         }
 
-        var newPaths = GetNewWindowsPaths(oldValue!, appPath);
+        var newPaths = GetNewWindowsPaths(oldValue, appPath);
         Environment.SetEnvironmentVariable(name, newPaths, scope);
         
         Console.WriteLine($"New {name}: {newPaths}");
