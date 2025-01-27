@@ -52,6 +52,29 @@ If everything ran smoothly, you should see the list of supported commands.
 
 ## :tada: Usage
 
+Before using ensure:
+- Installed google cloud sdk
+```cmd
+brew install --cask google-cloud-sdk
+```
+- Installed GKE plugin
+```cmd
+gcloud components install gke-gcloud-auth-plugin
+gcloud components list | grep gke
+```
+- Configured cloud default login:
+```cmd
+gcloud auth login <user-name>
+gcloud auth application-default revoke
+```
+- First time login
+```cmd
+gcloud auth login
+```
+- You have access to the requested google project
+- Optionally you have permission to access to the secret values in the required google project
+
+
 ```cmd
 gsclod <command> <profile>
 ```
