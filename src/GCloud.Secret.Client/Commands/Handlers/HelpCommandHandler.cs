@@ -18,7 +18,7 @@ public class HelpCommandHandler : ICommandHandler
 
     public string CommandName => "help";
 
-    public string ShortName => "?";
+    public string ShortName => "h";
 
     public string Description => "";
 
