@@ -75,17 +75,17 @@ FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
 
 Commands:
 - 'create/edit/delete-profile' - profile configuration commands:
-  - Mapping to google project id
-  - Rules for the creation of environment variable naming settings
+  - Mapping to google project id (by default equals to profile name)
+  - Rules for the creation of environment variable names settings
 - 'get-secrets' - create secrets dump file with values:
   - Connect to google project
   - Get secret ids
   - Access to secret values
-  - Dump file
+  - Dump file with values
   - Run command 'set-env-var'
 - 'clean-env-var' - clean active environment variables
 - If you does not have a access to the secret values, use the following commands:
-  - 'set/clean-env-var' - sync environment variables with selected profile secrets dump
+  - 'set-env-var' - sync environment variables with selected profile secrets dump
   - 'import/export-secrets' - import/export accessed secret values
 
 
