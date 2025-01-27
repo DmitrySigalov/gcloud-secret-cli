@@ -36,61 +36,65 @@ public class GetSecretsHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var profileNames = SpinnerHelper.Run(
-            _profileConfigProvider.GetNames,
-            "Get profile names");
-
-        if (profileNames.Any() == false)
-        {
-            ConsoleHelper.WriteLineError("Not found any profile");
-
-            return ContinueStatusEnum.Exit;
-        }
-
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
 
-        var selectedProfileName =
-            profileNames.Count == 1
-                ? profileNames.Single()
-                : Prompt.Select(
-                    "Select profile",
-                    items: profileNames,
-                    defaultValue: currentEnvironmentDescriptor.ProfileName);
-
-        var selectedProfileDo = SpinnerHelper.Run(
-            () => _profileConfigProvider.GetByName(selectedProfileName),
-            $"Read profile [{selectedProfileName}]");
-
-        if (selectedProfileDo == null)
+        if (string.IsNullOrEmpty(commandState.ProfileName))
         {
-            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
+            var profileNames = SpinnerHelper.Run(
+                _profileConfigProvider.GetNames,
+                "Get profile names");
 
-            return ContinueStatusEnum.Exit;
+            if (profileNames.Any() == false)
+            {
+                ConsoleHelper.WriteLineError("Not found any profile");
+
+                return ContinueStatusEnum.Exit;
+            }
+
+            commandState.ProfileName =
+                profileNames.Count == 1
+                    ? profileNames.Single()
+                    : Prompt.Select(
+                        "Select profile",
+                        items: profileNames,
+                        defaultValue: currentEnvironmentDescriptor.ProfileName);
+        }
+        
+        if (commandState.ProfileConfig == null)
+        {
+            commandState.ProfileConfig = SpinnerHelper.Run(
+                () => _profileConfigProvider.GetByName(commandState.ProfileName),
+                $"Read profile [{commandState.ProfileName}]");
+
+            if (commandState.ProfileConfig == null)
+            {
+                ConsoleHelper.WriteLineError($"Not found profile [{commandState.ProfileName}]");
+
+                return ContinueStatusEnum.Exit;
+            }
+
+            commandState.ProfileConfig.PrintProfileConfig();
         }
 
-        selectedProfileDo.PrintProfileConfig();
 
-        var oldSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
+        var newSecretIds = await GetSecretIdsAsync(commandState);
 
-        var secretIds = await _secretManagerProvider.GetSecretIdsAsync(
-            selectedProfileDo.ProjectId,
-            commandState.CancellationToken);
-
-        var newSecrets = selectedProfileDo.BuildSecretDetails(secretIds);
-
-        if (!newSecrets.Any())
+        commandState.SecretsDump = commandState.ProfileConfig.BuildSecretDetails(newSecretIds);
+        if (!commandState.SecretsDump.Any())
         {
             ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
 
             return ContinueStatusEnum.Exit;
         }
 
-        var changesCounter = await ProgressGetSecretLatestValuesAsync(selectedProfileDo.ProjectId,
-            newSecrets, oldSecrets,
+        var oldSecrets = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
+
+        var changesCounter = await ProgressGetSecretLatestValuesAsync(commandState.ProfileConfig.ProjectId,
+            commandState.SecretsDump, oldSecrets,
             commandState.CancellationToken);
 
-        var successCounter = newSecrets.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
-        var errorCounter = newSecrets.Count(x => x.Value.AccessStatusCode != StatusCode.OK);
+        var successCounter = commandState.SecretsDump.Count(x => x.Value.AccessStatusCode == StatusCode.OK);
+        var errorCounter = commandState.SecretsDump.Count(x => x.Value.AccessStatusCode != StatusCode.OK);
 
         if (successCounter == 0)
         {
@@ -100,21 +104,38 @@ public class GetSecretsHandler : ICommandHandler
             return ContinueStatusEnum.Exit;
         }
 
-        newSecrets.PrintSecretsMappingIdNamesAccessValues();
+        commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
 
         if (changesCounter == 0)
         {
             ConsoleHelper.WriteLineInfo(
-                $"NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
-            
-            return ContinueStatusEnum.Exit;
+                $"DUMP NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
         }
+        else
+        {
+            _profileConfigProvider.DumpSecrets(commandState.ProfileName, commandState.SecretsDump);
 
-        _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
-
-        ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {newSecrets.Count} secrets ({successCounter} values, {errorCounter} errors) according to profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {commandState.SecretsDump.Count} secrets ({successCounter} values, {errorCounter} errors) according to profile [{commandState.ProfileName}]");
+        }
         
-        return ContinueStatusEnum.Exit;
+        return ContinueStatusEnum.SetEnvironment;
+    }
+
+    private async Task<HashSet<string>> GetSecretIdsAsync(CommandState commandState)
+    {
+        try
+        {
+            return await _secretManagerProvider.GetSecretIdsAsync(
+                commandState.ProfileConfig.ProjectId,
+                commandState.CancellationToken);
+        }
+        catch (Exception e)
+        {
+            ConsoleHelper.WriteLineError("Error on attempt to get secret ids:");
+            ConsoleHelper.WriteLineWarn(e.Message);
+        }
+        
+        return new HashSet<string>();
     }
 
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,

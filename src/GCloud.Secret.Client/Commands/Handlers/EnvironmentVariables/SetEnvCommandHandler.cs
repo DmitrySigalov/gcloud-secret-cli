@@ -65,9 +65,9 @@ public class SetEnvCommandHandler : ICommandHandler
 
                 return Task.FromResult(ContinueStatusEnum.Exit);
             }
-        }
 
-        commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
+            commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
+        }
 
         var newDescriptor = new EnvironmentDescriptor
         {
