@@ -11,7 +11,7 @@ public static class StartupExtensions
     {
         var userParameters = new UserParameters
         {
-            CommandName = args.FirstOrDefault(x => !x.StartsWith("-")),
+            CommandName = args.FirstOrDefault(),
             Args = args,
         };
 

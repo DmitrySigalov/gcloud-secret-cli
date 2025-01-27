@@ -3,21 +3,23 @@ using GCloud.Secret.Client.EnvironmentVariables;
 
 namespace GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 
-public class CleanEnvCommandHandler : ICommandHandler
+public class CleanEnvVarCommandHandler : ICommandHandler
 {
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public CleanEnvCommandHandler(
+    public CleanEnvVarCommandHandler(
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "clean-env";
+    public string CommandName => "clean-env-var";
     
+    public string ShortName => "cev";
+
     public string Description => "Clean environment variables";
     
-    public Task Handle(CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -31,6 +33,6 @@ public class CleanEnvCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineInfo(
             "DONE - Cleaned the environment variables system");
 
-        return Task.CompletedTask;
+        return Task.FromResult(ContinueStatusEnum.Exit);
     }
 }

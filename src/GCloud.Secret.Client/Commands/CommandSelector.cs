@@ -1,9 +1,10 @@
 using GCloud.Secret.Client.Commands.Handlers;
+using GCloud.Secret.Client.Commands.Handlers.ProfileConfiguration;
+using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using GCloud.Secret.Client.Commands.Handlers.Secrets;
 using GCloud.Secret.Client.Common;
 using GCloud.Secret.Client.Profiles;
 using GCloud.Secret.Client.UserRuntime;
-using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using Sharprompt;
 
 namespace GCloud.Secret.Client.Commands;
@@ -14,10 +15,10 @@ public class CommandSelector
     private readonly IProfileConfigProvider _profileConfigProvider;
     
     private readonly ICommandHandler _helpCommandHandler;
-    private readonly ICommandHandler _configCommandHandler;
     private readonly ICommandHandler _defaultCommandHandler;
 
-    private readonly IDictionary<string, ICommandHandler> _allCommandHandlers;
+    private readonly IDictionary<string, ICommandHandler> _allCommandHandlersByFullNames;
+    private readonly IDictionary<string, ICommandHandler> _allCommandHandlersByShortNames;
 
     public CommandSelector(
         UserParameters userParameters,
@@ -32,41 +33,68 @@ public class CommandSelector
         
         _helpCommandHandler = helpCommandHandler;
 
-        _allCommandHandlers = new [] { helpCommandHandler, } 
+        _allCommandHandlersByFullNames = new [] { helpCommandHandler, } 
             .Union(handlers)
-            .ToDictionary(h => h.CommandName, h => h);
+            .ToDictionary(
+                h => h.CommandName, 
+                h => h);
 
-        _configCommandHandler = handlers.Single(x => x.CommandName == ConfigProfileCommandHandler.COMMAND_NAME);
+        _allCommandHandlersByShortNames = _allCommandHandlersByFullNames
+            .Values
+            .ToDictionary(
+                h => h.ShortName, 
+                h => h);
+
         _defaultCommandHandler = handlers.Single(x => x.CommandName == GetSecretsHandler.COMMAND_NAME);
     }
     
-    public ICommandHandler Get()
+    public ICommandHandler Get(ContinueStatusEnum continueStatus)
     {
-        var commandName = _userParameters.CommandName;
-        
-        if (commandName=="*" || string.IsNullOrEmpty(commandName))
+        if (continueStatus is ContinueStatusEnum.SelectCommand)
         {
-            if (_profileConfigProvider.GetNames().Any())
+            if (!_profileConfigProvider.GetNames().Any())
+            {
+                return GetTypedCommandHandler<CreateProfileCommandHandler>();
+            }
+
+            var commandName = _userParameters.CommandName;
+
+            if (commandName == "*" || string.IsNullOrEmpty(commandName))
             {
                 commandName = Prompt.Select(
                     "Select command",
-                    _allCommandHandlers.Select(x => x.Key),
+                    _allCommandHandlersByFullNames.Select(x => x.Key),
                     defaultValue: _defaultCommandHandler?.CommandName);
             }
-            else
+
+            if (!_allCommandHandlersByFullNames.TryGetValue(commandName, out var handler) &&
+                !_allCommandHandlersByShortNames.TryGetValue(commandName, out handler))
             {
-                commandName = _configCommandHandler.CommandName;
+                ConsoleHelper.WriteLineError($"Invalid command argument: '{commandName}'");
+                Console.WriteLine();
+            
+                return _helpCommandHandler;
             }
+
+            return handler;
         }
 
-        if (!_allCommandHandlers.TryGetValue(commandName, out var handler))
+        if (continueStatus is ContinueStatusEnum.ConfigProfile)
         {
-            ConsoleHelper.WriteLineError("Invalid command argument");
-            Console.WriteLine();
-            
-            return _helpCommandHandler;
+            return GetTypedCommandHandler<EditProfileCommandHandler>();
         }
-        
-        return handler;
+            
+        if (continueStatus is ContinueStatusEnum.SetEnvironment)
+        {
+            return GetTypedCommandHandler<SetEnvVarCommandHandler>();
+        }
+
+        throw new NotSupportedException();
     }
+
+    private ICommandHandler GetTypedCommandHandler<THandler>() 
+        where THandler : ICommandHandler =>
+            _allCommandHandlersByFullNames.Values
+                .OfType<THandler>()
+                .Single();
 }

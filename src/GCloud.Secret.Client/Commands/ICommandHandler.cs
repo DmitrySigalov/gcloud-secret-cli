@@ -4,7 +4,9 @@ public interface ICommandHandler
 {
     string CommandName { get; }
 
+    string ShortName { get; }
+
     string Description { get; }
 
-    Task Handle(CancellationToken cancellationToken);
+    Task<ContinueStatusEnum> Handle(CommandState commandState);
 }

@@ -1,4 +1,5 @@
 using GCloud.Secret.Client.Commands.Handlers;
+using GCloud.Secret.Client.Commands.Handlers.ProfileConfiguration;
 using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using GCloud.Secret.Client.Commands.Handlers.Secrets;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +18,11 @@ public static class StartupExtensions
             // Regular commands
             .AddSingleton<ICommandHandler, GetSecretsHandler>()
             .AddSingleton<ICommandHandler, ViewSecretsHandler>()
-            .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()
+            .AddSingleton<ICommandHandler, SetEnvVarCommandHandler>()
+            .AddSingleton<ICommandHandler, CleanEnvVarCommandHandler>()
+            .AddSingleton<ICommandHandler, CreateProfileCommandHandler>()
+            .AddSingleton<ICommandHandler, EditProfileCommandHandler>()
+            .AddSingleton<ICommandHandler, DeleteProfileCommandHandler>()
             .AddSingleton<ICommandHandler, ImportSecretsFromClipboardHandler>()
             .AddSingleton<ICommandHandler, ExportSecretsToClipboardHandler>();
 

@@ -1,18 +1,19 @@
 using GCloud.Secret.Client.Common;
 using GCloud.Secret.Client.EnvironmentVariables;
 using GCloud.Secret.Client.Profiles;
-using GCloud.Secret.Client.EnvironmentVariables.Helpers;
 using GCloud.Secret.Client.Profiles.Helpers;
 using Sharprompt;
 
-namespace GCloud.Secret.Client.Commands.Handlers.Secrets;
+namespace GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 
-public class ViewSecretsHandler : ICommandHandler
+public class SetEnvVarCommandHandler : ICommandHandler
 {
+    public const string COMMAND_NAME = "set-env-var";
+
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public ViewSecretsHandler(
+    public SetEnvVarCommandHandler(
         IProfileConfigProvider profileConfigProvider,
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
@@ -20,23 +21,18 @@ public class ViewSecretsHandler : ICommandHandler
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "view-secrets";
-            
-    public string ShortName => "vs";
+    public string CommandName => COMMAND_NAME;
+        
+    public string ShortName => "sev";
 
-    public string Description => "View profile secrets dump";
-
+    public string Description => "Set environment variables from the secrets dump";
+    
     public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
-
-        if (!string.IsNullOrEmpty(currentEnvironmentDescriptor.ProfileName))
-        {
-            ConsoleHelper.WriteLineWarn($"Current active profile is [{currentEnvironmentDescriptor.ProfileName}] in the environment variables system");
-        }
 
         if (string.IsNullOrEmpty(commandState.ProfileName))
         {
@@ -60,45 +56,38 @@ public class ViewSecretsHandler : ICommandHandler
                         defaultValue: currentEnvironmentDescriptor.ProfileName);
         }
 
-        if (commandState.ProfileConfig == null)
+        if (commandState.SecretsDump == null)
         {
-            commandState.ProfileConfig = SpinnerHelper.Run(
-                () => _profileConfigProvider.GetByName(commandState.ProfileName),
-                $"Read profile [{commandState.ProfileName}]");
-
-            if (commandState.ProfileConfig == null)
+            commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
+            if (commandState.SecretsDump == null)
             {
-                ConsoleHelper.WriteLineError($"Not found profile [{commandState.ProfileName}]");
+                ConsoleHelper.WriteLineNotification($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
 
                 return Task.FromResult(ContinueStatusEnum.Exit);
             }
 
-            commandState.ProfileConfig.PrintProfileConfig();
+            commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
         }
 
-        commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
-
-        if (commandState.SecretsDump == null)
+        var newDescriptor = new EnvironmentDescriptor
         {
-            ConsoleHelper.WriteLineNotification($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
+            ProfileName = commandState.ProfileName,
+            Variables = commandState.SecretsDump.ToEnvironmentDictionary(),
+        };
+        
+        if (!newDescriptor.Variables.Any())
+        {
+            ConsoleHelper.WriteLineNotification($"Not found any accessed secret value in dump according to profile [{commandState.ProfileName}]");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
-        commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
+        _environmentVariablesProvider.Set(newDescriptor,
+            ConsoleHelper.WriteLineNotification);
 
-        var newEnvironmentVariables = commandState.SecretsDump.ToEnvironmentDictionary();
-        
-        if (currentEnvironmentDescriptor.HasDiff(newEnvironmentVariables))
-        {
-            ConsoleHelper.WriteLineError(
-                $"Profile [{commandState.ProfileName}] has different secret values with the environment variables system");
-
-            return Task.FromResult(ContinueStatusEnum.Exit);
-        }
-        
+        Console.WriteLine();
         ConsoleHelper.WriteLineInfo(
-            $"Profile [{commandState.ProfileName}] is fully synchronized with the environment variables system");
+            $"DONE - Profile [{commandState.ProfileName}] ({newDescriptor.Variables.Count} secrets with value) has synchronized with the environment variables system");
 
         return Task.FromResult(ContinueStatusEnum.Exit);
     }
