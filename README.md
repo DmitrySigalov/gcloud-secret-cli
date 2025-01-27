@@ -73,34 +73,49 @@ FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
 - Interactive (not provided command and profile arguments)
 - Not-interactive command execution (exception - command 'edit-profile')
 
-Commands:
-- 'create/edit/delete-profile' - profile configuration commands:
-  - Mapping to google project id (by default equals to profile name)
-  - Rules for the creation of environment variable names settings
-- 'get-secrets' - create secrets dump file with values:
-  - Connect to google project
-  - Get secret ids
-  - Access to secret values
-  - Dump file with values
-  - Run command 'set-env-var'
-- 'clean-env-var' - clean active environment variables
-- If you does not have a access to the secret values, use the following commands:
-  - 'set-env-var' - sync environment variables with selected profile secrets dump
-  - 'import/export-secrets' - import/export accessed secret values
+## :books: Commands using
+
+### 'create-profile', 'edit-profile' and 'delete-profile'
+Using to manage profile configuration which includes:
+- Mapping to google project id (by default equals to profile name)
+- Settings for the resolving of environment variable names
+
+### 'get-secrets'
+Using to synchronize environment variables with google project secrets:
+- Connect to google project
+- Get secret ids
+- Access to secret values
+- Dump file with values
+- Run command 'set-env-var'
+#### macOS
+For the activation of environment variables required to recreate a process (terminal, Rider, ...)
+
+### `view-secrets`
+Using to see current status of profile:
+- Print all secrets
+- Synchronization status with environment variables
+
+### `clean-env-var`
+Using to clean environment variables
+
+### If you don't have access to the secret values
+
+#### 'export-secrets' and 'import-secrets`
+Using to export/import secrets dump (without access to google project)
+
+#### `set-env-var`
+Using to synchronize environment variables from secrets dump file (without access to google project)
 
 
 ## :gift: New Release Creation Process
 
-- In the new branch to implement fix/new feature
-- Update readme
 - Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
-- Create and send pull request to review
 - After merge into main
 - Create a new release:
   - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
   - Release name is based on created tag name
   - Mark a new release as latest
-- Once in day command line check if changed a new latest release and indicate about changes with instructions.
+- Every day command line check if changed a new latest release and indicate about changes with instructions.
 
 
 ## License
