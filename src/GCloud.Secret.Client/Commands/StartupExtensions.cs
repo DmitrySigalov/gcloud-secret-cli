@@ -21,7 +21,7 @@ public static class StartupExtensions
             .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
             .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
             .AddSingleton<ICommandHandler, CreateProfileCommandHandler>()
-            .AddSingleton<ICommandHandler, ConfigProfileCommandHandler>()
+            .AddSingleton<ICommandHandler, EditProfileCommandHandler>()
             .AddSingleton<ICommandHandler, DeleteProfileCommandHandler>()
             .AddSingleton<ICommandHandler, ImportSecretsFromClipboardHandler>()
             .AddSingleton<ICommandHandler, ExportSecretsToClipboardHandler>();

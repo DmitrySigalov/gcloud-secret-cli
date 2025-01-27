@@ -8,7 +8,7 @@ using IProfileConfigProvider = GCloud.Secret.Client.Profiles.IProfileConfigProvi
 
 namespace GCloud.Secret.Client.Commands.Handlers.ProfileConfiguration;
 
-public class ConfigProfileCommandHandler : ICommandHandler
+public class EditProfileCommandHandler : ICommandHandler
 {
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
@@ -20,16 +20,16 @@ public class ConfigProfileCommandHandler : ICommandHandler
         Edit,
     }
 
-    public ConfigProfileCommandHandler(IProfileConfigProvider profileConfigProvider,
+    public EditProfileCommandHandler(IProfileConfigProvider profileConfigProvider,
         ISecretManagerProvider secretManagerProvider)
     {
         _profileConfigProvider = profileConfigProvider;
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => "config-profile";
+    public string CommandName => "edit-profile";
     
-    public string Description => "Profile configuration";
+    public string Description => "Edit profile configuration";
     
     public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
     {

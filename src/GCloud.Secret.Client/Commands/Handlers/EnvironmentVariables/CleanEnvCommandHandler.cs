@@ -13,7 +13,7 @@ public class CleanEnvCommandHandler : ICommandHandler
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "clean-env";
+    public string CommandName => "clean-environment";
     
     public string Description => "Clean environment variables";
     

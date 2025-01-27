@@ -8,7 +8,7 @@ namespace GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 
 public class SetEnvCommandHandler : ICommandHandler
 {
-    public const string COMMAND_NAME = "set-env";
+    public const string COMMAND_NAME = "set-environment";
 
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;

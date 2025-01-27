@@ -71,7 +71,7 @@ public class CommandSelector
 
         if (continueStatus is ContinueStatusEnum.ConfigProfile)
         {
-            return GetTypedCommandHandler<ConfigProfileCommandHandler>();
+            return GetTypedCommandHandler<EditProfileCommandHandler>();
         }
             
         if (continueStatus is ContinueStatusEnum.SetEnvironment)
