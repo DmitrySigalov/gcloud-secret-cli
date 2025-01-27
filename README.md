@@ -49,18 +49,6 @@ gscli help
 ```
 If everything ran smoothly, you should see the list of supported commands.
 
-#### New Release Creation Process
-
-- In the new branch to implement fix/new feature
-- Update readme
-- Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
-- Create and send pull request to review
-- After merge into main 
-- Create a new release:
-  - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
-  - Release name is based on created tag name
-  - Mark a new release as latest
-- Once in day command line check if changed a new latest release and indicate about changes with instructions.
 
 
 ## :tada: Usage
@@ -92,6 +80,20 @@ Commands:
 ## :books: Examples
 
 TODO
+
+
+## :gift: New Release Creation Process
+
+- In the new branch to implement fix/new feature
+- Update readme
+- Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
+- Create and send pull request to review
+- After merge into main
+- Create a new release:
+  - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
+  - Release name is based on created tag name
+  - Mark a new release as latest
+- Once in day command line check if changed a new latest release and indicate about changes with instructions.
 
 
 ## License
