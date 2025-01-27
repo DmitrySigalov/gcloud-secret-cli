@@ -24,25 +24,26 @@ public class HelpCommandHandler : ICommandHandler
 
     public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
-        PrintFormat();
+        PrintUsage();
 
         PrintSupportedCommands();
 
         return Task.FromResult(ContinueStatusEnum.Exit);
     }
 
-    private void PrintFormat()
+    private void PrintUsage()
     {
-        ConsoleHelper.WriteLineNotification($"{typeof(HelpCommandHandler).Assembly.GetName().Name} | {CLI_NAME} [[<command-name> | <short-name>] [<profile-name>]]");
-
-        var table = new ConsoleTable("command-format", "description");
+        ConsoleHelper.WriteLineInfo("Usage:");
+        ConsoleHelper.WriteLineWarn($"{typeof(HelpCommandHandler).Assembly.GetName().Name} | {CLI_NAME} [[<command-name> | <short-name>] [<profile-name>]]");
+        
+        var table = new ConsoleTable("command", "description");
         table.Options.EnableCount = false;
 
         var descriptors = new Dictionary<string, string>
         {
-            [$"{CLI_NAME}"] = "Interactive mode, select command and enter profile",
-            [$"{CLI_NAME} <command>"] = "Interactive mode, enter profile",
-            [$"{CLI_NAME} <command> <profile>"] = "Not interactive command execution",
+            [$"{CLI_NAME}"] = "Interactive mode, select command and profile",
+            [$"{CLI_NAME} <command>"] = "Interactive mode, select profile",
+            [$"{CLI_NAME} <command> <profile>"] = "Not-interactive command execution",
         };
 
         foreach (var row in descriptors)
@@ -52,12 +53,12 @@ public class HelpCommandHandler : ICommandHandler
                 row.Value);
         }
 
-        ConsoleHelper.Warn(() => table.Write(Format.Minimal));
+        table.Write(Format.Minimal);
     }
 
     private void PrintSupportedCommands()
     {
-        ConsoleHelper.WriteLineNotification($"Supported commands:");
+        ConsoleHelper.WriteLineInfo("Supported commands:");
 
         var table = new ConsoleTable("command-name", "short-name", "description");
         table.Options.EnableCount = false;
@@ -70,6 +71,6 @@ public class HelpCommandHandler : ICommandHandler
                 commandHandler.Description);
         }
 
-        ConsoleHelper.Warn(() => table.Write(Format.Minimal));
+        table.Write(Format.Minimal);
     }
 }

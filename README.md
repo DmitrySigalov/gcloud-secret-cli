@@ -3,7 +3,7 @@
 [![Build](https://github.com/dmitrysigalov/gclod-secret-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-cli/actions/workflows/build.yml)
 [![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-cli)](https://github.com/DmitrySigalov/gclod-secret-cli/blob/main/LICENSE)
 
-A dotnet open source which provides integration with google cloud secret manager using tool
+A dotnet open source which provides integration with google cloud secret manager
 
 ## :gift: Features:
 - Best practice for the environment variable names according to secrets configured in Google Cloud secrets store
@@ -26,7 +26,7 @@ Verify your dotnet version:
 
 The Installer publishes the code to the machine applications directory and adds it to your system's path.
 
-Guideline:
+Installation steps:
 1. Download latest release to local machine
 2. Un-puck sources (installer and src folders)
 
@@ -65,7 +65,13 @@ If everything ran smoothly, you should see the list of supported commands.
 
 ## :tada: Usage
 
+```cmd
+gsclod <command> <profile>
+```
+
 TODO
+
+FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
 
 
 ## License
