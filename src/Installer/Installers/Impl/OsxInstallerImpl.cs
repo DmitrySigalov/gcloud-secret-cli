@@ -57,6 +57,7 @@ public class OsxInstallerImpl : IInstaller
             throw new InvalidOperationException($"Making '{shortcut}' execution failed with exit code {process.ExitCode}");
         }
         
+        Console.WriteLine("Done");
         Console.WriteLine();
     }
 }
