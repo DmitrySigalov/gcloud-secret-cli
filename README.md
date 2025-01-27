@@ -50,7 +50,6 @@ gscli help
 If everything ran smoothly, you should see the list of supported commands.
 
 
-
 ## :tada: Usage
 
 ```cmd
@@ -76,10 +75,6 @@ Commands:
 - If you does not have a access to the secret values use the following commands:
   - 'set/clean-env-var' - sync environment variables with selected profile secrets dump (without connect to Google)
   - 'import/export-secrets' - import/export accessed secret values (without connect to Google)
-
-## :books: Examples
-
-TODO
 
 
 ## :gift: New Release Creation Process
