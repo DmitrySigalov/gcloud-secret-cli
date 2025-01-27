@@ -31,69 +31,74 @@ public class ViewSecretsHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var profileNames = SpinnerHelper.Run(
-            _profileConfigProvider.GetNames,
-            "Get profile names");
-
-        if (profileNames.Any() == false)
-        {
-            ConsoleHelper.WriteLineError("Not found any profile");
-
-            return Task.FromResult(ContinueStatusEnum.Exit);
-        }
-
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
 
-        var selectedProfileName =
-            profileNames.Count == 1
-                ? profileNames.Single()
-                : Prompt.Select(
-                    "Select profile",
-                    items: profileNames,
-                    defaultValue: currentEnvironmentDescriptor.ProfileName);
-
-        var selectedProfileDo = SpinnerHelper.Run(
-            () => _profileConfigProvider.GetByName(selectedProfileName),
-            $"Read profile [{selectedProfileName}]");
-
-        if (selectedProfileDo == null)
+        if (!string.IsNullOrEmpty(currentEnvironmentDescriptor.ProfileName))
         {
-            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
+            ConsoleHelper.WriteLineWarn($"Current active profile is [{currentEnvironmentDescriptor.ProfileName}] in the environment variables system");
+        }
+
+        if (string.IsNullOrEmpty(commandState.ProfileName))
+        {
+            var profileNames = SpinnerHelper.Run(
+                _profileConfigProvider.GetNames,
+                "Get profile names");
+
+            if (profileNames.Any() == false)
+            {
+                ConsoleHelper.WriteLineError("Not found any profile");
+
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
+
+            commandState.ProfileName =
+                profileNames.Count == 1
+                    ? profileNames.Single()
+                    : Prompt.Select(
+                        "Select profile",
+                        items: profileNames,
+                        defaultValue: currentEnvironmentDescriptor.ProfileName);
+        }
+
+        if (commandState.ProfileConfig == null)
+        {
+            commandState.ProfileConfig = SpinnerHelper.Run(
+                () => _profileConfigProvider.GetByName(commandState.ProfileName),
+                $"Read profile [{commandState.ProfileName}]");
+
+            if (commandState.ProfileConfig == null)
+            {
+                ConsoleHelper.WriteLineError($"Not found profile [{commandState.ProfileName}]");
+
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
+
+            commandState.ProfileConfig.PrintProfileConfig();
+        }
+
+        commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
+
+        if (commandState.SecretsDump == null)
+        {
+            ConsoleHelper.WriteLineNotification($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
-        selectedProfileDo.PrintProfileConfig();
+        commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
 
-        var currentSecrets = _profileConfigProvider.ReadSecrets(selectedProfileName);
-
-        if (currentSecrets == null)
-        {
-            ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{selectedProfileName}]");
-
-            return Task.FromResult(ContinueStatusEnum.Exit);
-        }
-
-        currentSecrets.PrintSecretsMappingIdNamesAccessValues();
-
-        if (selectedProfileName != currentEnvironmentDescriptor.ProfileName)
-        {
-            ConsoleHelper.WriteLineNotification(
-                $"Profile [{selectedProfileName}] is inactive in the environment variables system");
-        }
-
-        var newEnvironmentVariables = currentSecrets.ToEnvironmentDictionary();
+        var newEnvironmentVariables = commandState.SecretsDump.ToEnvironmentDictionary();
         
         if (currentEnvironmentDescriptor.HasDiff(newEnvironmentVariables))
         {
             ConsoleHelper.WriteLineError(
-                $"Profile [{selectedProfileName}] has different secret values with the environment variables system");
+                $"Profile [{commandState.ProfileName}] has different secret values with the environment variables system");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }
         
         ConsoleHelper.WriteLineInfo(
-            $"Profile [{selectedProfileName}] is fully synchronized with the environment variables system");
+            $"Profile [{commandState.ProfileName}] is fully synchronized with the environment variables system");
 
         return Task.FromResult(ContinueStatusEnum.Exit);
     }

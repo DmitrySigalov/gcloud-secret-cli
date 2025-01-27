@@ -99,7 +99,7 @@ public class GetSecretsHandler : ICommandHandler
         if (successCounter == 0)
         {
             ConsoleHelper.WriteLineNotification(
-                $"NO DATA - Not retrieved any valid secret value ({errorCounter} errors)");
+                $"NO DATA - Not retrieved any accessed secret value ({errorCounter} errors)");
             
             return ContinueStatusEnum.Exit;
         }
@@ -108,8 +108,8 @@ public class GetSecretsHandler : ICommandHandler
 
         if (changesCounter == 0)
         {
-            ConsoleHelper.WriteLineInfo(
-                $"DUMP NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
+            ConsoleHelper.WriteLineNotification(
+                $"NO CHANGES - Secrets dump is fully synchronized ({successCounter} values, {errorCounter} errors)");
         }
         else
         {

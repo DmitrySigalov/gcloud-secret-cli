@@ -117,10 +117,6 @@ public abstract class BaseEnvironmentVariablesProvider : IEnvironmentVariablesPr
 
                 OnFinishSet(currentData, outputCallback);
             }
-            else
-            {
-                outputCallback("No changes in environment variables");
-            }
         }
     }
 

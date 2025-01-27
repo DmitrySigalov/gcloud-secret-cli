@@ -65,6 +65,8 @@ try
         var cliHandler = commandSelector
             .Get(continueStatus);
 
+        Console.WriteLine();
+        
         continueStatus = await cliHandler.Handle(commandState);
     }
 }

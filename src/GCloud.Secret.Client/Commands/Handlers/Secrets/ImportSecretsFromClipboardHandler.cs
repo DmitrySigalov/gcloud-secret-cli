@@ -39,53 +39,56 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
         
         ConsoleHelper.WriteLineInfo($"Imported json:");
         Console.WriteLine(importedData.ClipboardText);
-        Console.WriteLine();        
+        Console.WriteLine();
 
-        var profileNames = SpinnerHelper.Run(
-            _profileConfigProvider.GetNames,
-            "Get profile names");
-        if (profileNames.Any() == false)
+        if (string.IsNullOrEmpty(commandState.ProfileName))
         {
-            ConsoleHelper.WriteLineError("Not found any profile");
+            var profileNames = SpinnerHelper.Run(
+                _profileConfigProvider.GetNames,
+                "Get profile names");
+            if (profileNames.Any() == false)
+            {
+                ConsoleHelper.WriteLineError("Not found any profile");
 
-            return Task.FromResult(ContinueStatusEnum.Exit);
-        }
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
 
-        var selectedProfileName = 
-            profileNames.Count == 1
-            ? profileNames.Single()
-            : Prompt.Select(
+            commandState.ProfileName = Prompt.Select(
                 "Select profile",
                 items: profileNames);
-
-        var selectedProfileDo = SpinnerHelper.Run(
-            () => _profileConfigProvider.GetByName(selectedProfileName),
-            $"Read profile [{selectedProfileName}]");
-        if (selectedProfileDo == null)
-        {
-            ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
-
-            return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
-        var newSecrets = selectedProfileDo.BuildSecretDetails(
+        if (commandState.ProfileConfig == null)
+        {
+            commandState.ProfileConfig = SpinnerHelper.Run(
+                () => _profileConfigProvider.GetByName(commandState.ProfileName),
+                $"Read profile [{commandState.ProfileName}]");
+            if (commandState.ProfileConfig == null)
+            {
+                ConsoleHelper.WriteLineError($"Not found profile [{commandState.ProfileName}]");
+
+                return Task.FromResult(ContinueStatusEnum.Exit);
+            }
+        }
+
+        commandState.SecretsDump = commandState.ProfileConfig.BuildSecretDetails(
             importedData.Secrets.Keys.ToHashSet());
 
         foreach (var secret in importedData.Secrets)
         {
-            var newSecret = newSecrets[secret.Key];
+            var newSecret = commandState.SecretsDump[secret.Key];
 
             newSecret.AccessStatusCode = StatusCode.OK;
             newSecret.DecodedValue = secret.Value;
         }
 
-        _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
+        _profileConfigProvider.DumpSecrets(commandState.ProfileName, commandState.SecretsDump);
 
-        newSecrets.PrintSecretsMappingIdNamesAccessValues();
+        commandState.SecretsDump.PrintSecretsMappingIdNamesAccessValues();
         
-        ConsoleHelper.WriteLineInfo($"DONE - Imported/saved/dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Imported/saved/dumped {commandState.SecretsDump.Count} secrets according to profile [{commandState.ProfileName}]");
 
-        return Task.FromResult(ContinueStatusEnum.Exit);
+        return Task.FromResult(ContinueStatusEnum.SetEnvironment);
     }
 
     private (string ClipboardText, Dictionary<string, string> Secrets) GetSecretsFromClipboard()

@@ -3,19 +3,19 @@ using GCloud.Secret.Client.EnvironmentVariables;
 
 namespace GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 
-public class CleanEnvCommandHandler : ICommandHandler
+public class CleanEnvVarCommandHandler : ICommandHandler
 {
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public CleanEnvCommandHandler(
+    public CleanEnvVarCommandHandler(
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
         _environmentVariablesProvider = environmentVariablesProvider;
     }
     
-    public string CommandName => "clean-environment";
+    public string CommandName => "clean-env-var";
     
-    public string ShortName => "ce";
+    public string ShortName => "cev";
 
     public string Description => "Clean environment variables";
     

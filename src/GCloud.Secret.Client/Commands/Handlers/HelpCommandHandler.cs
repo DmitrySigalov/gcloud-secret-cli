@@ -24,8 +24,6 @@ public class HelpCommandHandler : ICommandHandler
 
     public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
-        Console.WriteLine();
-
         PrintFormat();
 
         PrintSupportedCommands();

@@ -6,14 +6,14 @@ using Sharprompt;
 
 namespace GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 
-public class SetEnvCommandHandler : ICommandHandler
+public class SetEnvVarCommandHandler : ICommandHandler
 {
-    public const string COMMAND_NAME = "set-environment";
+    public const string COMMAND_NAME = "set-env-var";
 
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
 
-    public SetEnvCommandHandler(
+    public SetEnvVarCommandHandler(
         IProfileConfigProvider profileConfigProvider,
         IEnvironmentVariablesProvider environmentVariablesProvider)
     {
@@ -23,9 +23,9 @@ public class SetEnvCommandHandler : ICommandHandler
     
     public string CommandName => COMMAND_NAME;
         
-    public string ShortName => "se";
+    public string ShortName => "sev";
 
-    public string Description => "Set environment variables from secrets dump";
+    public string Description => "Set environment variables from the secrets dump";
     
     public Task<ContinueStatusEnum> Handle(CommandState commandState)
     {
@@ -61,7 +61,7 @@ public class SetEnvCommandHandler : ICommandHandler
             commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
             if (commandState.SecretsDump == null)
             {
-                ConsoleHelper.WriteLineNotification($"Not found dump with secret values according to profile [{commandState.ProfileName}]");
+                ConsoleHelper.WriteLineNotification($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
 
                 return Task.FromResult(ContinueStatusEnum.Exit);
             }
@@ -77,7 +77,7 @@ public class SetEnvCommandHandler : ICommandHandler
         
         if (!newDescriptor.Variables.Any())
         {
-            ConsoleHelper.WriteLineNotification($"Not found any valid secret value in dump according to profile [{commandState.ProfileName}]");
+            ConsoleHelper.WriteLineNotification($"Not found any accessed secret value in dump according to profile [{commandState.ProfileName}]");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }

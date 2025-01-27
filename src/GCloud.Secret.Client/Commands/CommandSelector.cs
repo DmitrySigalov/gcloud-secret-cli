@@ -86,7 +86,7 @@ public class CommandSelector
             
         if (continueStatus is ContinueStatusEnum.SetEnvironment)
         {
-            return GetTypedCommandHandler<SetEnvCommandHandler>();
+            return GetTypedCommandHandler<SetEnvVarCommandHandler>();
         }
 
         throw new NotSupportedException();

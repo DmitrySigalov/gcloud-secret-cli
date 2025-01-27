@@ -18,8 +18,8 @@ public static class StartupExtensions
             // Regular commands
             .AddSingleton<ICommandHandler, GetSecretsHandler>()
             .AddSingleton<ICommandHandler, ViewSecretsHandler>()
-            .AddSingleton<ICommandHandler, SetEnvCommandHandler>()
-            .AddSingleton<ICommandHandler, CleanEnvCommandHandler>()
+            .AddSingleton<ICommandHandler, SetEnvVarCommandHandler>()
+            .AddSingleton<ICommandHandler, CleanEnvVarCommandHandler>()
             .AddSingleton<ICommandHandler, CreateProfileCommandHandler>()
             .AddSingleton<ICommandHandler, EditProfileCommandHandler>()
             .AddSingleton<ICommandHandler, DeleteProfileCommandHandler>()
