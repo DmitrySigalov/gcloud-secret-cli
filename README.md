@@ -1,7 +1,7 @@
 # gclod-secret-cli
 
-[![Build](https://github.com/dmitrysigalov/gclod-secret-manager-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-manager-cli/actions/workflows/build.yml)
-[![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-manager-cli)](https://github.com/DmitrySigalov/gclod-secret-manager-cli/blob/main/LICENSE)
+[![Build](https://github.com/dmitrysigalov/gclod-secret-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-cli/actions/workflows/build.yml)
+[![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-cli)](https://github.com/DmitrySigalov/gclod-secret-cli/blob/main/LICENSE)
 
 A dotnet open source which provides integration with google cloud secret manager using tool
 
@@ -66,3 +66,8 @@ If everything ran smoothly, you should see the list of supported commands.
 ## :tada: Usage
 
 TODO
+
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
