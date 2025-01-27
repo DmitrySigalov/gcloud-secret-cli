@@ -6,12 +6,10 @@ using GCloud.Secret.Client.Profiles.Helpers;
 using Sharprompt;
 using IProfileConfigProvider = GCloud.Secret.Client.Profiles.IProfileConfigProvider;
 
-namespace GCloud.Secret.Client.Commands.Handlers;
+namespace GCloud.Secret.Client.Commands.Handlers.ProfileConfiguration;
 
 public class ConfigProfileCommandHandler : ICommandHandler
 {
-    public const string COMMAND_NAME = "config-profile";
-    
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
@@ -29,11 +27,11 @@ public class ConfigProfileCommandHandler : ICommandHandler
         _secretManagerProvider = secretManagerProvider;
     }
 
-    public string CommandName => COMMAND_NAME;
+    public string CommandName => "config-profile";
     
-    public string Description => "Profile(s) configuration";
+    public string Description => "Profile configuration";
     
-    public async Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

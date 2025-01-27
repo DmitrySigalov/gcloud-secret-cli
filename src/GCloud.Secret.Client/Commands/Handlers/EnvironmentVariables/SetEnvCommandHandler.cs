@@ -25,7 +25,7 @@ public class SetEnvCommandHandler : ICommandHandler
     
     public string Description => "Set environment variables from secrets dump";
     
-    public Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

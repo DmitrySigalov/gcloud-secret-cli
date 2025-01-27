@@ -29,7 +29,7 @@ public class GetSecretsHandler : ICommandHandler
     
     public string Description => "Get and save/dump secrets from google";
 
-    public async Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();

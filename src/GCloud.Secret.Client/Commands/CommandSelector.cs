@@ -1,4 +1,5 @@
 using GCloud.Secret.Client.Commands.Handlers;
+using GCloud.Secret.Client.Commands.Handlers.ProfileConfiguration;
 using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using GCloud.Secret.Client.Commands.Handlers.Secrets;
 using GCloud.Secret.Client.Common;
@@ -14,7 +15,6 @@ public class CommandSelector
     private readonly IProfileConfigProvider _profileConfigProvider;
     
     private readonly ICommandHandler _helpCommandHandler;
-    private readonly ICommandHandler _configCommandHandler;
     private readonly ICommandHandler _defaultCommandHandler;
 
     private readonly IDictionary<string, ICommandHandler> _allCommandHandlers;
@@ -36,7 +36,6 @@ public class CommandSelector
             .Union(handlers)
             .ToDictionary(h => h.CommandName, h => h);
 
-        _configCommandHandler = handlers.Single(x => x.CommandName == ConfigProfileCommandHandler.COMMAND_NAME);
         _defaultCommandHandler = handlers.Single(x => x.CommandName == GetSecretsHandler.COMMAND_NAME);
     }
     
@@ -44,21 +43,19 @@ public class CommandSelector
     {
         if (continueStatus is ContinueStatusEnum.SelectCommand)
         {
-            var commandName = _userParameters.CommandName;
-        
-            if (commandName=="*" || string.IsNullOrEmpty(commandName))
+            if (!_profileConfigProvider.GetNames().Any())
             {
-                if (_profileConfigProvider.GetNames().Any())
-                {
-                    commandName = Prompt.Select(
-                        "Select command",
-                        _allCommandHandlers.Select(x => x.Key),
-                        defaultValue: _defaultCommandHandler?.CommandName);
-                }
-                else
-                {
-                    commandName = _configCommandHandler.CommandName;
-                }
+                return GetTypedCommandHandler<CreateProfileCommandHandler>();
+            }
+
+            var commandName = _userParameters.CommandName;
+
+            if (commandName == "*" || string.IsNullOrEmpty(commandName))
+            {
+                commandName = Prompt.Select(
+                    "Select command",
+                    _allCommandHandlers.Select(x => x.Key),
+                    defaultValue: _defaultCommandHandler?.CommandName);
             }
 
             if (!_allCommandHandlers.TryGetValue(commandName, out var handler))
