@@ -28,12 +28,12 @@ public class CreateProfileCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
+        var profileNames = SpinnerHelper.Run(
+            _profileConfigProvider.GetNames,
+            "Get profile names");
+
         if (string.IsNullOrWhiteSpace(commandState.ProfileName))
         {
-            var profileNames = SpinnerHelper.Run(
-                _profileConfigProvider.GetNames,
-                "Get profile names");
-
             commandState.ProfileName = Prompt.Input<string>(
                 "Enter new profile name (project id) ",
                 defaultValue: "google-project-id",
@@ -41,6 +41,17 @@ public class CreateProfileCommandHandler : ICommandHandler
                 {
                     check => ProfileNameValidationRule.Handle((string) check, profileNames),
                 }).Trim();
+        }
+        else
+        {
+            var validationResult = ProfileNameValidationRule.Handle(commandState.ProfileName, profileNames);
+
+            if (validationResult != ValidationResult.Success)
+            {
+                ConsoleHelper.WriteError(validationResult.ErrorMessage);
+
+                return ContinueStatusEnum.Exit;
+            }
         }
         
         commandState.ProfileConfig = new()

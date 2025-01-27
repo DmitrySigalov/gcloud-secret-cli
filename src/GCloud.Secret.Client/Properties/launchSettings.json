@@ -6,6 +6,41 @@
       "environmentVariables": {
         "USER_FOLDER_PATH": "." // Using for the debugging only
       }
+    },
+    "Client.Help": {
+      "commandName": "Project",
+      "commandLineArgs": "help",
+      "environmentVariables": {
+        "USER_FOLDER_PATH": "." // Using for the debugging only
+      }
+    },
+    "Client.Test.CreateProfile": {
+      "commandName": "Project",
+      "commandLineArgs": "create-profile test",
+      "environmentVariables": {
+        "USER_FOLDER_PATH": "." // Using for the debugging only
+      }
+    },
+    "Client.Test.GetSecrets": {
+      "commandName": "Project",
+      "commandLineArgs": "get-secrets test",
+      "environmentVariables": {
+        "USER_FOLDER_PATH": "." // Using for the debugging only
+      }
+    },
+    "Client.Test.SetEnvVar": {
+      "commandName": "Project",
+      "commandLineArgs": "set-env-var test",
+      "environmentVariables": {
+        "USER_FOLDER_PATH": "." // Using for the debugging only
+      }
+    },
+    "Client.Test.DeleteProfile": {
+      "commandName": "Project",
+      "commandLineArgs": "delete-profile test",
+      "environmentVariables": {
+        "USER_FOLDER_PATH": "." // Using for the debugging only
+      }
     }
   }
 }

@@ -61,7 +61,7 @@ public class SetEnvVarCommandHandler : ICommandHandler
             commandState.SecretsDump = _profileConfigProvider.ReadSecrets(commandState.ProfileName);
             if (commandState.SecretsDump == null)
             {
-                ConsoleHelper.WriteLineNotification($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
+                ConsoleHelper.WriteLineError($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
 
                 return Task.FromResult(ContinueStatusEnum.Exit);
             }
@@ -77,7 +77,7 @@ public class SetEnvVarCommandHandler : ICommandHandler
         
         if (!newDescriptor.Variables.Any())
         {
-            ConsoleHelper.WriteLineNotification($"Not found any accessed secret value in dump according to profile [{commandState.ProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found any accessed secret value in dump according to profile [{commandState.ProfileName}]");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }

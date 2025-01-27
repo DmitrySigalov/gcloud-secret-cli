@@ -80,7 +80,7 @@ public class ViewSecretsHandler : ICommandHandler
 
         if (commandState.SecretsDump == null)
         {
-            ConsoleHelper.WriteLineNotification($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found dump with accessed secret values according to profile [{commandState.ProfileName}]");
 
             return Task.FromResult(ContinueStatusEnum.Exit);
         }

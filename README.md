@@ -1,9 +1,9 @@
 # gclod-secret-cli
 
-[![Build](https://github.com/dmitrysigalov/gclod-secret-manager-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-manager-cli/actions/workflows/build.yml)
-[![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-manager-cli)](https://github.com/DmitrySigalov/gclod-secret-manager-cli/blob/main/LICENSE)
+[![Build](https://github.com/dmitrysigalov/gclod-secret-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-cli/actions/workflows/build.yml)
+[![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-cli)](https://github.com/DmitrySigalov/gclod-secret-cli/blob/main/LICENSE)
 
-A dotnet open source which provides integration with google cloud secret manager using tool
+A dotnet open source which provides integration with google cloud secret manager
 
 ## :gift: Features:
 - Best practice for the environment variable names according to secrets configured in Google Cloud secrets store
@@ -26,7 +26,7 @@ Verify your dotnet version:
 
 The Installer publishes the code to the machine applications directory and adds it to your system's path.
 
-Guideline:
+Installation steps:
 1. Download latest release to local machine
 2. Un-puck sources (installer and src folders)
 
@@ -49,13 +49,53 @@ gscli help
 ```
 If everything ran smoothly, you should see the list of supported commands.
 
-#### New Release Creation Process
+
+## :tada: Usage
+
+Before using ensure:
+- Installed and configured google cloud sdk
+- Installed and configured GKE plugin
+- First time user login
+```cmd
+gcloud auth login <user-name>
+```
+- You have access to the requested google project
+- Optionally you have permission to access to the secret values in the required google project
+
+
+```cmd
+gsclod <command> <profile>
+```
+
+FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
+
+2 execution modes:
+- Interactive (not provided command and profile arguments)
+- Not-interactive command execution (exception - command 'edit-profile')
+
+Commands:
+- 'create/edit/delete-profile' - profile configuration commands:
+  - Mapping to google project id (by default equals to profile name)
+  - Rules for the creation of environment variable names settings
+- 'get-secrets' - create secrets dump file with values:
+  - Connect to google project
+  - Get secret ids
+  - Access to secret values
+  - Dump file with values
+  - Run command 'set-env-var'
+- 'clean-env-var' - clean active environment variables
+- If you does not have a access to the secret values, use the following commands:
+  - 'set-env-var' - sync environment variables with selected profile secrets dump
+  - 'import/export-secrets' - import/export accessed secret values
+
+
+## :gift: New Release Creation Process
 
 - In the new branch to implement fix/new feature
 - Update readme
 - Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
 - Create and send pull request to review
-- After merge into main 
+- After merge into main
 - Create a new release:
   - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
   - Release name is based on created tag name
@@ -63,6 +103,6 @@ If everything ran smoothly, you should see the list of supported commands.
 - Once in day command line check if changed a new latest release and indicate about changes with instructions.
 
 
-## :tada: Usage
+## License
 
-TODO
+This project is licensed under the [MIT License](LICENSE).
