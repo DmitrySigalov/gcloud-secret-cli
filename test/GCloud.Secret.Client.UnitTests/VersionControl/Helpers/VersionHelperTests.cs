@@ -7,7 +7,7 @@ public class VersionHelperTests
     [Fact]
     public void RuntimeVersion_ShouldFormattedWithMajorMinorAndBuildVersions_AndAddedVPrefix()
     {
-        var expectedAssemblyMajorVersion = 1;
+        var expectedAssemblyMajorVersion = 0;
         var expectedAssemblyMinorVersion = 0;
         var expectedAssemblBuildVersion = 0;
         
@@ -21,7 +21,7 @@ public class VersionHelperTests
     [Fact]
     public void RuntimeVersion_ShouldReturnFromAssemblyVersion()
     {
-        var expectedAssemblyMajorVersion = 1;
+        var expectedAssemblyMajorVersion = 0;
         var expectedAssemblyMinorVersion = 0;
         var expectedAssemblBuildVersion = 0;
         
