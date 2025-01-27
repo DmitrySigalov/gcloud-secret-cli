@@ -14,7 +14,9 @@ public class DeleteProfileCommandHandler : ICommandHandler
     }
 
     public string CommandName => "delete-profile";
-    
+        
+    public string ShortName => "dp";
+
     public string Description => "Delete profile configuration";
     
     public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)

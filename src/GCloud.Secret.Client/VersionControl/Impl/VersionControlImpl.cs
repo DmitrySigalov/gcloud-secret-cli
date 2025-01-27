@@ -23,7 +23,7 @@ public class VersionControlImpl : IVersionControl
 
     public async Task CheckVersionAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine($"Runtime version is '{VersionHelper.RuntimeVersion}'.");
+        Console.WriteLine($"Runtime version is '{VersionHelper.RuntimeVersion}'");
         
         var checkVersionInfo = await GetCheckVersionInfoAsync(cancellationToken);
 

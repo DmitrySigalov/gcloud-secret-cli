@@ -18,7 +18,9 @@ public class CreateProfileCommandHandler : ICommandHandler
     }
 
     public string CommandName => COMMAND_NAME;
-    
+        
+    public string ShortName => "cp";
+
     public string Description => "Create profile configuration";
     
     public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)

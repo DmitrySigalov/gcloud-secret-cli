@@ -28,7 +28,9 @@ public class EditProfileCommandHandler : ICommandHandler
     }
 
     public string CommandName => "edit-profile";
-    
+            
+    public string ShortName => "ep";
+
     public string Description => "Edit profile configuration";
     
     public async Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)

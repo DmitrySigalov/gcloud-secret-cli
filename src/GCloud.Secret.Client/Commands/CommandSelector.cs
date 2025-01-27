@@ -17,7 +17,8 @@ public class CommandSelector
     private readonly ICommandHandler _helpCommandHandler;
     private readonly ICommandHandler _defaultCommandHandler;
 
-    private readonly IDictionary<string, ICommandHandler> _allCommandHandlers;
+    private readonly IDictionary<string, ICommandHandler> _allCommandHandlersByFullNames;
+    private readonly IDictionary<string, ICommandHandler> _allCommandHandlersByShortNames;
 
     public CommandSelector(
         UserParameters userParameters,
@@ -32,9 +33,17 @@ public class CommandSelector
         
         _helpCommandHandler = helpCommandHandler;
 
-        _allCommandHandlers = new [] { helpCommandHandler, } 
+        _allCommandHandlersByFullNames = new [] { helpCommandHandler, } 
             .Union(handlers)
-            .ToDictionary(h => h.CommandName, h => h);
+            .ToDictionary(
+                h => h.CommandName, 
+                h => h);
+
+        _allCommandHandlersByShortNames = _allCommandHandlersByFullNames
+            .Values
+            .ToDictionary(
+                h => h.ShortName, 
+                h => h);
 
         _defaultCommandHandler = handlers.Single(x => x.CommandName == GetSecretsHandler.COMMAND_NAME);
     }
@@ -54,13 +63,14 @@ public class CommandSelector
             {
                 commandName = Prompt.Select(
                     "Select command",
-                    _allCommandHandlers.Select(x => x.Key),
+                    _allCommandHandlersByFullNames.Select(x => x.Key),
                     defaultValue: _defaultCommandHandler?.CommandName);
             }
 
-            if (!_allCommandHandlers.TryGetValue(commandName, out var handler))
+            if (!_allCommandHandlersByFullNames.TryGetValue(commandName, out var handler) &&
+                !_allCommandHandlersByShortNames.TryGetValue(commandName, out handler))
             {
-                ConsoleHelper.WriteLineError("Invalid command argument");
+                ConsoleHelper.WriteLineError($"Invalid command argument: '{commandName}'");
                 Console.WriteLine();
             
                 return _helpCommandHandler;
@@ -84,7 +94,7 @@ public class CommandSelector
 
     private ICommandHandler GetTypedCommandHandler<THandler>() 
         where THandler : ICommandHandler =>
-            _allCommandHandlers.Values
+            _allCommandHandlersByFullNames.Values
                 .OfType<THandler>()
                 .Single();
 }

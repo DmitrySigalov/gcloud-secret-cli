@@ -15,6 +15,8 @@ public class CleanEnvCommandHandler : ICommandHandler
     
     public string CommandName => "clean-environment";
     
+    public string ShortName => "ce";
+
     public string Description => "Clean environment variables";
     
     public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)

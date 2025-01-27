@@ -22,7 +22,9 @@ public class SetEnvCommandHandler : ICommandHandler
     }
     
     public string CommandName => COMMAND_NAME;
-    
+        
+    public string ShortName => "se";
+
     public string Description => "Set environment variables from secrets dump";
     
     public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)

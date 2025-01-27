@@ -18,6 +18,8 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
     }
     
     public string CommandName => "import-secrets";
+        
+    public string ShortName => "is";
     
     public string Description => "Import secrets (json from the clipboard)";
     

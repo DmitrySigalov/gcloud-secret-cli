@@ -21,8 +21,10 @@ public class ViewSecretsHandler : ICommandHandler
     }
     
     public string CommandName => "view-secrets";
-    
-    public string Description => "View profile secrets details";
+            
+    public string ShortName => "vs";
+
+    public string Description => "View profile secrets dump details";
 
     public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
     {

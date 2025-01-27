@@ -16,19 +16,22 @@ public class HelpCommandHandler : ICommandHandler
 
     public string CommandName => "help";
 
+    public string ShortName => "?";
+
     public string Description => "";
 
     public Task<ContinueStatusEnum> Handle(CommandState commandState, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"Supported commands:");
 
-        var table = new ConsoleTable("command-name", "description");
+        var table = new ConsoleTable("command-name", "short-name", "description");
         table.Options.EnableCount = false;
 
         foreach (var commandHandler in _commandHandlers)
         {
             table.AddRow(
                 commandHandler.CommandName,
+                commandHandler.ShortName,
                 commandHandler.Description);
         }
 

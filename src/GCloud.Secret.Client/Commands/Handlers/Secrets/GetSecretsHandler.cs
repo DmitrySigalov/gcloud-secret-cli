@@ -26,6 +26,8 @@ public class GetSecretsHandler : ICommandHandler
     }
 
     public string CommandName => COMMAND_NAME;
+        
+    public string ShortName => "gs";
     
     public string Description => "Get and save/dump secrets from google";
 
