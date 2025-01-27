@@ -54,7 +54,10 @@ try
 
     var nextCommand = ContinueStatusEnum.SelectCommand;
 
-    var commandState = new CommandState();
+    var commandState = new CommandState
+    {
+        CancellationToken = cts.Token,
+    };
 
     while (nextCommand != ContinueStatusEnum.Exit)
     {

@@ -13,13 +13,6 @@ public class EditProfileCommandHandler : ICommandHandler
     private readonly IProfileConfigProvider _profileConfigProvider;
     private readonly ISecretManagerProvider _secretManagerProvider;
 
-    private enum OperationEnum
-    {
-        New,
-        Delete,
-        Edit,
-    }
-
     public EditProfileCommandHandler(IProfileConfigProvider profileConfigProvider,
         ISecretManagerProvider secretManagerProvider)
     {
@@ -38,24 +31,10 @@ public class EditProfileCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
 
-        var profileDetails = GetProfileDetailsForConfiguration();
-
-        if (profileDetails.Operation == OperationEnum.New)
+        GetProfileDetailsForConfiguration(commandState);
+        if (commandState.ProfileConfig == null)
         {
-            SpinnerHelper.Run(
-                () => _profileConfigProvider.Save(profileDetails.ProfileName, profileDetails.ProfileDo),
-                $"Save new profile [{profileDetails.ProfileName}] configuration with default settings");
-        }
-
-        profileDetails.ProfileDo.PrintProfileConfig();
-
-        if (profileDetails.Operation == OperationEnum.Delete)
-        {
-            SpinnerHelper.Run(
-                () => _profileConfigProvider.Delete(profileDetails.ProfileName),
-                $"Delete profile [{profileDetails.ProfileName}]");
-            
-            ConsoleHelper.WriteLineInfo($"DONE - Deleted profile [{profileDetails.ProfileName}]");
+            ConsoleHelper.WriteLineError($"Not found profile [{commandState.ProfileName}]");
 
             return ContinueStatusEnum.Exit;
         }
@@ -66,10 +45,10 @@ public class EditProfileCommandHandler : ICommandHandler
 
         while (lastSelectedOperationKey != saveOperationKey)
         {
-            var manageOperationsLookup = new Dictionary<string, Func<Profiles.ProfileConfig, Task<(bool IsChanged, Profiles.ProfileConfig ProfileConfig)>>>
+            var manageOperationsLookup = new Dictionary<string, Func<CommandState, Task>>
             {
-                { saveOperationKey, pf => Save(profileDetails.ProfileName, pf) },
-                { "Validate and get secret ids", pf => GetSecretIdsAsync(pf, false, cancellationToken) },
+                { saveOperationKey, Save },
+                { "Validate / get secret ids", ValidateGetSecretIdsAsync },
                 { "Set project id", SetProjectId },
                 { "Set advanced settings", SetAdvancedSettings },
                 { "Reset to defaults", ResetDefaultSettings },
@@ -82,156 +61,116 @@ public class EditProfileCommandHandler : ICommandHandler
 
             var operationFunction = manageOperationsLookup[lastSelectedOperationKey];
 
-            (bool HasChanges, Profiles.ProfileConfig ProfileConfig) operationResult = await operationFunction(profileDetails.ProfileDo);
-
-            if (operationResult.HasChanges)
-            {
-                profileDetails.ProfileDo = operationResult.ProfileConfig;
-            }
+            await operationFunction(commandState);
 
             Console.WriteLine();
         }
         
-        await GetSecretIdsAsync(profileDetails.ProfileDo, true, cancellationToken);
-
-        ConsoleHelper.WriteLineInfo($"DONE - Configured valid profile [{profileDetails.ProfileName}]");
+        ConsoleHelper.WriteLineInfo($"DONE - Configured valid profile [{commandState.ProfileName}]");
         Console.WriteLine();
 
         return ContinueStatusEnum.Exit;
     }
     
-    private (OperationEnum Operation, string ProfileName, ProfileConfig ProfileDo) GetProfileDetailsForConfiguration()
+    private void GetProfileDetailsForConfiguration(
+        CommandState commandState)
     {
-        var profileNames = SpinnerHelper.Run(
-            _profileConfigProvider.GetNames,
-            "Get profile names");
-
-        var operation = OperationEnum.New;
-        var profileName = "default";
-        var profileDo = new ProfileConfig();
-
-        if (profileNames.Any())
+        if (string.IsNullOrEmpty(commandState.ProfileName))
         {
-            operation = Prompt.Select(
-                "Select profile operation",
-                items: new[] { OperationEnum.Edit, OperationEnum.New, OperationEnum.Delete },
-                defaultValue: OperationEnum.Edit);
+            var profileNames = SpinnerHelper.Run(
+                _profileConfigProvider.GetNames,
+                "Get profile names");
+
+            commandState.ProfileName = Prompt.Select(
+                "Select profile",
+                items: profileNames);
         }
 
-        if (operation == OperationEnum.New)
+        if (commandState.ProfileConfig == null)
         {
-            profileName = Prompt.Input<string>(
-                "Enter new profile name (project id) ",
-                defaultValue: profileName,
-                validators: new List<Func<object, ValidationResult>>
-                {
-                    check => ProfileNameValidationRule.Handle((string) check, profileNames),
-                }).Trim();
+            commandState.ProfileConfig = SpinnerHelper.Run(
+                () => _profileConfigProvider.GetByName(commandState.ProfileName),
+                $"Read selected profile [{commandState.ProfileName}]");
             
-            profileDo.ProjectId = profileName;
-            
-            return (operation, profileName, profileDo);
+            if (commandState.ProfileConfig == null)
+            {
+                ConsoleHelper.WriteLineError($"Not found profile [{commandState.ProfileName}]");
+            }
         }
-
-        profileName =
-            profileNames.Count == 1
-                ? profileNames.Single()
-                : Prompt.Select(
-                    "Select profile",
-                    items: profileNames);
-
-        profileDo = SpinnerHelper.Run(
-            () => _profileConfigProvider.GetByName(profileName),
-            $"Read selected profile [{profileName}]");
-
-        profileDo ??= new ProfileConfig(); 
-
-        return (operation, profileName, profileDo);
     }
 
-    private Task<(bool, ProfileConfig)> Save(string profileName, ProfileConfig profileConfig)
+    private async Task Save(CommandState commandState)
     {
         SpinnerHelper.Run(
-            () => _profileConfigProvider.Save(profileName, profileConfig),
-            $"Save profile [{profileName}] configuration new settings");
-        
-        return Task.FromResult((false, profileConfig));
+            () => _profileConfigProvider.Save(commandState.ProfileName, commandState.ProfileConfig),
+            $"Save profile [{commandState.ProfileName}] configuration new settings");
+
+        await ValidateGetSecretIdsAsync(commandState);
     }
     
-    private async Task<(bool, ProfileConfig)> GetSecretIdsAsync(ProfileConfig profileConfig, bool throwOnException, CancellationToken cancellationToken)
+    private async Task ValidateGetSecretIdsAsync(CommandState commandState)
     {
-        profileConfig.PrintProfileConfig();
+        commandState.ProfileConfig.PrintProfileConfig();
 
         var secretIds = new HashSet<string>();
         
         try
         {
             secretIds = await _secretManagerProvider.GetSecretIdsAsync(
-                profileConfig.ProjectId,
-                cancellationToken);
+                commandState.ProfileConfig.ProjectId,
+                commandState.CancellationToken);
         }
         catch (Exception e)
         {
-            if (throwOnException)
-            {
-                throw;
-            }
-            
             ConsoleHelper.WriteLineError(e.Message);
         }
 
         if (secretIds.Any())
         {
-            var secrets = profileConfig.BuildSecretDetails(secretIds);
+            var secrets = commandState.ProfileConfig.BuildSecretDetails(secretIds);
 
             secrets.PrintSecretsMappingIdNames();
         }
-        
-        return (false, profileConfig);
     }
 
-    private Task<(bool, ProfileConfig)> SetProjectId(ProfileConfig profileConfig)
+    private Task SetProjectId(CommandState commandState)
     {
         var hasChanges = false;
 
         var newProjectId = Prompt.Input<string>(
             "Enter new project id",
-            defaultValue: profileConfig.ProjectId);
+            defaultValue: commandState.ProfileConfig.ProjectId);
         if (!string.IsNullOrEmpty(newProjectId))
         {
-            profileConfig.ProjectId = newProjectId;
+            commandState.ProfileConfig.ProjectId = newProjectId;
             hasChanges = true;
         }
 
-        return Task.FromResult((hasChanges, profileConfig));
+        return Task.CompletedTask;
     }
 
-    private Task<(bool, ProfileConfig)> SetAdvancedSettings(ProfileConfig profileConfig)
+    private Task SetAdvancedSettings(CommandState commandState)
     {
-        var hasChanges = false;
-
         var newEnvironmentVariablePrefix = Prompt.Input<string>(
             "Enter environment variable prefix",
-            defaultValue: profileConfig.EnvironmentVariablePrefix);
+            defaultValue: commandState.ProfileConfig.EnvironmentVariablePrefix);
         newEnvironmentVariablePrefix = newEnvironmentVariablePrefix?.Trim() ?? string.Empty;
         if (string.IsNullOrEmpty(newEnvironmentVariablePrefix))
         {
             newEnvironmentVariablePrefix = null;
         }
-        if (newEnvironmentVariablePrefix != profileConfig.EnvironmentVariablePrefix)
+        if (newEnvironmentVariablePrefix != commandState.ProfileConfig.EnvironmentVariablePrefix)
         {
-            profileConfig.EnvironmentVariablePrefix = newEnvironmentVariablePrefix;
-            hasChanges = true;
+            commandState.ProfileConfig.EnvironmentVariablePrefix = newEnvironmentVariablePrefix;
         }
 
         var newRemoveStartDelimiter = Prompt.Select(
             "Remove start delimiter",
             new[] { true, false, },
-            defaultValue: profileConfig.RemoveStartDelimiter);
-        if (newRemoveStartDelimiter != profileConfig.RemoveStartDelimiter)
+            defaultValue: commandState.ProfileConfig.RemoveStartDelimiter);
+        if (newRemoveStartDelimiter != commandState.ProfileConfig.RemoveStartDelimiter)
         {
-            profileConfig.RemoveStartDelimiter = newRemoveStartDelimiter;
-            hasChanges = true;
+            commandState.ProfileConfig.RemoveStartDelimiter = newRemoveStartDelimiter;
         }
 
         var newConfigPathDelimiter = Prompt.Select(
@@ -239,25 +178,26 @@ public class EditProfileCommandHandler : ICommandHandler
             new []
             {
                 '/', '_', '\\',
-                profileConfig.SecretPathDelimiter,
+                commandState.ProfileConfig.SecretPathDelimiter,
             }.Distinct(),
-            defaultValue: profileConfig.SecretPathDelimiter);
-        if (newConfigPathDelimiter != profileConfig.SecretPathDelimiter)
+            defaultValue: commandState.ProfileConfig.SecretPathDelimiter);
+        if (newConfigPathDelimiter != commandState.ProfileConfig.SecretPathDelimiter)
         {
-            profileConfig.SecretPathDelimiter = newConfigPathDelimiter;
-            hasChanges = true;
+            commandState.ProfileConfig.SecretPathDelimiter = newConfigPathDelimiter;
         }
 
-        return Task.FromResult((hasChanges, profileConfig));
+        return Task.CompletedTask;
     }
     
-    private Task<(bool, ProfileConfig)> ResetDefaultSettings(ProfileConfig profileConfig)
+    private Task ResetDefaultSettings(CommandState commandState)
     {
         var newProfileConfig = new ProfileConfig();
         
         // Don't reset project id
-        newProfileConfig.ProjectId = profileConfig.ProjectId ?? newProfileConfig.ProjectId;
+        newProfileConfig.ProjectId = commandState.ProfileConfig.ProjectId ?? newProfileConfig.ProjectId;
         
-        return Task.FromResult((true, newProfileConfig));
+        commandState.ProfileConfig = newProfileConfig;
+        
+        return Task.CompletedTask;
     }
 }
