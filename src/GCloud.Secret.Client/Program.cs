@@ -49,13 +49,22 @@ try
 {
     Console.WriteLine(Figgle.FiggleFonts.Standard.Render("GCloud-Secret-Cli"));
 
-    var cliHandler = serviceProvider
-        .GetRequiredService<CommandSelector>()
-        .Get();
+    var commandSelector = serviceProvider
+        .GetRequiredService<CommandSelector>();
 
-    await cliHandler.Handle(
-        new CommandState(),
-        cts.Token);
+    var nextCommand = ContinueStatusEnum.SelectCommand;
+
+    var commandState = new CommandState();
+
+    while (nextCommand != ContinueStatusEnum.Exit)
+    {
+        var cliHandler = commandSelector
+            .Get(nextCommand);
+
+        nextCommand = await cliHandler.Handle(
+            commandState,
+            cts.Token);
+    }
 }
 catch (Exception e)
 {

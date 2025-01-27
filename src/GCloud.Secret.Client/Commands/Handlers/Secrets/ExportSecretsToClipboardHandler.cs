@@ -20,7 +20,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
     
     public string Description => "Export secrets (copy json into clipboard) from the secrets dump";
 
-    public Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -33,7 +33,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError("Not found any profile");
 
-            return Task.FromResult(ResultStatusEnum.AllDone);
+            return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
         var selectedProfileName =
@@ -50,7 +50,7 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineNotification($"Not found any valid secret value in the dump according to profile [{selectedProfileName}]");
 
-            return Task.FromResult(ResultStatusEnum.AllDone);
+            return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
         var json = JsonSerializationHelper.Serialize(currentSecrets.ToSecretsDictionary());
@@ -59,6 +59,6 @@ public class ExportSecretsToClipboardHandler : ICommandHandler
 
         ConsoleHelper.WriteLineInfo($"DONE - Exported {currentSecrets.Count} secrets from dump according to profile [{selectedProfileName}]");
 
-        return Task.FromResult(ResultStatusEnum.AllDone);
+        return Task.FromResult(ContinueStatusEnum.Exit);
     }
 }

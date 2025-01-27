@@ -29,7 +29,7 @@ public class GetSecretsHandler : ICommandHandler
     
     public string Description => "Get and save/dump secrets from google";
 
-    public async Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public async Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -42,7 +42,7 @@ public class GetSecretsHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError("Not found any profile");
 
-            return ResultStatusEnum.AllDone;
+            return ContinueStatusEnum.Exit;
         }
 
         var currentEnvironmentDescriptor = _environmentVariablesProvider.Get() ?? new EnvironmentDescriptor();
@@ -63,7 +63,7 @@ public class GetSecretsHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
-            return ResultStatusEnum.AllDone;
+            return ContinueStatusEnum.Exit;
         }
 
         selectedProfileDo.PrintProfileConfig();
@@ -80,7 +80,7 @@ public class GetSecretsHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineNotification("Nothing data to synchronize");
 
-            return ResultStatusEnum.AllDone;
+            return ContinueStatusEnum.Exit;
         }
 
         var changesCounter = await ProgressGetSecretLatestValuesAsync(selectedProfileDo.ProjectId,
@@ -95,7 +95,7 @@ public class GetSecretsHandler : ICommandHandler
             ConsoleHelper.WriteLineNotification(
                 $"NO DATA - Not retrieved any valid secret value ({errorCounter} errors)");
             
-            return ResultStatusEnum.AllDone;
+            return ContinueStatusEnum.Exit;
         }
 
         newSecrets.PrintSecretsMappingIdNamesAccessValues();
@@ -105,14 +105,14 @@ public class GetSecretsHandler : ICommandHandler
             ConsoleHelper.WriteLineInfo(
                 $"NO CHANGES - Fully valid synchronized data ({successCounter} values, {errorCounter} errors)");
             
-            return ResultStatusEnum.AllDone;
+            return ContinueStatusEnum.Exit;
         }
 
         _profileConfigProvider.DumpSecrets(selectedProfileName, newSecrets);
 
         ConsoleHelper.WriteLineInfo($"DONE - Saved/dumped {newSecrets.Count} secrets ({successCounter} values, {errorCounter} errors) according to profile [{selectedProfileName}]");
         
-        return ResultStatusEnum.AllDone;
+        return ContinueStatusEnum.Exit;
     }
 
     private async Task<int> ProgressGetSecretLatestValuesAsync(string projectId,

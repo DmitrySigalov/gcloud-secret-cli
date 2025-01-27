@@ -1,9 +1,9 @@
 using GCloud.Secret.Client.Commands.Handlers;
+using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using GCloud.Secret.Client.Commands.Handlers.Secrets;
 using GCloud.Secret.Client.Common;
 using GCloud.Secret.Client.Profiles;
 using GCloud.Secret.Client.UserRuntime;
-using GCloud.Secret.Client.Commands.Handlers.EnvironmentVariables;
 using Sharprompt;
 
 namespace GCloud.Secret.Client.Commands;
@@ -40,33 +40,54 @@ public class CommandSelector
         _defaultCommandHandler = handlers.Single(x => x.CommandName == GetSecretsHandler.COMMAND_NAME);
     }
     
-    public ICommandHandler Get()
+    public ICommandHandler Get(ContinueStatusEnum continueStatus)
     {
-        var commandName = _userParameters.CommandName;
-        
-        if (commandName=="*" || string.IsNullOrEmpty(commandName))
+        if (continueStatus is ContinueStatusEnum.SelectCommand)
         {
-            if (_profileConfigProvider.GetNames().Any())
+            var commandName = _userParameters.CommandName;
+        
+            if (commandName=="*" || string.IsNullOrEmpty(commandName))
             {
-                commandName = Prompt.Select(
-                    "Select command",
-                    _allCommandHandlers.Select(x => x.Key),
-                    defaultValue: _defaultCommandHandler?.CommandName);
+                if (_profileConfigProvider.GetNames().Any())
+                {
+                    commandName = Prompt.Select(
+                        "Select command",
+                        _allCommandHandlers.Select(x => x.Key),
+                        defaultValue: _defaultCommandHandler?.CommandName);
+                }
+                else
+                {
+                    commandName = _configCommandHandler.CommandName;
+                }
             }
-            else
+
+            if (!_allCommandHandlers.TryGetValue(commandName, out var handler))
             {
-                commandName = _configCommandHandler.CommandName;
+                ConsoleHelper.WriteLineError("Invalid command argument");
+                Console.WriteLine();
+            
+                return _helpCommandHandler;
             }
+
+            return handler;
         }
 
-        if (!_allCommandHandlers.TryGetValue(commandName, out var handler))
+        if (continueStatus is ContinueStatusEnum.ConfigProfile)
         {
-            ConsoleHelper.WriteLineError("Invalid command argument");
-            Console.WriteLine();
-            
-            return _helpCommandHandler;
+            return GetTypedCommandHandler<ConfigProfileCommandHandler>();
         }
-        
-        return handler;
+            
+        if (continueStatus is ContinueStatusEnum.SetEnvironment)
+        {
+            return GetTypedCommandHandler<SetEnvCommandHandler>();
+        }
+
+        throw new NotSupportedException();
     }
+
+    private ICommandHandler GetTypedCommandHandler<THandler>() 
+        where THandler : ICommandHandler =>
+            _allCommandHandlers.Values
+                .OfType<THandler>()
+                .Single();
 }

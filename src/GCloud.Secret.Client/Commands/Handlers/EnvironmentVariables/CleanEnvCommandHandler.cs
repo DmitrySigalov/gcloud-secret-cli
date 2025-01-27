@@ -17,7 +17,7 @@ public class CleanEnvCommandHandler : ICommandHandler
     
     public string Description => "Clean environment variables";
     
-    public Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -31,6 +31,6 @@ public class CleanEnvCommandHandler : ICommandHandler
         ConsoleHelper.WriteLineInfo(
             "DONE - Cleaned the environment variables system");
 
-        return Task.FromResult(ResultStatusEnum.AllDone);
+        return Task.FromResult(ContinueStatusEnum.Exit);
     }
 }

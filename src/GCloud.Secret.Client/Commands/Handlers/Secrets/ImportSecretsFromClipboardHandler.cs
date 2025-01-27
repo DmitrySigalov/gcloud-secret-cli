@@ -21,7 +21,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
     
     public string Description => "Import secrets (json from the clipboard)";
     
-    public Task<ResultStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
+    public Task<ContinueStatusEnum> Handle(CommandState state, CancellationToken cancellationToken)
     {
         ConsoleHelper.WriteLineNotification($"START - {Description}");
         Console.WriteLine();
@@ -32,7 +32,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineInfo("No imported data");
 
-            return Task.FromResult(ResultStatusEnum.AllDone);
+            return Task.FromResult(ContinueStatusEnum.Exit);
         }
         
         ConsoleHelper.WriteLineInfo($"Imported json:");
@@ -46,7 +46,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError("Not found any profile");
 
-            return Task.FromResult(ResultStatusEnum.AllDone);
+            return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
         var selectedProfileName = 
@@ -63,7 +63,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
         {
             ConsoleHelper.WriteLineError($"Not found profile [{selectedProfileName}]");
 
-            return Task.FromResult(ResultStatusEnum.AllDone);
+            return Task.FromResult(ContinueStatusEnum.Exit);
         }
 
         var newSecrets = selectedProfileDo.BuildSecretDetails(
@@ -83,7 +83,7 @@ public class ImportSecretsFromClipboardHandler : ICommandHandler
         
         ConsoleHelper.WriteLineInfo($"DONE - Imported/saved/dumped {newSecrets.Count} secrets according to profile [{selectedProfileName}]");
 
-        return Task.FromResult(ResultStatusEnum.AllDone);
+        return Task.FromResult(ContinueStatusEnum.Exit);
     }
 
     private (string ClipboardText, Dictionary<string, string> Secrets) GetSecretsFromClipboard()
