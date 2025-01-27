@@ -49,7 +49,7 @@ public class EditProfileCommandHandler : ICommandHandler
                 { saveOperationKey, Save },
                 { "Validate / get secret ids", ValidateGetSecretIdsAsync },
                 { "Set project id", SetProjectId },
-                { "Set advanced settings", SetAdvancedSettings },
+                { "Environment variables naming settings", SetEnvironmentVariableSettings },
                 { "Reset to defaults", ResetDefaultSettings },
            };
 
@@ -149,7 +149,7 @@ public class EditProfileCommandHandler : ICommandHandler
         return Task.CompletedTask;
     }
 
-    private Task SetAdvancedSettings(CommandState commandState)
+    private Task SetEnvironmentVariableSettings(CommandState commandState)
     {
         var newEnvironmentVariablePrefix = Prompt.Input<string>(
             "Enter environment variable prefix",

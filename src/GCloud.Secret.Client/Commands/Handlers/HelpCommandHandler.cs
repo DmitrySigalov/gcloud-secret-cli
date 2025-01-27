@@ -34,7 +34,7 @@ public class HelpCommandHandler : ICommandHandler
     private void PrintUsage()
     {
         ConsoleHelper.WriteLineInfo("Usage:");
-        ConsoleHelper.WriteLineWarn($"{typeof(HelpCommandHandler).Assembly.GetName().Name} | {CLI_NAME} [[<command-name> | <short-name>] [<profile-name>]]");
+        ConsoleHelper.WriteLineWarn($"{typeof(HelpCommandHandler).Assembly.GetName().Name} | {CLI_NAME} [[<command> | <short>] [<profile>]]");
         
         var table = new ConsoleTable("command", "description");
         table.Options.EnableCount = false;

@@ -69,9 +69,29 @@ If everything ran smoothly, you should see the list of supported commands.
 gsclod <command> <profile>
 ```
 
-TODO
-
 FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
+
+2 execution modes:
+- Interactive (not provided command and profile arguments)
+- Not-interactive command execution (exception - command 'edit-profile')
+
+Commands:
+- 'create/edit/delete-profile' - profile configuration commands:
+  - Mapping to google project id
+  - Rules for the creation of environment variable naming settings
+- 'get-secrets' - create secrets dump file with values:
+  - Connect to google project
+  - Get secret ids
+  - Access to secret values
+  - Dump file
+  - Run command 'set-env-var'
+- If you does not have a access to the secret values use the following commands:
+  - 'set/clean-env-var' - sync environment variables with selected profile secrets dump (without connect to Google)
+  - 'import/export-secrets' - import/export accessed secret values (without connect to Google)
+
+## :books: Examples
+
+TODO
 
 
 ## License
