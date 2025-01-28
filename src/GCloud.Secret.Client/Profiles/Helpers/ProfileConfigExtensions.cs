@@ -6,13 +6,6 @@ namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class ProfileConfigExtensions
 {
-    public static ProfileConfig CloneObject(this ProfileConfig profileConfig)
-    {
-        var json = JsonSerializationHelper.Serialize(profileConfig);
-        
-        return JsonSerializationHelper.Deserialize<ProfileConfig>(json);
-    }
-
     public static void PrintProfileConfig(this ProfileConfig profileConfig)
     {
         if (profileConfig == null)
@@ -83,12 +76,12 @@ public static class ProfileConfigExtensions
         this ProfileConfig profileConfig,
         string secretId)
     {
-        if (profileConfig.SecretPathDelimiter == profileConfig.SecretIdDelimiter)
+        if (profileConfig.ConfigPathDelimiter == profileConfig.SecretIdDelimiter)
         {
             return secretId;
         }
         
         return secretId.Replace(profileConfig.SecretIdDelimiter, 
-            profileConfig.SecretPathDelimiter);
+            profileConfig.ConfigPathDelimiter);
     }
 }

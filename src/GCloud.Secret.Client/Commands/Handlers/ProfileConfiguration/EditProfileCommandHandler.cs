@@ -174,16 +174,16 @@ public class EditProfileCommandHandler : ICommandHandler
         }
 
         var newConfigPathDelimiter = Prompt.Select(
-            "Select secret path delimiter",
+            "Select config path delimiter",
             new []
             {
                 '/', '_', '\\',
-                commandState.ProfileConfig.SecretPathDelimiter,
+                commandState.ProfileConfig.ConfigPathDelimiter,
             }.Distinct(),
-            defaultValue: commandState.ProfileConfig.SecretPathDelimiter);
-        if (newConfigPathDelimiter != commandState.ProfileConfig.SecretPathDelimiter)
+            defaultValue: commandState.ProfileConfig.ConfigPathDelimiter);
+        if (newConfigPathDelimiter != commandState.ProfileConfig.ConfigPathDelimiter)
         {
-            commandState.ProfileConfig.SecretPathDelimiter = newConfigPathDelimiter;
+            commandState.ProfileConfig.ConfigPathDelimiter = newConfigPathDelimiter;
         }
 
         return Task.CompletedTask;

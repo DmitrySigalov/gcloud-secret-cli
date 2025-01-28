@@ -29,17 +29,18 @@ The Installer publishes the code to the machine applications directory and adds 
 Installation steps:
 1. Download latest release to local machine
 2. Un-puck sources (installer and src folders)
+3. Navigate to installer folder (with terminal 'cd' command)
 
 - ### Windows
   - Run Installer.exe (as Administrator)
 
 - ### macOS
-    - It will be easier to run the installer correctly with the following command, while in its directory (cd command):
+    - It will be easier to run the installer correctly with the following command, while in its directory:
 ```
 sudo dotnet Installer.dll
 ```
 
-3. Reopen terminal / cmd and run
+4Reopen terminal / cmd and run
 ```
 gcloud-secret-cli help
 ```
@@ -60,8 +61,7 @@ Before using ensure:
 gcloud auth login <user-name>
 ```
 - You have access to the requested google project
-- Optionally you have permission to access to the secret values in the required google project
-
+- Optionally you have permission access to the secret values in the required google project
 
 ```cmd
 gsclod <command> <profile>
@@ -73,12 +73,27 @@ FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
 - Interactive (not provided command and profile arguments)
 - Not-interactive command execution (exception - command 'edit-profile')
 
+### Profile configuration
+
+Profile contains configuration rules:
+- Mapping to google project id (by default equals to profile name)
+- Settings for the resolving of environment variable names
+- Settings for the resolving configuration path
+
+```json
+{
+  "ProjectId": "test",
+  "SecretIdDelimiter": "_",
+  "EnvironmentVariablePrefix": null,
+  "RemoveStartDelimiter": true,
+  "ConfigPathDelimiter": "/"
+}
+```
+
 ## :books: Commands using
 
 ### 'create-profile', 'edit-profile' and 'delete-profile'
-Using to manage profile configuration which includes:
-- Mapping to google project id (by default equals to profile name)
-- Settings for the resolving of environment variable names
+Using to manage profile configuration which includes
 
 ### 'get-secrets'
 Using to synchronize environment variables with google project secrets:
@@ -90,12 +105,12 @@ Using to synchronize environment variables with google project secrets:
 #### macOS
 For the activation of environment variables required to recreate a process (terminal, Rider, ...)
 
-### `view-secrets`
+### 'view-secrets`
 Using to see current status of profile:
 - Print all secrets
 - Synchronization status with environment variables
 
-### `clean-env-var`
+### 'clean-env-var`
 Using to clean environment variables
 
 ### If you don't have access to the secret values
@@ -103,7 +118,7 @@ Using to clean environment variables
 #### 'export-secrets' and 'import-secrets`
 Using to export/import secrets dump (without access to google project)
 
-#### `set-env-var`
+#### 'set-env-var'
 Using to synchronize environment variables from secrets dump file (without access to google project)
 
 
