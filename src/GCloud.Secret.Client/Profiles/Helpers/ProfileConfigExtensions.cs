@@ -6,13 +6,6 @@ namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class ProfileConfigExtensions
 {
-    public static ProfileConfig CloneObject(this ProfileConfig profileConfig)
-    {
-        var json = JsonSerializationHelper.Serialize(profileConfig);
-        
-        return JsonSerializationHelper.Deserialize<ProfileConfig>(json);
-    }
-
     public static void PrintProfileConfig(this ProfileConfig profileConfig)
     {
         if (profileConfig == null)
