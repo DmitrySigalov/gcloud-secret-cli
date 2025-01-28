@@ -76,12 +76,12 @@ public static class ProfileConfigExtensions
         this ProfileConfig profileConfig,
         string secretId)
     {
-        if (profileConfig.SecretPathDelimiter == profileConfig.SecretIdDelimiter)
+        if (profileConfig.ConfigPathDelimiter == profileConfig.SecretIdDelimiter)
         {
             return secretId;
         }
         
         return secretId.Replace(profileConfig.SecretIdDelimiter, 
-            profileConfig.SecretPathDelimiter);
+            profileConfig.ConfigPathDelimiter);
     }
 }
