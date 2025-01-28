@@ -105,12 +105,12 @@ Using to synchronize environment variables with google project secrets:
 #### macOS
 For the activation of environment variables required to recreate a process (terminal, Rider, ...)
 
-### `view-secrets`
+### 'view-secrets`
 Using to see current status of profile:
 - Print all secrets
 - Synchronization status with environment variables
 
-### `clean-env-var`
+### 'clean-env-var`
 Using to clean environment variables
 
 ### If you don't have access to the secret values
@@ -118,7 +118,7 @@ Using to clean environment variables
 #### 'export-secrets' and 'import-secrets`
 Using to export/import secrets dump (without access to google project)
 
-#### `set-env-var`
+#### 'set-env-var'
 Using to synchronize environment variables from secrets dump file (without access to google project)
 
 
