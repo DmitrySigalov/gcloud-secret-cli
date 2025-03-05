@@ -1,4 +1,4 @@
-# gclod-secret-cli
+# gcloud-secret-cli
 
 [![Build](https://github.com/dmitrysigalov/gclod-secret-cli/workflows/Build/badge.svg)](https://github.com/dmitrysigalov/gclod-secret-cli/actions/workflows/build.yml)
 [![License](https://badgen.net/github/license/dmitrysigalov/gclod-secret-cli)](https://github.com/DmitrySigalov/gclod-secret-cli/blob/main/LICENSE)
