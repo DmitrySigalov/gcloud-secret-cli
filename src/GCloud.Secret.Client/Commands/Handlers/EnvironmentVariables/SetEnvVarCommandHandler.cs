@@ -87,7 +87,7 @@ public class SetEnvVarCommandHandler : ICommandHandler
 
         Console.WriteLine();
         ConsoleHelper.WriteLineInfo(
-            $"DONE - Profile [{commandState.ProfileName}] ({newDescriptor.Variables.Count} secrets with value) has synchronized with the environment variables system");
+            $"DONE - Profile [{commandState.ProfileName}] ({newDescriptor.Variables.Count} secrets) has synchronized with the environment variables system");
 
         return Task.FromResult(ContinueStatusEnum.Exit);
     }
