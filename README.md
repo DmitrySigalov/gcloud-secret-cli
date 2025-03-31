@@ -40,7 +40,7 @@ Installation steps:
 sudo dotnet Installer.dll
 ```
 
-4Reopen terminal / cmd and run
+4. Reopen terminal / cmd and run
 ```
 gcloud-secret-cli help
 ```

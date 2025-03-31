@@ -10,6 +10,11 @@ public static class EnvironmentVariablesScriptTextBuilder
 
         foreach (var envVar in environmentVariables)
         {
+            if (envVar.Value == null)
+            {
+                continue;
+            }
+            
             stringBuilder.Append("export ");
 
             stringBuilder.Append(envVar.Key);
