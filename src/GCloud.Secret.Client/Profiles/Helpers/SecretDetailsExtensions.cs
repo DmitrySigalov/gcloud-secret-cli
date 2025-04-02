@@ -5,6 +5,8 @@ namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class SecretDetailsExtensions
 {
+    private const int MaxDecodedValueLengthToDisplay = 100;
+
     public static IDictionary<string, string> ToSecretsDictionary(this IDictionary<string, SecretDetails> secrets) =>
         secrets
             .ToDictionary(
@@ -43,12 +45,23 @@ public static class SecretDetailsExtensions
 
         foreach (var secretDetails in secrets)
         {
+            var valueToDisplay = $"<{secretDetails.Value.AccessStatusCode}>";
+            if (secretDetails.Value.AccessStatusCode == StatusCode.OK)
+            {
+                valueToDisplay = secretDetails
+                    .Value
+                    .DecodedValue?
+                    .Replace("\n", "<br/>");
+                if (valueToDisplay?.Length > MaxDecodedValueLengthToDisplay)
+                {
+                    valueToDisplay = valueToDisplay.Substring(0, MaxDecodedValueLengthToDisplay - 3) + "...";
+                }
+            }
+            
             table.AddRow(secretDetails.Key, 
                 secretDetails.Value.ConfigPath, 
                 secretDetails.Value.EnvironmentVariable, 
-                secretDetails.Value.AccessStatusCode == StatusCode.OK 
-                    ? secretDetails.Value.DecodedValue
-                    : $"<{secretDetails.Value.AccessStatusCode}>");
+                valueToDisplay);
         }
 
         table.Write(Format.Minimal);

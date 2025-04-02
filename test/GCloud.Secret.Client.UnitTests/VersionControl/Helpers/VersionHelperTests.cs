@@ -9,7 +9,7 @@ public class VersionHelperTests
     {
         var expectedAssemblyMajorVersion = 1;
         var expectedAssemblyMinorVersion = 0;
-        var expectedAssemblBuildVersion = 1;
+        var expectedAssemblBuildVersion = 2;
         
         var expectedCurrentVersion = $"v{expectedAssemblyMajorVersion}.{expectedAssemblyMinorVersion}.{expectedAssemblBuildVersion}";
         
@@ -23,7 +23,7 @@ public class VersionHelperTests
     {
         var expectedAssemblyMajorVersion = 1;
         var expectedAssemblyMinorVersion = 0;
-        var expectedAssemblBuildVersion = 1;
+        var expectedAssemblBuildVersion = 2;
         
         var assemblyVersion = typeof(VersionHelper).Assembly.GetName().Version!;
         var expectedCurrentVersion = $"v{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
