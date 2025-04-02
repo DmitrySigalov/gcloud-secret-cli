@@ -51,7 +51,7 @@ public static class SecretDetailsExtensions
                 valueToDisplay = secretDetails
                     .Value
                     .DecodedValue?
-                    .Replace(Environment.NewLine, "<br/>");
+                    .Replace("\n", "<br/>");
                 if (valueToDisplay?.Length > MaxDecodedValueLengthToDisplay)
                 {
                     valueToDisplay = valueToDisplay.Substring(0, MaxDecodedValueLengthToDisplay - 3) + "...";
