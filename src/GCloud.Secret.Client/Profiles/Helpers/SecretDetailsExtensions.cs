@@ -43,12 +43,16 @@ public static class SecretDetailsExtensions
 
         foreach (var secretDetails in secrets)
         {
+            var valueToDisplay = $"<{secretDetails.Value.AccessStatusCode}>";
+            if (secretDetails.Value.AccessStatusCode == StatusCode.OK)
+            {
+                valueToDisplay = secretDetails.Value.DecodedValue;
+            }
+            
             table.AddRow(secretDetails.Key, 
                 secretDetails.Value.ConfigPath, 
                 secretDetails.Value.EnvironmentVariable, 
-                secretDetails.Value.AccessStatusCode == StatusCode.OK 
-                    ? secretDetails.Value.DecodedValue
-                    : $"<{secretDetails.Value.AccessStatusCode}>");
+                valueToDisplay);
         }
 
         table.Write(Format.Minimal);
