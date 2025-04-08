@@ -27,12 +27,11 @@ public static class SecretDetailsExtensions
     
     public static void PrintSecretsMappingIdNames(this IDictionary<string, SecretDetails> secrets)
     {
-        var table = new ConsoleTable("secret-id", "config-path", "environment-variable");
+        var table = new ConsoleTable("secret-id", "environment-variable");
 
         foreach (var names in secrets)
         {
             table.AddRow(names.Key, 
-                names.Value.ConfigPath, 
                 names.Value.EnvironmentVariable);
         }
 
@@ -41,7 +40,7 @@ public static class SecretDetailsExtensions
     
     public static void PrintSecretsMappingIdNamesAccessValues(this IDictionary<string, SecretDetails> secrets)
     {
-        var table = new ConsoleTable("secret-id", "config-path", "environment-variable", "decoded-value");
+        var table = new ConsoleTable("secret-id", "environment-variable", "decoded-value");
 
         foreach (var secretDetails in secrets)
         {
@@ -59,7 +58,6 @@ public static class SecretDetailsExtensions
             }
             
             table.AddRow(secretDetails.Key, 
-                secretDetails.Value.ConfigPath, 
                 secretDetails.Value.EnvironmentVariable, 
                 valueToDisplay);
         }
