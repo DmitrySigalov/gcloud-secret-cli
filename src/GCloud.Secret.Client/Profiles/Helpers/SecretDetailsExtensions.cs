@@ -50,7 +50,7 @@ public static class SecretDetailsExtensions
             var maxAllowedDecodedValueSLengthToDisplay = Console.BufferWidth 
                                                          - (table.Columns.Count + 1) // Number of column-splitters
                                                          - secrets.Keys.Max(x => x?.Length ?? 0)
-                                                         - secrets.Values.Max(x => x?.DecodedValue?.Length ?? 0)
+                                                         - secrets.Values.Max(x => x?.EnvironmentVariable?.Length ?? 0)
                                                          - Enum.GetNames<StatusCode>().Max(x => x.Length);
             
             foreach (var secretDetails in secrets)
