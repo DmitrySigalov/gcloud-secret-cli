@@ -1,5 +1,7 @@
 using ConsoleTables;
 using GCloud.Secret.Client.Common;
+using Google.Rpc;
+using Grpc.Core;
 
 namespace GCloud.Secret.Client.Profiles.Helpers;
 
@@ -46,10 +48,10 @@ public static class SecretDetailsExtensions
         if (secrets.Any())
         {
             var maxAllowedDecodedValueSLengthToDisplay = Console.BufferWidth 
-                                                         - (table.Columns.Count + 1) * 2 // Number of splitted columns
+                                                         - (table.Columns.Count + 1) // Number of column-splitters
                                                          - secrets.Keys.Max(x => x?.Length ?? 0)
                                                          - secrets.Values.Max(x => x?.DecodedValue?.Length ?? 0)
-                                                         - secrets.Values.Max(x => x?.AccessStatusCode.ToString().Length ?? 0);
+                                                         - Enum.GetNames<StatusCode>().Max(x => x.Length);
             
             foreach (var secretDetails in secrets)
             {
