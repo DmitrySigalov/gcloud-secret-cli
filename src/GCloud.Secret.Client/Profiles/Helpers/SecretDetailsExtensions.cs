@@ -1,11 +1,12 @@
 using ConsoleTables;
-using Grpc.Core;
+using GCloud.Secret.Client.Common;
 
 namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class SecretDetailsExtensions
 {
-    private const int MaxDecodedValueLengthToDisplay = 100;
+    private const int MaxDecodedValueLengthToDisplay = 50;
+    private const string SeeBelow = "<See below>";
 
     public static IDictionary<string, string> ToSecretsDictionary(this IDictionary<string, SecretDetails> secrets) =>
         secrets
@@ -31,8 +32,7 @@ public static class SecretDetailsExtensions
 
         foreach (var names in secrets)
         {
-            table.AddRow(names.Key, 
-                names.Value.EnvironmentVariable);
+            table.AddRow(names.Key, names.Value.EnvironmentVariable);
         }
 
         table.Write(Format.Minimal);
@@ -40,28 +40,46 @@ public static class SecretDetailsExtensions
     
     public static void PrintSecretsMappingIdNamesAccessValues(this IDictionary<string, SecretDetails> secrets)
     {
-        var table = new ConsoleTable("secret-id", "environment-variable", "decoded-value");
+        var notDisplayedValues = new Dictionary<string, SecretDetails>();
+        
+        var table = new ConsoleTable("secret-id", "environment-variable", "access-status", "decoded-value");
 
         foreach (var secretDetails in secrets)
         {
-            var valueToDisplay = $"<{secretDetails.Value.AccessStatusCode}>";
-            if (secretDetails.Value.AccessStatusCode == StatusCode.OK)
+            var status = secretDetails.Value.AccessStatusCode.ToString();
+            var valueToDisplay = secretDetails.Value.DecodedValue;
+
+            if (valueToDisplay != null)
             {
-                valueToDisplay = secretDetails
-                    .Value
-                    .DecodedValue?
-                    .Replace("\n", "<br/>");
-                if (valueToDisplay?.Length > MaxDecodedValueLengthToDisplay)
+                if (valueToDisplay.Length > MaxDecodedValueLengthToDisplay)
                 {
-                    valueToDisplay = valueToDisplay.Substring(0, MaxDecodedValueLengthToDisplay - 3) + "...";
+                    valueToDisplay = SeeBelow;
+                    notDisplayedValues[secretDetails.Key] = secretDetails.Value;
+                }
+                else if (valueToDisplay.Contains('\n') || valueToDisplay.Contains(Environment.NewLine))
+                {
+                    valueToDisplay = SeeBelow;
+                    notDisplayedValues[secretDetails.Key] = secretDetails.Value;
                 }
             }
-            
-            table.AddRow(secretDetails.Key, 
-                secretDetails.Value.EnvironmentVariable, 
+
+            table.AddRow(
+                secretDetails.Key,
+                secretDetails.Value.EnvironmentVariable,
+                status,
                 valueToDisplay);
         }
 
         table.Write(Format.Minimal);
+
+        if (notDisplayedValues.Any())
+        {
+            foreach (var secretDetails in notDisplayedValues)
+            {
+                ConsoleHelper.WriteInfo(secretDetails.Key + ": ");
+                Console.WriteLine(secretDetails.Value.DecodedValue);
+            }
+            Console.WriteLine();
+        }
     }
 }
