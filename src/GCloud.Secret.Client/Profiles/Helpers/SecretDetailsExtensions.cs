@@ -1,13 +1,13 @@
 using ConsoleTables;
 using GCloud.Secret.Client.Common;
-using Google.Rpc;
 using Grpc.Core;
 
 namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class SecretDetailsExtensions
 {
-    private const string SeeBelow = "<See below>";
+    private const string NullLabel = "<Null>";
+    private const string SeeBelowLabel = "<See below>";
 
     public static IDictionary<string, string> ToSecretsDictionary(this IDictionary<string, SecretDetails> secrets) =>
         secrets
@@ -29,7 +29,7 @@ public static class SecretDetailsExtensions
     
     public static void PrintSecretsMappingIdNames(this IDictionary<string, SecretDetails> secrets)
     {
-        var table = new ConsoleTable("secret-id", "environment-variable");
+        var table = new ConsoleTable("secret-id", "env-variable");
 
         foreach (var names in secrets)
         {
@@ -43,39 +43,41 @@ public static class SecretDetailsExtensions
     {
         var notDisplayedValues = new Dictionary<string, SecretDetails>();
         
-        var table = new ConsoleTable("secret-id", "environment-variable", "access-status", "decoded-value");
+        var table = new ConsoleTable("secret-id", "env-variable", "secret-value");
 
         if (secrets.Any())
         {
             var maxAllowedDecodedValueSLengthToDisplay = Console.BufferWidth 
-                                                         - (table.Columns.Count + 1) // Number of column-splitters
+                                                         - (table.Columns.Count + 1) * 3 // Number of column-splitters
                                                          - secrets.Keys.Max(x => x?.Length ?? 0)
-                                                         - secrets.Values.Max(x => x?.DecodedValue?.Length ?? 0)
-                                                         - Enum.GetNames<StatusCode>().Max(x => x.Length);
+                                                         - secrets.Values.Max(x => x?.EnvironmentVariable?.Length ?? 0);
             
             foreach (var secretDetails in secrets)
             {
-                var status = secretDetails.Value.AccessStatusCode.ToString();
                 var valueToDisplay = secretDetails.Value.DecodedValue;
 
-                if (valueToDisplay != null)
+                if (secretDetails.Value.AccessStatusCode != StatusCode.OK)
                 {
-                    if (valueToDisplay.Length > maxAllowedDecodedValueSLengthToDisplay)
-                    {
-                        valueToDisplay = SeeBelow;
-                        notDisplayedValues[secretDetails.Key] = secretDetails.Value;
-                    }
-                    else if (valueToDisplay.Contains('\n') || valueToDisplay.Contains(Environment.NewLine))
-                    {
-                        valueToDisplay = SeeBelow;
-                        notDisplayedValues[secretDetails.Key] = secretDetails.Value;
-                    }
+                    valueToDisplay = $"<{secretDetails.Value.AccessStatusCode}>";
+                }
+                else if (valueToDisplay == null)
+                {
+                    valueToDisplay = NullLabel;
+                }
+                else if (valueToDisplay.Length > maxAllowedDecodedValueSLengthToDisplay)
+                {
+                    valueToDisplay = SeeBelowLabel;
+                    notDisplayedValues[secretDetails.Key] = secretDetails.Value;
+                }
+                else if (valueToDisplay.Contains('\n') || valueToDisplay.Contains(Environment.NewLine))
+                {
+                    valueToDisplay = SeeBelowLabel;
+                    notDisplayedValues[secretDetails.Key] = secretDetails.Value;
                 }
 
                 table.AddRow(
                     secretDetails.Key,
                     secretDetails.Value.EnvironmentVariable,
-                    status,
                     valueToDisplay);
             }
         }
@@ -86,10 +88,10 @@ public static class SecretDetailsExtensions
         {
             foreach (var secretDetails in notDisplayedValues)
             {
-                ConsoleHelper.WriteWarn(secretDetails.Key + ": ");
+                ConsoleHelper.WriteLineWarn(secretDetails.Key + ": ");
                 Console.WriteLine(secretDetails.Value.DecodedValue);
+                Console.WriteLine();
             }
-            Console.WriteLine();
         }
     }
 }
