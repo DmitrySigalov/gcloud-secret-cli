@@ -78,15 +78,13 @@ FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
 Profile contains configuration rules:
 - Mapping to google project id (by default equals to profile name)
 - Settings for the resolving of environment variable names
-- Settings for the resolving configuration path
 
 ```json
 {
   "ProjectId": "test",
   "SecretIdDelimiter": "_",
   "EnvironmentVariablePrefix": null,
-  "RemoveStartDelimiter": true,
-  "ConfigPathDelimiter": "/"
+  "RemoveStartDelimiter": true
 }
 ```
 
