@@ -10,7 +10,6 @@ public class ProfileConfigTests
         Assert.Equal("<google-project-id>", profileConfig.ProjectId);
 
         Assert.Equal('_', profileConfig.SecretIdDelimiter);
-        Assert.Equal('/', profileConfig.ConfigPathDelimiter);
         
         Assert.Null(profileConfig.EnvironmentVariablePrefix);
         

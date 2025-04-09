@@ -78,15 +78,13 @@ FYI - The CLI can be executed using the commands `gscli` or `gclou-secret-cli`.
 Profile contains configuration rules:
 - Mapping to google project id (by default equals to profile name)
 - Settings for the resolving of environment variable names
-- Settings for the resolving configuration path
 
 ```json
 {
   "ProjectId": "test",
   "SecretIdDelimiter": "_",
   "EnvironmentVariablePrefix": null,
-  "RemoveStartDelimiter": true,
-  "ConfigPathDelimiter": "/"
+  "RemoveStartDelimiter": true
 }
 ```
 
@@ -125,9 +123,11 @@ Using to synchronize environment variables from secrets dump file (without acces
 ## :gift: New Release Creation Process
 
 - Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
-- After merge into main
-- Create a new release:
-  - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
+- Fix unit test
+- Create pull request
+- For merge pull request use <Squash and merge> option
+- In the main branch create a new release:
+  - Create new tag contains prefix 'v' and VersionPrefix. Examples - 'v1.1.0'
   - Release name is based on created tag name
   - Mark a new release as latest
 - Every day command line check if changed a new latest release and indicate about changes with instructions.

@@ -135,15 +135,12 @@ public class EditProfileCommandHandler : ICommandHandler
 
     private Task SetProjectId(CommandState commandState)
     {
-        var hasChanges = false;
-
         var newProjectId = Prompt.Input<string>(
             "Enter new project id",
             defaultValue: commandState.ProfileConfig.ProjectId);
         if (!string.IsNullOrEmpty(newProjectId))
         {
             commandState.ProfileConfig.ProjectId = newProjectId;
-            hasChanges = true;
         }
 
         return Task.CompletedTask;
@@ -171,19 +168,6 @@ public class EditProfileCommandHandler : ICommandHandler
         if (newRemoveStartDelimiter != commandState.ProfileConfig.RemoveStartDelimiter)
         {
             commandState.ProfileConfig.RemoveStartDelimiter = newRemoveStartDelimiter;
-        }
-
-        var newConfigPathDelimiter = Prompt.Select(
-            "Select config path delimiter",
-            new []
-            {
-                '/', '_', '\\',
-                commandState.ProfileConfig.ConfigPathDelimiter,
-            }.Distinct(),
-            defaultValue: commandState.ProfileConfig.ConfigPathDelimiter);
-        if (newConfigPathDelimiter != commandState.ProfileConfig.ConfigPathDelimiter)
-        {
-            commandState.ProfileConfig.ConfigPathDelimiter = newConfigPathDelimiter;
         }
 
         return Task.CompletedTask;
