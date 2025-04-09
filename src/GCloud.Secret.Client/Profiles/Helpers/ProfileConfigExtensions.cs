@@ -36,8 +36,6 @@ public static class ProfileConfigExtensions
             return result;
         }
         
-        result.ConfigPath = profileConfig.ConvertToPath(secretId);
-        
         result.EnvironmentVariable = profileConfig.ConvertToEnvironmentVariableName(secretId);
         
         return result;
@@ -70,18 +68,5 @@ public static class ProfileConfigExtensions
         }
 
         return result.ToString().Trim().ToUpper();
-    }
-    
-    private static string ConvertToPath(
-        this ProfileConfig profileConfig,
-        string secretId)
-    {
-        if (profileConfig.ConfigPathDelimiter == profileConfig.SecretIdDelimiter)
-        {
-            return secretId;
-        }
-        
-        return secretId.Replace(profileConfig.SecretIdDelimiter, 
-            profileConfig.ConfigPathDelimiter);
     }
 }

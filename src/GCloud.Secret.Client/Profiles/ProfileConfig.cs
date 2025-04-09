@@ -9,6 +9,4 @@ public sealed class ProfileConfig
     public string EnvironmentVariablePrefix { get; set; }
 
     public bool RemoveStartDelimiter { get; set; } = true;
-
-    public char ConfigPathDelimiter { get; set; } = '/';
 }

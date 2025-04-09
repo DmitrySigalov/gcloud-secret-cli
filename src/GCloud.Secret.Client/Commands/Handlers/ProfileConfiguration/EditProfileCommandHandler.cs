@@ -173,19 +173,6 @@ public class EditProfileCommandHandler : ICommandHandler
             commandState.ProfileConfig.RemoveStartDelimiter = newRemoveStartDelimiter;
         }
 
-        var newConfigPathDelimiter = Prompt.Select(
-            "Select config path delimiter",
-            new []
-            {
-                '/', '_', '\\',
-                commandState.ProfileConfig.ConfigPathDelimiter,
-            }.Distinct(),
-            defaultValue: commandState.ProfileConfig.ConfigPathDelimiter);
-        if (newConfigPathDelimiter != commandState.ProfileConfig.ConfigPathDelimiter)
-        {
-            commandState.ProfileConfig.ConfigPathDelimiter = newConfigPathDelimiter;
-        }
-
         return Task.CompletedTask;
     }
     

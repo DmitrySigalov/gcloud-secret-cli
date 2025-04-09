@@ -19,11 +19,6 @@ public class ProfileConfigExtensionsTests
             "folder2-no-prefix_sub-folder1_param1",
         };
 
-        var expectedConfigPathMapping = secretIds
-            .ToDictionary(
-                x => x,
-                y => y.Replace(profileConfig.SecretIdDelimiter, profileConfig.ConfigPathDelimiter));
-
         var expectedEnvironmentVariablesMapping = secretIds
             .ToDictionary(
                 x => x,
@@ -39,8 +34,6 @@ public class ProfileConfigExtensionsTests
         {
             Assert.Contains(check.Key, secretIds);
             
-            Assert.Equal(expectedConfigPathMapping[check.Key], check.Value.ConfigPath);
-            
             Assert.Equal(expectedEnvironmentVariablesMapping[check.Key], check.Value.EnvironmentVariable);
         });
     }
@@ -51,7 +44,6 @@ public class ProfileConfigExtensionsTests
         var profileConfig = new ProfileConfig
         {
             ProjectId = "test-project",
-            ConfigPathDelimiter = '\\',
             EnvironmentVariablePrefix = "TEST_PREFIX_",
             RemoveStartDelimiter = false,
         };
@@ -62,11 +54,6 @@ public class ProfileConfigExtensionsTests
             "folder1-no-prefix_sub-folder1_param2",
             "folder2-no-prefix_sub-folder1_param1",
         };
-
-        var expectedConfigPathMapping = secretIds
-            .ToDictionary(
-                x => x,
-                y => y.Replace(profileConfig.SecretIdDelimiter, profileConfig.ConfigPathDelimiter));
 
         var expectedEnvironmentVariablesMapping = secretIds
             .ToDictionary(
@@ -82,8 +69,6 @@ public class ProfileConfigExtensionsTests
         Assert.All(result, check =>
         {
             Assert.Contains(check.Key, secretIds);
-            
-            Assert.Equal(expectedConfigPathMapping[check.Key], check.Value.ConfigPath);
             
             Assert.Equal(expectedEnvironmentVariablesMapping[check.Key], check.Value.EnvironmentVariable);
         });
