@@ -125,7 +125,7 @@ Using to synchronize environment variables from secrets dump file (without acces
 - Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
 - Fix unit test
 - Create pull request
-- For merge pull request use <Squash and merge> option
+- For merge pull request use "Squash and merge" option
 - In the main branch create a new release:
   - Create new tag contains prefix 'v' and VersionPrefix. Examples - 'v1.1.0'
   - Release name is based on created tag name
