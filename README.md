@@ -125,6 +125,7 @@ Using to synchronize environment variables from secrets dump file (without acces
 ## :gift: New Release Creation Process
 
 - Update VersionPrefix (major, minor and build numbers) in the file [Directory.Build.props](Directory.Build.props).
+- Fix unit test
 - After merge into main
 - Create a new release:
   - Create new tag contains prefix 'v' and VersionPrefix. Example - 'v1.0.0'
