@@ -6,7 +6,7 @@ public class JsonSerializationHelperTests
 {
     public class TestClass
     {
-        public string StringProperty { get; set; }
+        public required string StringProperty { get; set; }
     }
 
     [Fact]

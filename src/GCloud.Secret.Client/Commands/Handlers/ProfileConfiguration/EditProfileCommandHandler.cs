@@ -135,15 +135,12 @@ public class EditProfileCommandHandler : ICommandHandler
 
     private Task SetProjectId(CommandState commandState)
     {
-        var hasChanges = false;
-
         var newProjectId = Prompt.Input<string>(
             "Enter new project id",
             defaultValue: commandState.ProfileConfig.ProjectId);
         if (!string.IsNullOrEmpty(newProjectId))
         {
             commandState.ProfileConfig.ProjectId = newProjectId;
-            hasChanges = true;
         }
 
         return Task.CompletedTask;
