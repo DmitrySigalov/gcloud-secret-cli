@@ -8,8 +8,8 @@ public class VersionHelperTests
     public void RuntimeVersion_ShouldFormattedWithMajorMinorAndBuildVersions_AndAddedVPrefix()
     {
         var expectedAssemblyMajorVersion = 1;
-        var expectedAssemblyMinorVersion = 0;
-        var expectedAssemblBuildVersion = 3;
+        var expectedAssemblyMinorVersion = 1;
+        var expectedAssemblBuildVersion = 0;
         
         var expectedCurrentVersion = $"v{expectedAssemblyMajorVersion}.{expectedAssemblyMinorVersion}.{expectedAssemblBuildVersion}";
         
@@ -22,8 +22,8 @@ public class VersionHelperTests
     public void RuntimeVersion_ShouldReturnFromAssemblyVersion()
     {
         var expectedAssemblyMajorVersion = 1;
-        var expectedAssemblyMinorVersion = 0;
-        var expectedAssemblBuildVersion = 3;
+        var expectedAssemblyMinorVersion = 1;
+        var expectedAssemblBuildVersion = 0;
         
         var assemblyVersion = typeof(VersionHelper).Assembly.GetName().Version!;
         var expectedCurrentVersion = $"v{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
