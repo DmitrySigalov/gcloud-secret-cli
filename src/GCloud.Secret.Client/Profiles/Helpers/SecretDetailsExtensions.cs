@@ -29,7 +29,7 @@ public static class SecretDetailsExtensions
     
     public static void PrintSecretsMappingIdNames(this IDictionary<string, SecretDetails> secrets)
     {
-        var table = new ConsoleTable("secret-id", "environment-variable");
+        var table = new ConsoleTable("secret-id", "env-variable");
 
         foreach (var names in secrets)
         {
@@ -43,7 +43,7 @@ public static class SecretDetailsExtensions
     {
         var notDisplayedValues = new Dictionary<string, SecretDetails>();
         
-        var table = new ConsoleTable("secret-id", "environment-variable", "decoded-value");
+        var table = new ConsoleTable("secret-id", "env-variable", "secret-value");
 
         if (secrets.Any())
         {
