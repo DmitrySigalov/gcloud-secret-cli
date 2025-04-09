@@ -5,7 +5,6 @@ namespace GCloud.Secret.Client.Profiles.Helpers;
 
 public static class SecretDetailsExtensions
 {
-    private const int MaxDecodedValueLengthToDisplay = 50;
     private const string SeeBelow = "<See below>";
 
     public static IDictionary<string, string> ToSecretsDictionary(this IDictionary<string, SecretDetails> secrets) =>
@@ -44,30 +43,39 @@ public static class SecretDetailsExtensions
         
         var table = new ConsoleTable("secret-id", "environment-variable", "access-status", "decoded-value");
 
-        foreach (var secretDetails in secrets)
+        if (secrets.Any())
         {
-            var status = secretDetails.Value.AccessStatusCode.ToString();
-            var valueToDisplay = secretDetails.Value.DecodedValue;
-
-            if (valueToDisplay != null)
+            var maxAllowedDecodedValueSLengthToDisplay = Console.BufferWidth 
+                                                         - (table.Columns.Count + 1) * 2 // Number of splitted columns
+                                                         - secrets.Keys.Max(x => x?.Length ?? 0)
+                                                         - secrets.Values.Max(x => x?.DecodedValue?.Length ?? 0)
+                                                         - secrets.Values.Max(x => x?.AccessStatusCode.ToString().Length ?? 0);
+            
+            foreach (var secretDetails in secrets)
             {
-                if (valueToDisplay.Length > MaxDecodedValueLengthToDisplay)
-                {
-                    valueToDisplay = SeeBelow;
-                    notDisplayedValues[secretDetails.Key] = secretDetails.Value;
-                }
-                else if (valueToDisplay.Contains('\n') || valueToDisplay.Contains(Environment.NewLine))
-                {
-                    valueToDisplay = SeeBelow;
-                    notDisplayedValues[secretDetails.Key] = secretDetails.Value;
-                }
-            }
+                var status = secretDetails.Value.AccessStatusCode.ToString();
+                var valueToDisplay = secretDetails.Value.DecodedValue;
 
-            table.AddRow(
-                secretDetails.Key,
-                secretDetails.Value.EnvironmentVariable,
-                status,
-                valueToDisplay);
+                if (valueToDisplay != null)
+                {
+                    if (valueToDisplay.Length > maxAllowedDecodedValueSLengthToDisplay)
+                    {
+                        valueToDisplay = SeeBelow;
+                        notDisplayedValues[secretDetails.Key] = secretDetails.Value;
+                    }
+                    else if (valueToDisplay.Contains('\n') || valueToDisplay.Contains(Environment.NewLine))
+                    {
+                        valueToDisplay = SeeBelow;
+                        notDisplayedValues[secretDetails.Key] = secretDetails.Value;
+                    }
+                }
+
+                table.AddRow(
+                    secretDetails.Key,
+                    secretDetails.Value.EnvironmentVariable,
+                    status,
+                    valueToDisplay);
+            }
         }
 
         table.Write(Format.Minimal);
@@ -76,7 +84,7 @@ public static class SecretDetailsExtensions
         {
             foreach (var secretDetails in notDisplayedValues)
             {
-                ConsoleHelper.WriteInfo(secretDetails.Key + ": ");
+                ConsoleHelper.WriteWarn(secretDetails.Key + ": ");
                 Console.WriteLine(secretDetails.Value.DecodedValue);
             }
             Console.WriteLine();
